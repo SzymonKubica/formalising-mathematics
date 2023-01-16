@@ -43,55 +43,126 @@ variables (P Q R : Prop)
 
 example : ¬ true → false :=
 begin
-  by_contra,
+  intro h,
+  change true -> false at h,
+  apply h,
+  triv,
 end
 
 example : false → ¬ true :=
 begin
-  sorry
+  intro h,
+  exfalso,
+  exact h,
 end
 
 example : ¬ false → true :=
 begin
-  sorry
+  intro h,
+  triv,
 end
 
 example : true → ¬ false :=
 begin
-  sorry
+  intro h0,
+  by_contra,
+  exact h,
 end
 
 example : false → ¬ P :=
 begin
-  sorry
+  intro h0,
+  by_contra,
+  exact h0,
+end
+
+lemma EM : P ∧ ¬ P -> false :=
+begin
+  intro h1,
+  cases h1,
+  change P -> false at h1_right,
+  apply h1_right,
+  exact h1_left,
+end
+
+lemma EM_2 : (P ∧ ¬ P) -> false :=
+begin
+  intro h1,
+  cases h1,
+  change P -> false at h1_right,
+  apply h1_right,
+  exact h1_left,
 end
 
 example : P → ¬ P → false :=
 begin
-  sorry
+  intro h1,
+  intro h2,
+  have h3 : P ∧ ¬ P,
+  split,
+  exact h1,
+  exact h2,
+  apply EM,
+  exact h3,
 end
 
 example : P → ¬ (¬ P) :=
 begin
-  sorry
+  intro h,
+  change not P -> false,
+  intro h1,
+  have h2 : P ∧ ¬ P,
+  split,
+  exact h,
+  exact h1,
+  apply EM,
+  exact h2,
 end
 
 example : (P → Q) → (¬ Q → ¬ P) :=
 begin
-  sorry
+  intro h1,
+  intro h2,
+  by_contra,
+  change Q -> false at h2,
+  apply h2,
+  apply h1,
+  exact h,
 end
 
 example : ¬ ¬ false → false :=
 begin
-  sorry
+  intro h1,
+  change ¬ false → false at h1,
+  apply h1,
+  change false -> false,
+  intro h2,
+  exact h2,
 end
 
 example : ¬ ¬ P → P :=
 begin
-  sorry
+  intro h1,
+  change ¬ P → false at h1,
+  by_contra,
+  apply h1,
+  exact h,
 end
 
 example : (¬ Q → ¬ P) → (P → Q) :=
 begin
-  sorry,
+  intro h1,
+  intro h2,
+  by_contra,
+  have h3: ¬ P :=
+  begin
+    apply h1,
+    exact h,
+  end,
+  have h4: P ∧ ¬ P,
+  split,
+  exact h2,
+  exact h3,
+  apply EM,
+  exact h4,
 end
