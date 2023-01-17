@@ -11,7 +11,7 @@ import data.real.basic -- imports the real numbers
 
 # The real numbers in Lean
 
-Lean has a copy of of the real numbers. It's called `real`, 
+Lean has a copy of of the real numbers. It's called `real`,
 but we use the usual notation `ℝ`. Put your cursor on the `ℝ` to find
 out how to type it in VS Code.
 
@@ -33,30 +33,34 @@ New tactics you'll need to know about:
 
 example : (2 : ℝ) + 2 = 4 :=
 begin
-  sorry
+  norm_num,
 end
 
 example : (2 : ℝ) + 2 ≠ 5 :=
 begin
-  sorry
+  norm_num,
 end
 
 example : (2 : ℝ) + 2 < 5 :=
 begin
-  sorry
+  norm_num,
 end
 
 example : ∃ (x : ℝ), 3 * x + 7 = 12 :=
 begin
-  sorry
+  use 5/3,
+  norm_num,
 end
 
 example : ∃ (x : ℝ), 3 * x + 7 ≠ 12 :=
 begin
-  sorry
+  use 0,
+  norm_num,
 end
 
 example : ∃ (x y : ℝ), 2 * x + 3 * y = 7 ∧ x + 2 * y = 4 :=
 begin
-  sorry,
+  use 2,
+  use 1,
+  norm_num,
 end
