@@ -29,6 +29,22 @@ begin
   refl,
 end
 
+-- Alternative
+example : (P ↔ Q) → (Q ↔ P) :=
+begin
+  intro h,
+  cases h,
+  split;
+  assumption,
+end
+
+-- Alternative
+example : (P ↔ Q) → (Q ↔ P) :=
+begin
+  intro h,
+  rw h,
+end
+
 example : (P ↔ Q) → (Q ↔ P) :=
 begin
   intro h,

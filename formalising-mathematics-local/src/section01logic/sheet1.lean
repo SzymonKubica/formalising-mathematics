@@ -143,6 +143,9 @@ begin
   exact h3,
 end
 
+--example : (P → Q → R) → (P → Q) → (P → R) :=
+--λ hPQ hQR hP, hPQ (hQR hP)
+
 /-
 Here are some harder puzzles. They won't teach you anything new about
 Lean, they're just trickier. If you're not into logic puzzles

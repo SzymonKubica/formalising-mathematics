@@ -40,16 +40,18 @@ begin
   exact right,
 end
 
+
 example : (P → Q → R) → (P ∧ Q → R) :=
 begin
-  intro h1,
-  intro h2,
+  intros h1 h2,
   cases h2,
   apply h1,
   exact h2_left,
   exact h2_right,
 end
 
+-- !!!!!!!!
+-- Bad code !!!!!! Don't do that
 example : P → Q → P ∧ Q :=
 begin
   intro h1,
@@ -57,6 +59,23 @@ begin
   split,
   exact h1,
   exact h2,
+end
+
+-- Better code style below:
+example : P → Q → P ∧ Q :=
+begin
+  intros h1 h2,
+  split,
+  { exact h1, },
+  { exact h2, },
+end
+
+-- Or even more fancy:
+example : P → Q → P ∧ Q :=
+begin
+  intros h1 h2,
+  split,
+  exacts [h1, h2],
 end
 
 /-- `∧` is symmetric -/

@@ -52,6 +52,13 @@ begin
   exact h,
 end
 
+example (P : Prop) : false → P :=
+begin
+  rintro h,
+  exfalso,
+  exact h,
+end
+
 example : (true → false) → false :=
 begin
   intro h1,
