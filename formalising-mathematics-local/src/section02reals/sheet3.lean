@@ -52,6 +52,15 @@ is the assertion that the limit of `a(n)` as `n → ∞` is `t`. -/
 def tends_to (a : ℕ → ℝ) (t : ℝ) : Prop :=
 ∀ ε > 0, ∃ B : ℕ, ∀ n, B ≤ n → |a n - t| < ε
 
+def P : Prop := tends_to (λ n, 37) 42
+theorem P_is_false : ¬ P :=
+begin
+  by_contra,
+  rw P at h,
+  rw tends_to at h,
+  norm_num at h,
+  sorry,
+end
 /-
 
 We've made a definition, so it's our job to now make the API
@@ -84,15 +93,15 @@ but it can't do anything with it if it's a variable.
 /-- The limit of the constant sequence with value 37 is 37. -/
 theorem tends_to_thirtyseven : tends_to (λ n, 37) 37 :=
 begin
-  rw tends_to,
-  intro ε,
-  intro h1,
+  rw tends_to, -- rewrite works only on equality and iff
+  intros ε hε,
   use 2,
-  intro n,
-  intro h2,
-  norm_num,
-  exact h1,
+  intros n hn,
+  simp only [abs_zero, sub_self],
+  exact hε,
 end
+
+-- add ? for some debug informations.
 
 /-- The limit of the constant sequence with value `c` is `c`. -/
 theorem tends_to_const (c : ℝ) : tends_to (λ n, c) c :=
@@ -108,13 +117,29 @@ begin
 end
 
 /-- If `a(n)` tends to `t` then `a(n) + c` tends to `t + c` -/
+theorem tends_to_add_const_specialise {a : ℕ → ℝ} {t : ℝ} (c : ℝ)
+  (h : tends_to a t) :
+  tends_to (λ n, a n + c) (t + c) :=
+begin
+  rw tends_to at *,
+  intros ε hε,
+  specialize h ε,
+  specialize h hε,
+  cases h,
+  use h_w,
+  intro,
+  intro hN,
+  ring_nf,
+  apply h_h,
+  exact hN,
+end
+
 theorem tends_to_add_const {a : ℕ → ℝ} {t : ℝ} (c : ℝ)
   (h : tends_to a t) :
   tends_to (λ n, a n + c) (t + c) :=
 begin
-  rw tends_to,
+  rw tends_to at *,
   ring_nf,
-  rw tends_to at h,
   exact h,
 end
 

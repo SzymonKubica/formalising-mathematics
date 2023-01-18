@@ -77,6 +77,30 @@ begin
   have h8: h3_w ≤ n ∧ h4_w ≤ n,
   rw max_le_iff at h7,
   exact h7,
+  have h10 : ∀ (n : ℕ), |a n - t| + |b n - u| < ε -> |a n - t + (b n - u)| < ε  :=
+  begin
+    intro,
+    intro h9,
+    specialize h2 n_1,
+    linarith,
+  end,
+  specialize h10 n,
+  apply h10,
+  specialize h5 n,
+  apply h5,
+  split,
+  {
+    specialize h4_h n,
+    apply h4_h,
+    cases h8,
+    exact h8_right,
+  },
+  {
+    specialize h3_h n,
+    apply h3_h,
+    cases h8,
+    exact h8_left,
+  },
 end
 
 /-- If `a(n)` tends to t and `b(n)` tends to `u` then `a(n) - b(n)`
@@ -86,6 +110,8 @@ theorem tends_to_sub {a b : ℕ → ℝ} {t u : ℝ}
   tends_to (λ n, a n - b n) (t - u) :=
 begin
   -- this one follows without too much trouble from earlier results.
-  sorry
+  have h3: tends_to (-b) (-u),
+  exact tends_to_neg hb,
+  exact tends_to_add ha h3,
 end
 

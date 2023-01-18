@@ -31,6 +31,38 @@ New tactics you'll need to know about:
 
 -/
 
+-- We only need to specify the type of the first argument because addition
+-- requires that types of inputs and outputs are the same.
+example : (2 : ℕ) + 2 = 4 :=
+begin
+  norm_num,
+end
+
+-- We can also use refl to solve it
+example : (2 : ℕ) + 2 = 4 :=
+begin
+  refl,
+end
+
+-- We can also use it on reals provided that we don't use subtraction
+example : (2 : ℝ) + 2 = 4 :=
+begin
+  refl,
+end
+
+-- We can also use it on reals provided that we don't use subtraction
+example : (3 : ℝ) - 1 = 2 :=
+begin
+  -- refl, -- This one should fail.
+  norm_num,
+end
+
+example (x: ℝ) : x + 2 * x = 3 * x :=
+begin
+  -- norm_num fails here because we aren't dealing with only numerals.
+  ring,
+end
+
 example : (2 : ℝ) + 2 = 4 :=
 begin
   norm_num,
@@ -60,7 +92,6 @@ end
 
 example : ∃ (x y : ℝ), 2 * x + 3 * y = 7 ∧ x + 2 * y = 4 :=
 begin
-  use 2,
-  use 1,
+  use [2, 1],
   norm_num,
 end
