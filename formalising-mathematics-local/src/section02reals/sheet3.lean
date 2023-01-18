@@ -148,7 +148,6 @@ end
 example {a : ℕ → ℝ} {t : ℝ} (ha : tends_to a t) :
   tends_to (λ n, - a n) (-t) :=
 begin
-  sorry,
   -- Try this one. You don't know enough material to do it yet!
   -- Where do you get stuck? The problem is that I didn't teach you
   -- any "API" for (a.k.a. theorems about) the absolute value function |.|.
@@ -156,4 +155,24 @@ begin
   -- or |a - b| = |b - a| or something like that.
   -- Leave this for now and try sheet 4, where you'll learn how to discover these things.
   -- We'll come back to this example on sheet 5.
+  rw tends_to at *,
+  have h1: ∀ (n : ℕ), | a n - t | = | - a n - - t | :=
+  begin
+    intro n,
+    ring,
+    rw abs_sub_comm,
+    rw add_comm,
+    ring,
+  end,
+  intros ε hε,
+  specialize ha ε,
+  specialize ha hε,
+  cases ha,
+  use ha_w,
+  intro n,
+  specialize ha_h n,
+  intro h2,
+  specialize h1 n,
+  specialize ha_h h2,
+  linarith,
 end
