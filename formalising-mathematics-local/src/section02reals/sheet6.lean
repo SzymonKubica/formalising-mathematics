@@ -23,7 +23,7 @@ you can do. I will go through them all in a solutions video,
 so if you like you can try some of them and then watch me
 solving them.
 
-Good luck! 
+Good luck!
 -/
 
 
@@ -31,15 +31,81 @@ Good luck!
 theorem tends_to_thirtyseven_mul (a : ℕ → ℝ) (t : ℝ) (h : tends_to a t) :
   tends_to (λ n, 37 * a n) (37 * t) :=
 begin
-  sorry,
+  rw tends_to at *,
+  have h2: ∀ (n : ℕ), | 37 * a n - 37 * t | = 37 * | a n - t | :=
+  begin
+    intro n,
+    rw <- mul_sub 37 (a n) t,
+    rw abs_mul,
+    have h1: (0: ℝ) ≤ 37,
+    linarith,
+    simp,
+    left,
+    exact h1,
+  end,
+  intros ε hε,
+  specialize h (ε / 37),
+  have h3: (ε / 37) > 0 :=
+  begin
+    linarith,
+  end,
+  specialize h h3,
+  cases h,
+  use h_w,
+  intro n,
+  specialize h_h n,
+  specialize h2 n,
+  intro h4,
+  rw h2,
+  specialize h_h h4,
+  rw lt_div_iff at h_h,
+  rw mul_comm at h_h,
+  exact h_h,
+  linarith,
 end
+
 
 /-- If `a(n)` tends to `t` and `c` is a positive constant then
 `c * a(n)` tends to `c * t`. -/
 theorem tends_to_pos_const_mul {a : ℕ → ℝ} {t : ℝ} (h : tends_to a t)
   {c : ℝ} (hc : 0 < c) : tends_to (λ n, c * a n) (c * t) :=
 begin
-  sorry,
+  rw tends_to at *,
+  have h3: ∀ (n : ℕ), | c * a n - c * t | = c * | a n - t | :=
+  begin
+    intro n,
+    rw <- mul_sub c (a n) t,
+    rw abs_mul,
+    simp,
+    left,
+    linarith,
+  end,
+  intros ε hε,
+  specialize h (ε / c),
+  have h2: ε / c > 0,
+  rw gt_iff_lt at *,
+  apply div_pos,
+  exact hε,
+  exact hc,
+  specialize h h2,
+  have h4: ∀ (n : ℕ), c * | a n - t | < ε ↔  | a n - t | < ε / c:=
+  begin
+    intro n,
+    rw lt_div_iff,
+    rw mul_comm,
+    exact hc,
+  end,
+  cases h,
+  use h_w,
+  intro n,
+  intro hN,
+  specialize h3 n,
+  specialize h4 n,
+  specialize h_h n,
+  rw h3,
+  rw h4,
+  apply h_h,
+  exact hN,
 end
 
 /-- If `a(n)` tends to `t` and `c` is a negative constant then
