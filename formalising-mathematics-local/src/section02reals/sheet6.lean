@@ -113,23 +113,128 @@ end
 theorem tends_to_neg_const_mul {a : ℕ → ℝ} {t : ℝ} (h : tends_to a t)
   {c : ℝ} (hc : c < 0) : tends_to (λ n, c * a n) (c * t) :=
 begin
-  sorry,
+  rw tends_to at *,
+  have h3: ∀ (n : ℕ), | c * a n - c * t | = (- c) * | a n - t | :=
+  begin
+    intro n,
+    rw <- mul_sub c (a n) t,
+    rw abs_mul,
+    have h4: |c| = -c :=
+    begin
+      rw abs_eq_neg_self,
+      linarith,
+    end,
+    rw h4,
+  end,
+  intros ε hε,
+  specialize h (ε / (- c)),
+  have h2: ε / (- c) > 0,
+  rw gt_iff_lt at *,
+  apply div_pos,
+  exact hε,
+  simp,
+  exact hc,
+  specialize h h2,
+  have h4: ∀ (n : ℕ), (-c) * | a n - t | < ε ↔  | a n - t | < ε / (-c):=
+  begin
+    intro n,
+    rw lt_div_iff,
+    rw mul_comm,
+    simp,
+    exact hc,
+  end,
+  cases h,
+  use h_w,
+  intro n,
+  intro hN,
+  specialize h3 n,
+  specialize h4 n,
+  specialize h_h n,
+  rw h3,
+  rw h4,
+  apply h_h,
+  exact hN,
 end
 
 /-- If `a(n)` tends to `t` and `c` is a constant then `c * a(n)` tends
 to `c * t`. -/
+
+lemma deMorgan (P : Prop) (Q : Prop) : ¬ (P ∨ Q) ↔ ¬ P ∧ ¬ Q :=
+begin
+  split,
+  { intro h,
+    split,
+    { intro hP,
+      apply h,
+      left,
+      exact hP },
+    { intro hQ,
+      apply h,
+      right,
+      exact hQ } },
+  { rintro ⟨hnP, hnQ⟩ (hP | hQ),
+    { apply hnP, exact hP },
+    { exact hnQ hQ } }
+end
+
+
 theorem tends_to_const_mul {a : ℕ → ℝ} {t : ℝ} (c : ℝ) (h : tends_to a t) :
   tends_to (λ n, c * a n) (c * t) :=
 begin
-  sorry,
+  have h1: (c < 0) ∨ (c ≥ 0) :=
+  begin
+    by_contra,
+    rw deMorgan at h,
+    cases h,
+    linarith,
+  end,
+  cases h1,
+  {
+    apply tends_to_neg_const_mul,
+    exact h,
+    exact h1
+  },
+  {
+    have h1: c = 0 ∨ c > 0 :=
+    begin
+      by_contra,
+      rw deMorgan at h,
+      cases h,
+      change c = 0 → false at h_left,
+      apply h_left,
+      linarith,
+    end,
+    cases h1,
+    {
+      rw h1_1,
+      simp,
+      rw tends_to,
+      simp,
+      intros ε hε,
+      use 1,
+      intro n,
+      intro h5,
+      exact hε
+    },
+    {
+      apply tends_to_pos_const_mul,
+      exact h,
+      linarith,
+    },
+  },
 end
 
 /-- If `a(n)` tends to `t` and `c` is a constant then `a(n) * c` tends
 to `t * c`. -/
+
+
 theorem tends_to_mul_const {a : ℕ → ℝ} {t : ℝ} (c : ℝ) (h : tends_to a t) :
   tends_to (λ n, a n * c) (t * c) :=
 begin
-  sorry
+  have h1: ∀ (n : ℕ) ((a n * c) = (c * a n)) :=
+  begin
+
+  end,
 end
 
 -- another proof of this result, showcasing some tactics
