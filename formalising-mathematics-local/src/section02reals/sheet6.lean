@@ -231,10 +231,15 @@ to `t * c`. -/
 theorem tends_to_mul_const {a : ℕ → ℝ} {t : ℝ} (c : ℝ) (h : tends_to a t) :
   tends_to (λ n, a n * c) (t * c) :=
 begin
-  have h1: ∀ (n : ℕ) ((a n * c) = (c * a n)) :=
+  have h1: (λ n, a n * c) = (λ n, c * a n) :=
   begin
-
+  ext,
+  rw mul_comm,
   end,
+  rw mul_comm,
+  rw h1,
+  apply tends_to_const_mul,
+  exact h,
 end
 
 -- another proof of this result, showcasing some tactics
@@ -255,7 +260,6 @@ theorem tends_to_of_tends_to_sub {a b : ℕ → ℝ} {t u : ℝ}
   (h1 : tends_to (λ n, a n - b n) t) (h2 : tends_to b u) :
   tends_to a (t+u) :=
 begin
-  sorry,
 end
 
 /-- If `a(n)` tends to `t` then `a(n)-t` tends to `0`. -/
