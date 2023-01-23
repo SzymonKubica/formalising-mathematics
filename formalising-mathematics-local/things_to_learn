@@ -1,0 +1,5 @@
+rintro -> like intro but then can do cases on something in one step
+ext -> prove something by extensionality (e.g. equality of functions)
+use cases to close the goal when there are no cases.
+
+try -> tries to apply a tactic in brackets repeatedly but succeeds regardless.

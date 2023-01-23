@@ -13,7 +13,7 @@ import tactic -- imports all the Lean tactics
 Lean uses something called "types" instead of sets, as its foundational
 way of saying a "collection of stuff". For example, the real numbers
 are a type in Lean, a group `G` is a type `G` equipped with a multiplication
-and satisfying some axioms, and so on. 
+and satisfying some axioms, and so on.
 
 Sometimes, especially when making counterexamples, it's helpful to have a way
 of making your own types. For example if I asked you to give an example
@@ -46,13 +46,13 @@ inductive X : Type
 | b : X
 | c : X
 
--- Here `X` is a new type, with three terms whose full names are `X.a`, `X.b` and `X.c`. 
+-- Here `X` is a new type, with three terms whose full names are `X.a`, `X.b` and `X.c`.
 -- You can think of `X` as a set, with three elements `X = {X.a, X.b, X.c}`. Typing
 -- `X.` gets old very quickly so we `open X` meaning that we don't have to do this.
 
 open X
 
-#check a -- works, and says `a : X`, i.e. type of `a` is `X`. 
+#check a -- works, and says `a : X`, i.e. type of `a` is `X`.
 
 -- Given a general term `x : X`, you can do `cases x` and Lean will turn one goal into
 -- three goals with this command, one for `x = a`, one for `x = b` and one for `x = c`.
@@ -61,7 +61,21 @@ example (x : X) : x = a ∨ x = b ∨ x = c :=
 begin
   -- start with `cases x`; you should get three goals,
   -- which you should then put in `{ }` brackets.
-  sorry
+  cases x,
+  {
+    left,
+    refl,
+  },
+  {
+    right,
+    left,
+    refl,
+  },
+  {
+    right,
+    right,
+    refl,
+  },
 end
 
 -- How does Lean know that `a` and `b` are *distinct* elements of `X`? If you
@@ -71,19 +85,19 @@ end
 
 example : a ≠ b :=
 begin
-  -- `a ≠ b` is definitionally equal to `¬ (a = b)` which is 
+  -- `a ≠ b` is definitionally equal to `¬ (a = b)` which is
   -- definitionally equal to `a = b → false`. So `intro` works
   intro h,
   -- `h : a = b`
-  cases h, -- closes the goal. 
+  cases h, -- closes the goal.
 end
 
 
 -- We defined `X` using the `inductive` keyword and these funny `|` "pipe" symbols.
 -- If you want to define a function from `X` to another type you can use `def`
--- and the `|` symbols again. 
+-- and the `|` symbols again.
 
-def f : X → ℕ 
+def f : X → ℕ
 | a := 37
 | b := 42
 | c := 0
@@ -94,7 +108,7 @@ begin
   refl
 end
 
--- Here is a proof that `f` is an injective function. 
+-- Here is a proof that `f` is an injective function.
 -- At some point in this proof there are 9 goals; you can see them
 -- by changing the `;` after `cases y` to a `,`. The semicolon means
 -- "apply the next tactic to all the goals produced by the last tactic".

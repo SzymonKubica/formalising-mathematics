@@ -6,13 +6,15 @@ Author : Kevin Buzzard
 
 import tactic -- imports all the Lean tactics
 
+import section03functions.sheet1 -- import the definition of `injective_def` from a previous sheet
+
 /-
 
 # More on functions
 
 Another question on the Imperial introduction to proof problem sheet on functions
 is "If `f : X → Y` and `g : Y → Z` and `g ∘ f` is injective, is it true that `g` is injective?"
-This is not true. A counterexample could be made by letting `X` and `Z` have one element, 
+This is not true. A counterexample could be made by letting `X` and `Z` have one element,
 and letting `Y` have two elements; `f` and `g` are then not hard to write down. Let's
 see how to do this in Lean by making inductive types `X`, `Y` and `Z` and functions
 `f` and `g` which give an explicit counterexample.
@@ -60,14 +62,26 @@ end
 lemma gYb_eq_gYc : g Y.b = g Y.c :=
 begin
   -- they're both definitionally `Z.d` so which tactic solves this goal?
-  sorry
+  refl,
 end
 
 open function
 
 lemma gf_injective : injective (g ∘ f) :=
 begin
-  sorry,
+  rw injective_def,
+  intros c b,
+  intro h,
+  repeat {rw comp_eval at h},
+  have h1 : ∀ (x : X), x = X.a :=
+  begin
+   intro x,
+   cases x,
+   refl,
+  end,
+  specialize h1 c,
+  cases b,
+  exact h1,
 end
 
 -- This is a question on the IUM (Imperial introduction to proof course) function problem sheet.
@@ -75,7 +89,23 @@ end
 -- will specialize `h` to the specific case `A = X`.
 example : ¬ (∀ A B C : Type, ∀ (φ : A → B) (ψ : B → C), injective (ψ ∘ φ) → injective ψ) :=
 begin
-  sorry,
+  by_contra,
+  specialize h X,
+  specialize h Y,
+  specialize h Z,
+  specialize h f,
+  specialize h g,
+  specialize h gf_injective,
+  rw injective_def at h,
+  specialize h Y.b,
+  specialize h Y.c,
+  have h2: g Y.b = g Y.c :=
+  begin
+    refl,
+  end,
+  specialize h h2,
+  apply Yb_ne_Yc,
+  exact h,
 end
 
 -- This is another one. You might want to make some sublemmas first.
