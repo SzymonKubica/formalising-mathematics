@@ -143,6 +143,13 @@ begin
   exact h,
 end
 
+example (a b : ℝ ) : |a - b| = |b - a| :=
+begin
+  have : linear_order ℝ,
+  { apply_instance },
+  exact abs_sub_comm a b,
+end
+
 -- you're not quite ready for this one yet though.
 /-- If `a(n)` tends to `t` then `-a(n)` tends to `-t`.  -/
 example {a : ℕ → ℝ} {t : ℝ} (ha : tends_to a t) :
@@ -159,7 +166,7 @@ begin
   have h1: ∀ (n : ℕ), | a n - t | = | - a n - - t | :=
   begin
     intro n,
-    ring,
+    ring_nf,
     rw abs_sub_comm,
     rw add_comm,
     ring,

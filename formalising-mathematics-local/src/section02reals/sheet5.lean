@@ -35,6 +35,32 @@ of the results we proved in sheet 4 will be helpful.
 
 /-- If `a(n)` tends to `t` and `b(n)` tends to `u` then `a(n) + b(n)`
 tends to `t + u`. -/
+
+-- Solution from the lectures
+theorem tends_to_add_lectures {a b : ℕ → ℝ} {t u : ℝ}
+  (ha : tends_to a t) (hb : tends_to b u) :
+  tends_to (λ n, a n + b n) (t + u) :=
+begin
+  -- We can abuse definitional equality,
+  intros ε hε,
+  specialize ha (ε/2) (half_pos hε),
+  specialize hb (ε/2) (half_pos hε),
+  cases ha with  A hA,
+  cases hb with  B hB,
+  use (max A B),
+  intros n hn,
+  rw max_le_iff at hn,
+  specialize hA n,
+  specialize hB n,
+  specialize hA hn.1,
+  specialize hB hn.2,
+  simp,
+  rw abs_lt at *,
+  split;
+  linarith,
+  -- You lose marks if you have two goals and don't indicate it with {} {}
+end
+
 theorem tends_to_add {a b : ℕ → ℝ} {t u : ℝ}
   (ha : tends_to a t) (hb : tends_to b u) :
   tends_to (λ n, a n + b n) (t + u) :=
@@ -110,8 +136,16 @@ theorem tends_to_sub {a b : ℕ → ℝ} {t u : ℝ}
   tends_to (λ n, a n - b n) (t - u) :=
 begin
   -- this one follows without too much trouble from earlier results.
-  have h3: tends_to (-b) (-u),
-  exact tends_to_neg hb,
-  exact tends_to_add ha h3,
+  apply tends_to_add,
+  { exact ha, },
+  {
+    apply tends_to_neg,
+    exact hb,
+  },
+
 end
 
+theorem tends_to_sub_short {a b : ℕ → ℝ} {t u : ℝ}
+  (ha : tends_to a t) (hb : tends_to b u) :
+  tends_to (λ n, a n - b n) (t - u) :=
+tends_to_add ha (tends_to_neg hb)

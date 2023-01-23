@@ -3,3 +3,20 @@ ext -> prove something by extensionality (e.g. equality of functions)
 use cases to close the goal when there are no cases.
 
 try -> tries to apply a tactic in brackets repeatedly but succeeds regardless.
+
+we can use let instead of specialize:
+  let ha := ha ε hε,
+
+^ experiment with that one
+
+We can do library search in standalone lemmas and then apply the found functions
+in our proofs.
+
+use cases with
+
+look at conv mode
+
+In the project comment a lot in the lemmas and if something follows from them
+then write it in a concise way.
+
+-> use nth_rewrite to rewrite only one occurrence of a specific pattern.
