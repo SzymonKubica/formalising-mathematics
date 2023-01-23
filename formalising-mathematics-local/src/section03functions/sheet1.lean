@@ -10,8 +10,8 @@ import tactic -- imports all the Lean tactics
 
 # Functions in Lean.
 
-In this sheet we'll learn how to manipulate the concepts of 
-injectivity and surjectivity in Lean. 
+In this sheet we'll learn how to manipulate the concepts of
+injectivity and surjectivity in Lean.
 
 The notation for functions is the usual one in mathematics:
 if `X` and `Y` are types, then `f : X → Y` denotes a function
@@ -33,7 +33,7 @@ a function just eats the next term greedily.
 
 Lean has the predicates `function.injective` and `function.surjective` on functions.
 In other words, if `f : X → Y` is a function, then `function.injective f`
-and `function.surjective f` are true-false statements. 
+and `function.surjective f` are true-false statements.
 
 -/
 
@@ -47,16 +47,16 @@ variables (X Y Z : Type)
 
 -- Let's prove some theorems, each of which are true by definition.
 
-theorem injective_def (f : X → Y) : 
+theorem injective_def (f : X → Y) :
   injective f ↔ ∀ (a b : X), f a = f b → a = b :=
 begin
-  refl -- this proof works, because `injective f` 
+  refl -- this proof works, because `injective f`
        -- means ∀ a b, f a = f b → a = b *by definition*
        -- so the proof is "it's reflexivity of `↔`"
 end
 
 -- similarly this is the *definition* of `surjective f`
-theorem surjective_def (f : X → Y) : 
+theorem surjective_def (f : X → Y) :
   surjective f ↔ ∀ b : Y, ∃ a : X, f a = b :=
 begin
   refl
@@ -69,7 +69,7 @@ begin
   refl
 end
 
--- Function composition is `∘` in Lean (find out how to type it by putting your cursor on it). 
+-- Function composition is `∘` in Lean (find out how to type it by putting your cursor on it).
 -- The *definition* of (g ∘ f) (x) is g(f(x)).
 theorem comp_eval (f : X → Y) (g : Y → Z) (x : X) :
   (g ∘ f) x = g (f x) :=
@@ -86,17 +86,24 @@ begin
   -- you can start with `rw injective_def` if you like,
   -- and later you can `rw id_eval`, although remember that `rw` doesn't
   -- work under binders like `∀`, so use `intro` first.
-  sorry
+  rw injective_def,
+  intros a b,
+  repeat {rw id_eval},
+  intro h,
+  exact h,
 end
 
 example : surjective (id : X → X) :=
 begin
-  sorry
+  rw surjective_def,
+  intro b,
+  use b,
+  rw id_eval,
 end
 
 -- Theorem: if f : X → Y and g : Y → Z are injective,
 -- then so is g ∘ f
-example (f : X → Y) (g : Y → Z) (hf : injective f) 
+example (f : X → Y) (g : Y → Z) (hf : injective f)
   (hg : injective g) : injective (g ∘ f) :=
 begin
   -- By definition of injectivity,
@@ -116,7 +123,7 @@ end
 
 -- Theorem: composite of two surjective functions
 -- is surjective.
-example (f : X → Y) (g : Y → Z) (hf : surjective f) 
+example (f : X → Y) (g : Y → Z) (hf : surjective f)
   (hg : surjective g) :
   surjective (g ∘ f) :=
 begin
@@ -144,15 +151,30 @@ begin
 end
 
 -- This is a question on the IUM (Imperial introduction to proof course) function problem sheet
-example (f : X → Y) (g : Y → Z) : 
+example (f : X → Y) (g : Y → Z) :
   injective (g ∘ f) → injective f :=
 begin
-  sorry
+  intro h,
+  rw injective_def at *,
+  intros a b,
+  specialize h a,
+  specialize h b,
+  intro h1,
+  apply h,
+  repeat {rw comp_eval},
+  rw h1,
 end
 
 -- This is another one
-example (f : X → Y) (g : Y → Z) : 
+example (f : X → Y) (g : Y → Z) :
   surjective (g ∘ f) → surjective g :=
 begin
-  sorry
+  repeat {rw surjective_def},
+  intro h,
+  intro b,
+  specialize h b,
+  cases h,
+  use f h_w,
+  rw comp_eval at h_h,
+  exact  h_h,
 end
