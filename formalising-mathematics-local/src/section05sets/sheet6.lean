@@ -56,12 +56,20 @@ example : f '' S ⊆ T ↔ S ⊆ f ⁻¹' T :=
 begin
   split,
   {
-    intro h,
-    intros s hs,
-
+    intros h1 s hs,
+    change f s ∈ T,
+    apply h1,
+    use s,
+    split,
+    { exact hs  },
+    { refl },
   },
   {
-
+    intros h1 y hy,
+    cases hy with x hx,
+    rw <- hx.right,
+    specialize h1 hx.left,
+    exact h1,
   },
 end
 
@@ -102,11 +110,48 @@ variables (Z : Type) (g : Y → Z) (U : set Z)
 -- preimage of preimage is preimage of comp
 example : (g ∘ f) ⁻¹' U = f ⁻¹' (g ⁻¹' U) :=
 begin
-  sorry
+  ext x,
+  split;
+  {
+    intro hgf,
+    exact hgf,
+  },
 end
 
 -- preimage of preimage is preimage of comp
 example : (g ∘ f) '' S = g '' (f '' S) :=
 begin
-  sorry
+  ext x,
+  split,
+  {
+    intro hgf,
+    cases hgf with z hgfz,
+    use f z,
+    split,
+    {
+      use z,
+      split,
+      { exact hgfz.left },
+      { refl },
+    },
+    {
+      exact hgfz.right,
+    },
+  },
+  {
+    intro hgf,
+    cases hgf with y hy,
+    cases hy with hyf hgy,
+    cases hyf with x2 hx2,
+    use x2,
+    split,
+    {
+      exact hx2.left,
+    },
+    {
+      change g(f x2) = x,
+      rw hx2.right,
+      exact hgy,
+    },
+  },
 end
