@@ -79,9 +79,8 @@ begin
         split,
         {
           rw <- Icc_def,
-          split,
-          { linarith },
-          { linarith },
+          split;
+          linarith,
         },
         { exact hfa },
       },

@@ -32,37 +32,82 @@ variables
 
 example : x ∉ A → (x ∈ A → false) :=
 begin
-
+  intro h,
+  intro h2,
+  apply h,
+  exact h2,
 end
 
 example : x ∈ A → (x ∉ A → false) :=
 begin
-  sorry
+  intros h1 h2,
+  apply h2,
+  exact h1,
 end
 
 example : (A ⊆ B) → x ∉ B → x ∉ A :=
 begin
-  sorry
+  intros hab hnb ha,
+  apply hnb,
+  apply hab,
+  exact ha,
 end
 
 -- Lean couldn't work out what I meant when I wrote `x ∈ ∅` so I had
 -- to give it a hint by telling it the type of `∅`.
 example : x ∉ (∅ : set X):=
 begin
-  sorry
+  intro h,
+  exact h,
 end
 
 example : x ∈ Aᶜ → x ∉ A :=
 begin
-  sorry
+  intro h,
+  intro hna,
+  apply h,
+  exact hna,
 end
 
 example : (∀ x, x ∈ A) ↔ ¬ (∃ x, x ∈ Aᶜ) :=
 begin
-  sorry
+  split,
+  {
+    intros h1 h2,
+    cases h2 with x hx,
+    specialize h1 x,
+    apply hx,
+    exact h1,
+  },
+  {
+    intros h1 x,
+    rw not_exists at h1,
+    specialize h1 x,
+    by_contra,
+    apply h1,
+    intro h2,
+    apply h,
+    exact h2,
+  },
 end
 
 example : (∃ x, x ∈ A) ↔ ¬ (∀ x, x ∈ Aᶜ) :=
 begin
-  sorry
+  split,
+  {
+    intros h1 h2,
+    cases h1 with x hx,
+    specialize h2 x,
+    apply h2,
+    exact hx,
+  },
+  {
+    intro h1,
+    rw not_forall at h1,
+    cases h1 with x hx,
+    use x,
+    by_contra,
+    apply hx,
+    exact h,
+  },
 end
