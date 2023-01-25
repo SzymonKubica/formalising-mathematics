@@ -15,10 +15,10 @@ import data.real.basic -- the reals
 
 If `f : X → Y` then given a subset `S : set X` of `X` we can push it
 forward to make a subset `f(S) : set Y` of `Y`. The definition
-of `f(S)` is `{y : Y | ∃ x : X, x ∈ S ∧ f x = y}`. 
+of `f(S)` is `{y : Y | ∃ x : X, x ∈ S ∧ f x = y}`.
 
 However `f(S)` doesn't make sense in Lean, because `f` eats
-terms of type `X` and not `S`, which has type `set X`. 
+terms of type `X` and not `S`, which has type `set X`.
 In Lean we use the notation `f '' S` for this. This is notation
 for `set.image` and if you need any API for this, it's likely
 to use the word `image`.
@@ -43,18 +43,26 @@ variables (X Y : Type) (f : X → Y) (S : set X) (T : set Y)
 
 example : S ⊆ f ⁻¹' (f '' S) :=
 begin
-  sorry
+  exact set.subset_preimage_image f S,
 end
 
 example : f '' (f ⁻¹' T) ⊆ T :=
 begin
-  sorry
+  exact set.image_preimage_subset f T,
 end
 
 -- `library_search` will do this but see if you can do it yourself.
 example : f '' S ⊆ T ↔ S ⊆ f ⁻¹' T :=
 begin
-  sorry
+  split,
+  {
+    intro h,
+    intros s hs,
+
+  },
+  {
+
+  },
 end
 
 -- Pushforward and pullback along the identity map don't change anything
@@ -62,13 +70,30 @@ end
 -- pullback is not so hard
 example : id ⁻¹' S = S :=
 begin
-  sorry
+  refl,
 end
 
 -- pushforward is a little trickier. You might have to `ext x, split`.
 example : id '' S = S :=
 begin
-  sorry
+  ext,
+  split,
+  {
+    intro h,
+    cases h,
+    rw id at h_h,
+    cases h_h,
+    rw <- h_h_right,
+    exact h_h_left,
+  },
+  {
+    intro h,
+    use x,
+    rw id,
+    split,
+    { exact h },
+    { refl },
+  },
 end
 
 -- Now let's try composition.
