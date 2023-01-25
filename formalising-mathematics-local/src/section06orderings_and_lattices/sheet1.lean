@@ -10,11 +10,11 @@ import tactic
 
 ## Orderings and lattices
 
-In the last section we saw how subsets of a type worked, and we saw that 
+In the last section we saw how subsets of a type worked, and we saw that
 things like `⊆` and `∪` and `∩` made sense for subsets, and they satisfied
 theorems such as `A ∩ B ⊆ B`. But it turns out that there is a more general
 abstraction called a *lattice* which captures these kinds of ideas, and I'd
-like to explain this concept in this section. Note that the word "lattice" 
+like to explain this concept in this section. Note that the word "lattice"
 unfortunately means several things in mathematics; this is the use of the
 word in the context of partial orders. So let me start by talking about
 partial orders.
@@ -35,7 +35,7 @@ these examples are not quite representative, because a partial order does *not* 
 the axiom that for all `a b : X` we have either `a ≤ b` or `b ≤ a`. A perhaps more
 representative example of a partial order is the type `set X` of subsets of a type `X`,
 with `a ≤ b` defined to mean `a ⊆ b`. For two general subsets `a` and `b` of `X`,
-both `a ⊆ b` and `b ⊆ a` might be false. 
+both `a ⊆ b` and `b ⊆ a` might be false.
 
 -/
 
@@ -62,15 +62,15 @@ variables (a b c d : X)
 -- See if you can prove these basic facts about partial orders.
 example : a ≤ a :=
 begin
-  sorry
+  exact le_refl a,
 end
 
 example (hab : a ≤ b) (hbc : b ≤ c) (hcd : c ≤ d) : a ≤ d :=
-begin
-  sorry
-end
+  le_trans (le_trans hab hbc) hcd
 
 example (hab : a ≤ b) (hbc : b ≤ c) (hca : c ≤ a) : a = b :=
 begin
-  sorry
+  apply le_antisymm,
+  { exact hab },
+  { exact le_trans hbc hca },
 end
