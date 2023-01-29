@@ -17,6 +17,26 @@ def continuous (f : ℝ → ℝ) : Prop :=
 ∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x - y| < δ → |f x - f y| < ε
 
 
+lemma lemma1 (k m : ℝ) (S : set ℝ)
+(h0: k < m) (h1: m ∈ upper_bounds S) (h2 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
+begin
+  rw upper_bounds,
+  intros a ha,
+  specialize h2 a,
+  by_contra,
+  rw not_le at h,
+  have h3: a ∈ Ioc k m,
+  { rw <- Ioc_def,
+    split,
+    { exact h },
+    { specialize h1 ha,
+      exact h1 }, },
+  specialize h2 h3,
+  apply h2,
+  exact ha,
+end
+
+
 theorem intermediate_value_theorem (a b : ℝ ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
 ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
