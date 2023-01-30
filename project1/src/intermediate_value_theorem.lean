@@ -63,12 +63,16 @@ begin
     },
 end
 
-lemma upper_bound_not_lt_sup (a b : ℝ) (S : set ℝ) (h0: is_lub S b) (h1: a < b) :
-a ∉ upper_bounds S :=
+lemma add_positive_gt_self (a b : ℝ) (h : 0 < b) : a < a + b :=
 begin
-  by_contra,
-  cases h0,
-  specialize h0_right h,
+  simp,
+  exact h,
+end
+
+lemma no_elem_gt_upper_bound (a b : ℝ) (S : set ℝ) (h0: b ∈ upper_bounds S) (h1: a ∈ S) (h2: b < a) :
+false :=
+begin
+  specialize h0 h1,
   linarith,
 end
 
@@ -112,92 +116,60 @@ begin
     by_contra,
     specialize hc x (c - f x),
     rw not_le at h,
-    have h5: x ≠ b,
-    { intro h5,
-      rw <- h5 at hcfb,
-      linarith, },
-
     have hlt: x < b,
     { rw <- not_le,
       intro hbx,
-      apply h5,
-      exact antisymm h4.right hbx, },
+      rw antisymm hbx h4.right at hcfb,
+      linarith, },
 
     simp at hc,
     specialize hc h,
     cases hc with δ hδ,
     cases hδ,
-    let y := x + 1 / 2 * (min δ (b - x)),
+    let offset := 1 / 2 * (min δ (b - x)),
+    let y := x + offset,
+    have hpos: 0 < offset,
+    { simp, exacts ⟨hδ_left, hlt⟩,},
     specialize hδ_right y,
-    have hymx: x < y :=
-    begin
-      simp,
-      split,
-      { exact hδ_left },
-      { exact hlt },
-    end,
-    have hy: y ∈ S :=
-    begin
-      split,
-      {
-        simp,
+    have hymx: x < y,
+    { exact add_positive_gt_self x offset hpos, },
+    have hy: y ∈ S,
+    { split,
+      { simp,
         split,
         { linarith },
-        {
-          have h6: y ≤  x + 1/2 * (b - x) :=
-          begin
-            simp,
-          end,
-          linarith,
-        },
-      },
       {
-        have hxy : | x - y | < δ :=
-        begin
-          simp,
+        have hxy : | x - y | < δ,
+        { simp,
           rw abs_lt,
           split,
-          {
-            have hmin: 0 < 2⁻¹ * min δ (b - x), {
-              rw mul_pos_iff,
+          { have hmin: 0 < 2⁻¹ * min δ (b - x),
+            { rw mul_pos_iff,
               left,
               split,
-              { norm_num, },
-              { rw lt_min_iff,
-                split,
+                { norm_num, },
+                { rw lt_min_iff,
+              split,
                 { exact hδ_left },
-                { simp,
-                  exact hlt,},
-              },
-            },
-            have hdmin: -δ < 0, {
-              simp,
-                exact hδ_left,
-            },
-            exact lt_trans hdmin hmin,
-          },
-          {
-            rw inv_mul_eq_div,
+                { simp, exact hlt,}, }, },
+            have hdmin: -δ < 0,
+              { simp, exact hδ_left, },
+            exact lt_trans hdmin hmin, },
+          { rw inv_mul_eq_div,
             rw div_lt_iff,
             rw min_lt_iff,
             left,
             linarith,
-            norm_num,
-          },
-        end,
+            norm_num, },
+        },
         specialize hδ_right hxy,
         rw abs_lt at hδ_right,
         cases hδ_right,
         simp at hδ_right_left,
         exact hδ_right_left,
       },
-    end,
-    rw is_lub at hxlub,
-    rw upper_bounds at hxlub,
-    rw is_least at hxlub,
-    cases hxlub,
-    specialize hxlub_left hy,
-    linarith,
+    },
+    exact no_elem_gt_upper_bound y x S hxlub.left hy hymx,
   end,
   have hlt: f x ≤ c :=
   begin
@@ -265,7 +237,7 @@ begin
     },
     have hmu: m ∈ upper_bounds S :=
     begin
-      exact lemma1 m x S hm hxlub.left hmS,
+      exact lemma1 m x S hxlub.left hmS,
     end,
     rw is_lub at hxlub,
     rw is_least at hxlub,
@@ -279,5 +251,3 @@ begin
   { split; linarith },
   { linarith, },
 end
-
-#lint
