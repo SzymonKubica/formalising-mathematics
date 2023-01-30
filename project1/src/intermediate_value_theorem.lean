@@ -18,131 +18,111 @@ def continuous (f : ℝ → ℝ) : Prop :=
 
 
 lemma lemma1 (k m : ℝ) (S : set ℝ)
-(h0: k < m) (h1: m ∈ upper_bounds S) (h2 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
+(h0: m ∈ upper_bounds S) (h1 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
 begin
   rw upper_bounds,
   intros a ha,
-  specialize h2 a,
+  specialize h1 a,
   by_contra,
   rw not_le at h,
-  have h3: a ∈ Ioc k m,
+  have hlub: a ∈ Ioc k m,
   { rw <- Ioc_def,
     split,
     { exact h },
-    { specialize h1 ha,
-      exact h1 }, },
-  specialize h2 h3,
-  apply h2,
+    { specialize h0 ha,
+      exact h0 }, },
+  specialize h1 hlub,
+  apply h1,
   exact ha,
 end
 
+lemma subset_of_Icc_bdd_above (a b : ℝ) (S: set ℝ) (h0 : S ⊆ Icc a b) : bdd_above S :=
+begin
+ use b,
+ intros y hy,
+ specialize h0 hy,
+ exact h0.right,
+end
 
-theorem intermediate_value_theorem (a b : ℝ ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
+lemma subset_of_Icc_sup_bounds (a b x : ℝ) (S : set ℝ)
+(h0: a < b) (h1: a ∈ S) (h2: bdd_above S) (h3: S ⊆ Icc a b) (h4: is_lub S x) :
+a ≤ x ∧ x ≤ b :=
+begin
+    rw is_lub at h4,
+    split,
+    {
+      cases h4,
+      specialize h4_left h1,
+      exact h4_left,
+    },
+    {
+      apply h4.right,
+      intros y hy,
+      specialize h3 hy,
+      exact h3.right,
+    },
+end
+
+lemma upper_bound_not_lt_sup (a b : ℝ) (S : set ℝ) (h0: is_lub S b) (h1: a < b) :
+a ∉ upper_bounds S :=
+begin
+  by_contra,
+  cases h0,
+  specialize h0_right h,
+  linarith,
+end
+
+theorem intermediate_value_theorem (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
 ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
   rw continuous at *,
-  intro c,
-  intro hc,
-  rw <- Ioo_def at hc,
-  rw mem_def at hc,
-  rw set_of_app_iff at hc,
-  cases hc with hfa hfb,
-  let S: set ℝ := { y : ℝ | y ∈ Icc a b ∧ f y < c },
-  have hsc: S.nonempty :=
-  begin
-   use a,
-   rw mem_def,
-   split,
-   {
-     rw <- Icc_def,
-     rw mem_def,
-     rw set_of_app_iff,
-     split;
-     linarith,
-   },
-   { exact hfa },
-  end,
-  have hba: bdd_above S:=
-  begin
-    use b,
-    intro x,
-    intro hx,
-    rw mem_def at hx,
-    cases hx,
-    rw <- Icc_def at hx_left,
-    rw mem_def at hx_left,
-    rw set_of_app_iff at hx_left,
-    exact hx_left.right,
-  end,
-  have h3: ∃ (x : ℝ), is_lub S x :=
-  begin
-    apply real.exists_is_lub S hsc hba,
-  end,
-  cases h3 with x h3h,
-  have hx: x = Sup S :=
-  begin
-    have hSup : is_lub S (Sup S),
-    apply real.is_lub_Sup S hsc hba,
-    exact is_lub.unique h3h hSup,
-  end,
+  intros c hc,
+  cases hc with hfac hcfb,
 
-  have h4: a ≤ x ∧ x ≤ b :=
-  begin
-    split,
-    {
-      rw hx,
-      rw real.le_Sup_iff,
-      intros ε hε,
-      use a,
-      split,
-      {
-        split,
-        { rw <- Icc_def,
-          split;
-          linarith, },
-        { exact hfa },
-      },
-      { linarith },
-      exacts [hba, hsc],
-    },
-    {
-      rw is_lub at h3h,
-      have h5: b ∈ upper_bounds S :=
-      begin
-        rw upper_bounds,
-        intros k hk,
-        cases hk,
-        rw <- Icc_def at hk_left,
-        exact hk_left.right,
-      end,
-      rw is_least at h3h,
-      cases h3h,
-      rw lower_bounds at h3h_right,
-      rw mem_def at h3h_right,
-      rw set_of_app_iff at h3h_right,
-      specialize h3h_right h5,
-      exact h3h_right,
-    },
-  end,
+  let S: set ℝ := { y : ℝ | y ∈ Icc a b ∧ f y < c },
+
+  have ha : a ∈ S,
+  { split,
+    { split; linarith, },
+    { exact hfac },
+  },
+
+  have hsc: S.nonempty,
+  { exact ⟨a, ha⟩ },
+
+  have hSab: S ⊆ Icc a b,
+  { intros y hy,
+    exact hy.left },
+
+  have hba: bdd_above S,
+  { exact subset_of_Icc_bdd_above a b S hSab },
+
+  have hlub: ∃ (x : ℝ), is_lub S x,
+  { apply real.exists_is_lub S hsc hba, },
+
+  cases hlub with x hxlub,
+  have hx: x = Sup S,
+  { exact is_lub.unique hxlub (real.is_lub_Sup S hsc hba), },
+
+  have h4: a ≤ x ∧ x ≤ b,
+  { exact subset_of_Icc_sup_bounds a b x S h0 ha hba hSab hxlub, },
+
   have hgt: f x ≥ c :=
   begin
     by_contra,
-    specialize hc x,
-    specialize hc (c - f x),
+    specialize hc x (c - f x),
     rw not_le at h,
-    have h5: x ≠ b :=
-    begin
-      intro h5,
-      rw <- h5 at hfb,
-      linarith,
-    end,
-    have hlt: x < b :=
-    begin
-      rw <- not_le,
+    have h5: x ≠ b,
+    { intro h5,
+      rw <- h5 at hcfb,
+      linarith, },
+
+    have hlt: x < b,
+    { rw <- not_le,
       intro hbx,
       apply h5,
-      exact antisymm h4.right hbx,
-    end,
+      exact antisymm h4.right hbx, },
+
     simp at hc,
     specialize hc h,
     cases hc with δ hδ,
@@ -212,11 +192,11 @@ begin
         exact hδ_right_left,
       },
     end,
-    rw is_lub at h3h,
-    rw upper_bounds at h3h,
-    rw is_least at h3h,
-    cases h3h,
-    specialize h3h_left hy,
+    rw is_lub at hxlub,
+    rw upper_bounds at hxlub,
+    rw is_least at hxlub,
+    cases hxlub,
+    specialize hxlub_left hy,
     linarith,
   end,
   have hlt: f x ≤ c :=
@@ -228,7 +208,7 @@ begin
     have h5: x ≠ a :=
     begin
       intro h5,
-      rw <- h5 at hfa,
+      rw <- h5 at hfac,
       linarith,
     end,
     simp at hc,
@@ -261,57 +241,43 @@ begin
         exact antisymm hxa h4.left,
       },
     end,
-    have hmu: m ∈ upper_bounds S :=
-    begin
-      rw upper_bounds,
-      intros k hk,
-      by_contra h2,
-      rw <- lt_iff_not_le at h2,
-      specialize hy k,
-      have hxk: | x - k | < δ,
-      { rw abs_lt,
-        split,
-        {
-          simp,
-          rw is_lub at h3h,
-          rw is_least at h3h,
-          rw upper_bounds at h3h,
-          cases h3h,
-          specialize h3h_left hk,
+    have hmS: ∀ y ∈ Ioc m x, y ∉ S,
+    { intros y hy2,
+      specialize hy y,
+      apply hy,
+      rw abs_lt,
+      split,
+      { simp,
+        cases hy2,
+        linarith, },
+      { simp,
+        apply sub_lt_comm.mp,
+        { cases hy2,
+          have hmx: x - δ ≤ m,
+          { rw le_max_iff,
+            left,
+            simp,
+            linarith, },
           linarith,
         },
-        {
-          apply sub_left_lt_of_lt_add,
-          rw add_comm,
-          apply lt_add_of_sub_left_lt,
-          have hmxδ : x - δ < m,
-          {
-            simp,
-            left,
-            linarith,
-          },
-          exact lt_trans hmxδ h2,
-        },
+        {exact covariant_add_lt_of_contravariant_add_le ℝ,}
       },
-      specialize hy hxk,
-      apply hy,
-      exact hk,
+    },
+    have hmu: m ∈ upper_bounds S :=
+    begin
+      exact lemma1 m x S hm hxlub.left hmS,
     end,
-    rw is_lub at h3h,
-    rw is_least at h3h,
-    rw lower_bounds at h3h,
-    cases h3h,
-    specialize h3h_right hmu,
+    rw is_lub at hxlub,
+    rw is_least at hxlub,
+    rw lower_bounds at hxlub,
+    cases hxlub,
+    specialize hxlub_right hmu,
     linarith,
   end,
   use x,
   split,
-  {
-    split;
-    linarith
-  },
-  {
-    linarith,
-  },
+  { split; linarith },
+  { linarith, },
 end
 
+#lint
