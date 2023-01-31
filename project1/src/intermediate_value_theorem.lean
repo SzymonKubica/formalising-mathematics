@@ -16,6 +16,22 @@ def tends_to (a : ℕ → ℝ) (t : ℝ) : Prop :=
 def continuous (f : ℝ → ℝ) : Prop :=
 ∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x - y| < δ → |f x - f y| < ε
 
+theorem negative_continuous (f : ℝ → ℝ) (h: continuous f) : continuous (-f) :=
+begin
+ intros x ε hε,
+ specialize h x ε hε,
+ cases h with δ hδ,
+ cases hδ with hδ hy,
+ use δ,
+ split,
+ { exact hδ },
+ { simp,
+   intros y hxyδ,
+   specialize hy y hxyδ,
+   rw abs_sub_comm,
+   exact hy },
+end
+
 
 lemma lemma1 (k m : ℝ) (S : set ℝ)
 (h0: m ∈ upper_bounds S) (h1 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
@@ -82,9 +98,8 @@ begin
   exact (div_lt_iff' h0).mpr h,
 end
 
-#check two_pos
 
-theorem intermediate_value_theorem (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
+theorem intermediate_value_theorem_special (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
 ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
   rw continuous at *,
@@ -243,4 +258,163 @@ begin
   split,
   { split; linarith },
   { linarith, },
+end
+
+lemma elem_in_Icc_not_at_endpoints_in_Ioo (a b c : ℝ) (h0 : a ≠ c) (h1 : b ≠ c)
+(hIcc: c ∈ Icc a b) :  c ∈ Ioo a b :=
+begin
+  cases hIcc with hac hcb,
+  split,
+  { by_contra,
+    rw not_lt at h,
+    apply h0,
+    exact antisymm hac h, },
+  { by_contra,
+    rw not_lt at h,
+    apply h1,
+    exact antisymm hcb h,},
+end
+
+lemma min_eq_smaller_number (a b : ℝ) (h: a < b): a = min a b :=
+begin
+  apply eq.symm,
+  rw min_eq_iff,
+  left,
+  split,
+  { refl, },
+  { linarith, },
+end
+
+lemma max_eq_larger_number (a b : ℝ) (h: a < b): b = max a b :=
+begin
+  apply eq.symm,
+  rw max_eq_iff,
+  right,
+  split,
+  { refl, },
+  { linarith, },
+end
+
+lemma not_eq_min (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : min a b ≠ c :=
+begin
+  by_contra,
+  rw min_eq_iff at h,
+  cases h,
+  { apply h0,
+    apply eq.symm,
+    exact h.left, },
+  { apply h1,
+    apply eq.symm,
+    exact h.left, },
+end
+
+lemma not_eq_max (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : max a b ≠ c :=
+begin
+  by_contra,
+  rw max_eq_iff at h,
+  cases h,
+  { apply h0,
+    apply eq.symm,
+    exact h.left, },
+  { apply h1,
+    apply eq.symm,
+    exact h.left, },
+end
+
+lemma neg_one_mul2 (a b : ℝ) (h : a = -b) : (-a) = b :=
+begin
+  exact neg_eq_iff_neg_eq.mp (eq.symm h),
+end
+
+lemma neg_elem_reflection_Ioo (a b c: ℝ) (h : c ∈ Ioo a b): (-c) ∈ Ioo (-b) (-a) :=
+begin
+  split,
+    { simp, exact h.right, },
+    { simp, exact h.left, },
+end
+
+theorem intermediate_value_theorem_general (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
+∀ (c : ℝ), c ∈ Icc (min (f a) (f b)) (max (f a) (f b)) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
+begin
+  intro c,
+  by_cases (c = f a ∨ c = f b),
+    { cases h,
+      repeat { intro hIcc,
+        use a,
+        split,
+        { simp, linarith, },
+        { rw h, }, },
+      { intro hIcc,
+        use b,
+        split,
+        { simp, linarith, },
+        { rw h, }, }, },
+    { rw not_or_distrib at h,
+      intro hIcc,
+      have himp: c ∈ Ioo (min (f a) (f b)) (max (f a) (f b)),
+      { have hMin: (min (f a) (f b)) ≠ c,
+          { exact not_eq_min (f a) (f b) c h.left h.right, },
+        have hMax: (max (f a) (f b)) ≠ c,
+          { exact not_eq_max (f a) (f b) c h.left h.right, },
+        exact elem_in_Icc_not_at_endpoints_in_Ioo (min (f a) (f b)) (max (f a) (f b)) c hMin hMax hIcc},
+      by_cases (f a) < (f b),
+      { dedup,
+        have hMin: f a = min (f a) (f b),
+          { exact min_eq_smaller_number (f a) (f b) h_1 },
+        have hMax: f b = max (f a) (f b),
+          { exact max_eq_larger_number (f a) (f b) h_1 },
+        rw <- hMin at himp,
+        rw <- hMax at himp,
+        apply intermediate_value_theorem_special a b h0 f hc,
+        exact himp,
+        },
+      { let g := -f,
+
+        have hg : continuous g,
+          { exact negative_continuous f hc, },
+
+        have hfba : f b < f a,
+          { rw not_lt at h,
+            by_contra,
+            dedup,
+            rw not_lt at h_2,
+            have h_3: f a = f b,
+              { linarith },
+            rw h_3 at himp,
+            simp at himp,
+            exact himp, },
+
+        have hgab : g a < g b,
+          { change - (f a) < - (f b),
+            simp,
+            exact hfba, },
+
+        have hcf: c ∈ Ioo (f b) (f a),
+          { have hMin: f b = min (f b) (f a),
+              { exact min_eq_smaller_number (f b) (f a) hfba },
+            have hMax: f a = max (f b) (f a),
+              { exact max_eq_larger_number (f b) (f a) hfba },
+            rw min_comm at himp,
+            rw max_comm at himp,
+            rw <- hMin at himp,
+            rw <- hMax at himp,
+            exact himp,
+          },
+
+        have hcm: -c ∈ Ioo (g a) (g b),
+          { exact neg_elem_reflection_Ioo (f b) (f a) c hcf, },
+        have hx: ∃ (x : ℝ), x ∈ Icc a b ∧ g x = - c,
+          { exact intermediate_value_theorem_special a b h0 g hg (-c) hcm,},
+
+        rcases hx with ⟨x , ⟨ hIcc, hgx ⟩⟩,
+        use x,
+        split,
+        { exact hIcc },
+        { have hfx: -(f x) = -c,
+            { rw <- hgx, refl, },
+          simp at hfx,
+          exact hfx,
+        },
+      },
+    },
 end
