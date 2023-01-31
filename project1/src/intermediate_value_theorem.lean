@@ -193,24 +193,33 @@ begin
   exact neg_eq_iff_neg_eq.mp (eq.symm h),
 end
 
-theorem intermediate_value_theorem_special (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
+-- The following proves the special case of the IVT where we assume that
+-- f(a) < c < f(b). The lemmas above are then used to prove the theorem in the
+-- genreal case.
+theorem intermediate_value_theorem_special (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hfcont: continuous f) :
 ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
-  rw continuous at *,
-  intros c hc,
-  cases hc with hfac hcfb,
+  rintro c ⟨hfac, hcfb⟩, -- Introduce the arbitrary c and break down the fact that c ∈ (f(a), f(b)).
 
+  -- Now we define the set, for which we'll show that it has a supremum and then
+  -- we'll argue that that supremum x satisfies f(x) = c.
   let S: set ℝ := { y : ℝ | y ∈ Icc a b ∧ f y < c },
 
+  -- In order to show that the set S has a supremum, we need to argue that
+  -- it is nonempty and bounded above. To show the former, we choose the point
+  -- a to be the candidate.
   have ha : a ∈ S,
-  { split,
+  { have haIcc : a ∈ Icc a b,
     { split; linarith, },
-    { exact hfac },
-  },
+    exact ⟨haIcc, hfac⟩ },
 
+  -- Now we apply our candidate a to show that S is indeed nonempty.
   have hsc: S.nonempty,
   { exact ⟨a, ha⟩ },
 
+  -- At this point we need to show that S is bounded above, this can be achieved
+  -- by showing that it is a subset of a closed interval and using the lemma
+  -- subset_of_Icc_bdd_above which we have defined before.
   have hSab: S ⊆ Icc a b,
   { intros y hy,
     exact hy.left },
@@ -218,41 +227,54 @@ begin
   have hba: bdd_above S,
   { exact subset_of_Icc_bdd_above a b S hSab },
 
-  have hlub: ∃ (x : ℝ), is_lub S x,
+  -- Now we argue that S has a supremum as it is nonempty and bounded.
+  obtain ⟨x, hxlub⟩ : ∃ (x : ℝ), is_lub S x,
   { apply real.exists_is_lub S hsc hba, },
 
-  cases hlub with x hxlub,
-  have hx: x = Sup S,
-  { exact is_lub.unique hxlub (real.is_lub_Sup S hsc hba), },
-
-  have h4: a ≤ x ∧ x ≤ b,
+  -- Let us use the previously proven lemma to obtain the bounds for x.
+  have haxb: a ≤ x ∧ x ≤ b,
   { exact subset_of_Icc_sup_bounds a b x S h0 ha hba hSab hxlub, },
 
+  -- Now comes the main part of the proof of the special case, we show that
+  -- both f(x) ≥ c and f(x) ≤ c and so by antisymmetry we'll conclude f(x) = c,
+  -- which will finish the proof.
   have hgt: f x ≥ c :=
   begin
     by_contra,
-    specialize hc x (c - f x),
+    specialize hfcont x (c - f x), -- We use continuity at x with ε:= (c - f(x)).
     rw not_le at h,
     have hlt: x < b,
     { rw <- not_le,
       intro hbx,
-      rw antisymm hbx h4.right at hcfb,
+      rw antisymm hbx haxb.right at hcfb,
       linarith, },
 
-    simp at hc,
-    specialize hc h,
-    cases hc with δ hδ,
-    cases hδ with hδ_pos hδ_imp,
+    -- We need to simplify the implication which we got from the definition of
+    -- continuity to match with our hypotesis for contradiction h: f(x) < c.
+    simp at hfcont,
+
+    -- Now we can specialize that implication with our hypothesis h and unwrap its contents.
+    rcases hfcont h with ⟨δ, ⟨hδ_pos, hδ_imp⟩⟩,
+
+    -- The main idea of the proof at this point is to define a particular point
+    -- y which is offset from x by distance dx which is still within the δ-neighbourhood
+    -- around x. We'll then show that y ∈ S which violates the property that x
+    -- is the supremum of S.
     let dx := (1 / 2) * (min δ (b - x)),
+    have hpos: 0 < dx, -- We need to show that dx is indeed positive.
+    { simp, exacts ⟨hδ_pos, hlt⟩,},
+
+    -- Now we define y, show that x < y and argue that y ∈ S.
     let y := x + dx,
-    have hpos: 0 < dx,
-    { simp,
-      exacts ⟨hδ_pos, hlt⟩,},
-    specialize hδ_imp y,
     have hymx: x < y,
     { exact add_positive_gt_self x dx hpos, },
+
     have hy: y ∈ S,
-    { split,
+    { -- The argument below involves a number of arithmetic manipulations which
+      -- are quite difficult to work with which impacts the readability of the
+      -- proof. Essentially what happens in the first part is we show that
+      -- y was chosen just right to be greater than x yet still belong to [a,b].
+      split,
       { simp,
         split,
         { linarith },
@@ -266,6 +288,9 @@ begin
           linarith,
         }, },
       {
+        -- Here we show that y belongs to the δ-neighbourhood of x and thus
+        -- we'll be able to apply the bound on |f(x) - f(y)| which continuity
+        -- gives us.
         have hxy : | x - y | < δ,
         { simp,
           rw abs_lt,
@@ -280,32 +305,35 @@ begin
               left,
               linarith, }, }, },
 
-        specialize hδ_imp hxy,
+        -- Below we apply continuity and perform arithmetic manipulation of the
+        -- terms to show the desired inequality.
+        specialize hδ_imp y hxy,
         rw abs_lt at hδ_imp,
         cases hδ_imp,
         simp at hδ_imp_left,
         exact hδ_imp_left,
       },
     },
+    -- Finally we apply the lemma which we've defined above to arrive at the contradiction.
     exact no_elem_gt_upper_bound y x S hxlub.left hy hymx,
   end,
+
+  -- Here follows the second part of the main body of the argument.
   have hlt: f x ≤ c :=
   begin
     by_contra,
-    specialize hc x (f x - c),
+    specialize hfcont x (f x - c),
     rw not_le at h,
-    simp at hc,
-    specialize hc h,
-    cases hc with δ hδ,
-    cases hδ,
+    simp at hfcont,
+    rcases hfcont h with ⟨δ, ⟨hδ_pos, hδ_imp⟩⟩,
     have hy: ∀ (y : ℝ), | x - y | < δ -> y ∉ S,
     { intro y,
-      specialize hδ_right y,
+      specialize hδ_imp y,
       intro hxyδ,
-      specialize hδ_right hxyδ,
-      rw abs_lt at hδ_right,
-      cases hδ_right,
-      simp at hδ_right_right,
+      specialize hδ_imp hxyδ,
+      rw abs_lt at hδ_imp,
+      cases hδ_imp,
+      simp at hδ_imp_right,
       intro hSy,
       cases hSy,
       linarith, },
@@ -313,10 +341,10 @@ begin
     have hm : m < x,
     { simp,
       split,
-      { exact div_pos hδ_left two_pos },
+      { exact div_pos hδ_pos two_pos },
       { rw lt_iff_not_le,
         intro hxa,
-        rw antisymm hxa h4.left at hgt,
+        rw antisymm hxa haxb.left at hgt,
         linarith, }, },
 
     have hmS: ∀ y ∈ Ioc m x, y ∉ S,
@@ -349,9 +377,7 @@ begin
     linarith,
   end,
   use x,
-  split,
-  { split; linarith },
-  { linarith, },
+  exact ⟨haxb, antisymm hgt hlt⟩,
 end
 
 theorem intermediate_value_theorem_general (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
