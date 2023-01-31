@@ -31,6 +31,9 @@
 \newcommand\C{\mathbb{C}}
 \newcommand\l{\mathcal{l}}
 
+\newtheorem*{theorem}{Theorem}[section]
+
+
 \parindent 0ex
 
 %% Page style settings
@@ -45,6 +48,22 @@
 \date{\today}
 \author{CID: 01871147}
 \maketitle
+
+\section*{ Introduction }
+\section*{ Proof of The theorem }
+
+Let us start by stating the theorem and its proof, which then will be broken down
+into separate lemmas which we can prove using Lean.
+\begin{theorem}[Intermediate Value Theorem]
+  Let $f : [a, b] \to \R  $ be a countinuous function, then for all $c$ between
+  $f(a)$ and $f(b)$, there exists $x \in [a, b] $ satisfying $f(x) = c$.
+\end{theorem}
+
+\begin{proof}
+
+\end{proof}
+\section*{ Walkthrough in lean }
+\section*{ Introduction }
 
 \end{document}
 
