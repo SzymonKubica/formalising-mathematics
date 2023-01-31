@@ -3,25 +3,25 @@ import data.real.basic
 import data.set.intervals.basic
 import data.set
 import order
+import logic.basic
 
--- Makes the set class globally available for syntax brevity.
+-- Makes the set, function, order classes globally available for syntax brevity.
 open set
 open function
 open order
 
-def tends_to (a : ℕ → ℝ) (t : ℝ) : Prop :=
-∀ ε > 0, ∃ B : ℕ, ∀ n, B ≤ n → |a n - t| < ε
-
-
 def continuous (f : ℝ → ℝ) : Prop :=
 ∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x - y| < δ → |f x - f y| < ε
 
-theorem negative_continuous (f : ℝ → ℝ) (h: continuous f) : continuous (-f) :=
+-- The following theorem proves that if a function f is continuous then its
+-- reflection along x-axis is also continuous. It will be used int the last part
+-- of the proof to achieve the full generality of the statement of IVT.
+theorem negation_is_continuous (f : ℝ → ℝ) (h: continuous f) : continuous (-f) :=
 begin
  intros x ε hε,
+ -- Unwrapping the definition of continuity of f to get the required δ.
  specialize h x ε hε,
- cases h with δ hδ,
- cases hδ with hδ hy,
+ rcases h with ⟨δ, ⟨hδ, hy⟩⟩,
  use δ,
  split,
  { exact hδ },
@@ -32,26 +32,30 @@ begin
    exact hy },
 end
 
+-- The following section contains lemmas which prove useful fundamental operations
+-- on sets and interfals and their respective upper bounds. Those lemmas are used
+-- in the main proof to make the arguments more concise and speed up the compilation
+-- of the body of the main proof.
 
-lemma lemma1 (k m : ℝ) (S : set ℝ)
+-- This lemma proves that if we have some upper bound m for the set S, and
+-- in the interval (k,m] there are no elements of S, then we can improve the
+-- bound for S. It will be used in the proof of the special case of IVT.
+lemma no_elems_lt_upper_bound_imp_better_bound (k m : ℝ) (S : set ℝ)
 (h0: m ∈ upper_bounds S) (h1 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
 begin
-  rw upper_bounds,
   intros a ha,
   specialize h1 a,
   by_contra,
   rw not_le at h,
   have hlub: a ∈ Ioc k m,
-  { rw <- Ioc_def,
-    split,
-    { exact h },
-    { specialize h0 ha,
-      exact h0 }, },
-  specialize h1 hlub,
+  { rw <- Ioc_def,       -- Here the left part of the conjunction follows immediately
+    exact ⟨h, h0 ha⟩, }, -- whereas the right follows because m is an upper bound for S.
   apply h1,
-  exact ha,
+  exacts [hlub, ha],
 end
 
+-- This lemma asserts that any subset of a closed interval [a,b] is bounded above,
+-- it is used later to simplify some of the arguments in the special case of the proof.
 lemma subset_of_Icc_bdd_above (a b : ℝ) (S: set ℝ) (h0 : S ⊆ Icc a b) : bdd_above S :=
 begin
  use b,
@@ -60,31 +64,25 @@ begin
  exact h0.right,
 end
 
+-- The following lemma shows that if a set S is a subset of the closed interval
+-- [a,b] then its supremum must belong to that interval.
 lemma subset_of_Icc_sup_bounds (a b x : ℝ) (S : set ℝ)
 (h0: a < b) (h1: a ∈ S) (h2: bdd_above S) (h3: S ⊆ Icc a b) (h4: is_lub S x) :
 a ≤ x ∧ x ≤ b :=
 begin
     rw is_lub at h4,
     split,
-    {
-      cases h4,
+    { cases h4,
       specialize h4_left h1,
-      exact h4_left,
-    },
-    {
-      apply h4.right,
+      exact h4_left, },
+    { apply h4.right,
       intros y hy,
       specialize h3 hy,
-      exact h3.right,
-    },
+      exact h3.right, },
 end
 
-lemma add_positive_gt_self (a b : ℝ) (h : 0 < b) : a < a + b :=
-begin
-  simp,
-  exact h,
-end
-
+-- This lemma is used later to derive a contradition given an element of a set
+-- which is greater than an upper bound of that set.
 lemma no_elem_gt_upper_bound (a b : ℝ) (S : set ℝ) (h0: b ∈ upper_bounds S) (h1: a ∈ S) (h2: b < a) :
 false :=
 begin
@@ -92,12 +90,108 @@ begin
   linarith,
 end
 
+-- This lemma proves that if we are given a closed interval [a,b] and a point
+-- inside that interval which doesn't lie on either of the endpoints, then in fact
+-- the point belongs to the open interval (a,b)
+lemma elem_in_Icc_not_at_endpoints_in_Ioo (a b c : ℝ) (h0 : a ≠ c) (h1 : b ≠ c)
+(hIcc: c ∈ Icc a b) :  c ∈ Ioo a b :=
+begin
+  cases hIcc with hac hcb,
+  rw <- Ioo_def,
+  split,
+  { rw lt_iff_le_and_ne,
+    exact ⟨hac, h0⟩ },
+  { rw lt_iff_le_and_ne,
+    rw ne_comm at h1,
+    exact ⟨hcb, h1⟩ },
+end
+
+lemma neg_elem_reflection_Ioo (a b c: ℝ) (h : c ∈ Ioo a b): (-c) ∈ Ioo (-b) (-a) :=
+begin
+  split,
+    { simp, exact h.right, },
+    { simp, exact h.left, },
+end
+
+
+
+-- The following section contains lemmas involving some elementary arithmetic
+-- operations which are a bit difficult to show once the terms in the expressions
+-- of the main proof get more complex.
+
+-- Adding a positive constant makes a number bigger.
+lemma add_positive_gt_self (a b : ℝ) (h : 0 < b) : a < a + b :=
+begin
+  simp,
+  exact h,
+end
+
+-- One can divide both sides of an inequality by a positive constant.
 lemma div_lt_iff_mul_pos (a b c : ℝ) (h0: 0 < c): a < c * b → a / c < b :=
 begin
   intro h,
   exact (div_lt_iff' h0).mpr h,
 end
 
+-- Given two numbers, their minimum is equal to the smaller one.
+lemma min_eq_smaller_number (a b : ℝ) (h: a < b): a = min a b :=
+begin
+  apply eq.symm,
+  rw min_eq_iff,
+  left,
+  split,
+  { refl, },
+  { linarith, },
+end
+
+-- Given two numbers, their maximum is equal to the larger one.
+lemma max_eq_larger_number (a b : ℝ) (h: a < b): b = max a b :=
+begin
+  apply eq.symm,
+  rw max_eq_iff,
+  right,
+  split,
+  { refl, },
+  { linarith, },
+end
+
+-- The following two lemmas deal with the fact that if we are given two numbers
+-- a and b, then if c is not equal to either of them, then it won't be equal to
+-- neither their min nor their max. It seems obvious, but I've decided to introduce
+-- an additional lemma because writing the proofs inline was a bit difficult when
+-- operating on more complicated terms such as a, b, and c.
+
+lemma not_eq_min (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : min a b ≠ c :=
+begin
+  by_contra,
+  rw min_eq_iff at h,
+  cases h,
+  { apply h0,
+    apply eq.symm,
+    exact h.left, },
+  { apply h1,
+    apply eq.symm,
+    exact h.left, },
+end
+
+lemma not_eq_max (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : max a b ≠ c :=
+begin
+  by_contra,
+  rw max_eq_iff at h,
+  cases h,
+  { apply h0,
+    apply eq.symm,
+    exact h.left, },
+  { apply h1,
+    apply eq.symm,
+    exact h.left, },
+end
+
+-- One can multiply both sides of an equation by (-1).
+lemma neg_one_mul2 (a b : ℝ) (h : a = -b) : (-a) = b :=
+begin
+  exact neg_eq_iff_neg_eq.mp (eq.symm h),
+end
 
 theorem intermediate_value_theorem_special (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
 ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
@@ -248,7 +342,7 @@ begin
       },
     },
     have hmu: m ∈ upper_bounds S,
-     { exact lemma1 m x S hxlub.left hmS, },
+     { exact no_elems_lt_upper_bound_imp_better_bound m x S hxlub.left hmS, },
 
     cases hxlub,
     specialize hxlub_right hmu,
@@ -258,79 +352,6 @@ begin
   split,
   { split; linarith },
   { linarith, },
-end
-
-lemma elem_in_Icc_not_at_endpoints_in_Ioo (a b c : ℝ) (h0 : a ≠ c) (h1 : b ≠ c)
-(hIcc: c ∈ Icc a b) :  c ∈ Ioo a b :=
-begin
-  cases hIcc with hac hcb,
-  split,
-  { by_contra,
-    rw not_lt at h,
-    apply h0,
-    exact antisymm hac h, },
-  { by_contra,
-    rw not_lt at h,
-    apply h1,
-    exact antisymm hcb h,},
-end
-
-lemma min_eq_smaller_number (a b : ℝ) (h: a < b): a = min a b :=
-begin
-  apply eq.symm,
-  rw min_eq_iff,
-  left,
-  split,
-  { refl, },
-  { linarith, },
-end
-
-lemma max_eq_larger_number (a b : ℝ) (h: a < b): b = max a b :=
-begin
-  apply eq.symm,
-  rw max_eq_iff,
-  right,
-  split,
-  { refl, },
-  { linarith, },
-end
-
-lemma not_eq_min (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : min a b ≠ c :=
-begin
-  by_contra,
-  rw min_eq_iff at h,
-  cases h,
-  { apply h0,
-    apply eq.symm,
-    exact h.left, },
-  { apply h1,
-    apply eq.symm,
-    exact h.left, },
-end
-
-lemma not_eq_max (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : max a b ≠ c :=
-begin
-  by_contra,
-  rw max_eq_iff at h,
-  cases h,
-  { apply h0,
-    apply eq.symm,
-    exact h.left, },
-  { apply h1,
-    apply eq.symm,
-    exact h.left, },
-end
-
-lemma neg_one_mul2 (a b : ℝ) (h : a = -b) : (-a) = b :=
-begin
-  exact neg_eq_iff_neg_eq.mp (eq.symm h),
-end
-
-lemma neg_elem_reflection_Ioo (a b c: ℝ) (h : c ∈ Ioo a b): (-c) ∈ Ioo (-b) (-a) :=
-begin
-  split,
-    { simp, exact h.right, },
-    { simp, exact h.left, },
 end
 
 theorem intermediate_value_theorem_general (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc: continuous f) :
@@ -371,7 +392,7 @@ begin
       { let g := -f,
 
         have hg : continuous g,
-          { exact negative_continuous f hc, },
+          { exact negation_is_continuous f hc, },
 
         have hfba : f b < f a,
           { rw not_lt at h,
