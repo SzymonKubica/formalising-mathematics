@@ -10,13 +10,14 @@ open set
 open function
 open order
 
+/- Definition of continuity  -/
 def continuous (f : ℝ → ℝ) : Prop :=
 ∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x - y| < δ → |f x - f y| < ε
 
--- The following theorem proves that if a function f is continuous then its
--- reflection along x-axis is also continuous. It will be used int the last part
--- of the proof to achieve the full generality of the statement of IVT.
-theorem negation_is_continuous (f : ℝ → ℝ) (h : continuous f) : continuous (-f) :=
+/- The following theorem proves that if a function f is continuous then its
+   reflection along x-axis is also continuous. It will be used int the last part
+   of the proof to achieve the full generality of the statement of IVT. -/
+theorem negation_is_continuous {f : ℝ → ℝ} (h : continuous f) : continuous (-f) :=
 begin
  intros x ε hε,
  -- Unwrapping the definition of continuity of f to get the required δ.
@@ -32,14 +33,14 @@ begin
    exact hy },
 end
 
--- The following section contains lemmas which prove useful fundamental operations
--- on sets and interfals and their respective upper bounds. Those lemmas are used
--- in the main proof to make the arguments more concise and speed up the compilation
--- of the body of the main proof.
+/- The following section contains lemmas which prove useful fundamental operations
+   on sets and interfals and their respective upper bounds. Those lemmas are used
+   in the main proof to make the arguments more concise and speed up the compilation
+   of the body of the main proof. -/
 
--- This lemma proves that if we have some upper bound m for the set S, and
--- in the interval (k,m] there are no elements of S, then we can improve the
--- bound for S. It will be used in the proof of the special case of IVT.
+/- This lemma proves that if we have some upper bound m for the set S, and
+   in the interval (k,m] there are no elements of S, then we can improve the
+   bound for S. It will be used in the proof of the special case of IVT. -/
 lemma no_elems_lt_upper_bound_imp_better_bound {k m : ℝ} {S : set ℝ}
   (h0 : m ∈ upper_bounds S) (h1 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
 begin
@@ -54,8 +55,8 @@ begin
   exacts [hlub, ha],
 end
 
--- This lemma asserts that any subset of a closed interval [a,b] is bounded above,
--- it is used later to simplify some of the arguments in the special case of the proof.
+/- This lemma asserts that any subset of a closed interval [a,b] is bounded above,
+   it is used later to simplify some of the arguments in the special case of the proof. -/
 lemma subset_of_Icc_bdd_above {a b : ℝ} {S : set ℝ}
   (h0 : S ⊆ Icc a b) : bdd_above S :=
 begin
@@ -65,8 +66,8 @@ begin
  exact h0.right,
 end
 
--- The following lemma shows that if a set S is a subset of the closed interval
--- [a,b] then its supremum must belong to that interval.
+/- The following lemma shows that if a set S is a subset of the closed interval
+   [a,b] then its supremum must belong to that interval. -/
 lemma subset_of_Icc_sup_bounds {a b x : ℝ} {S : set ℝ}
   (h0 : a ∈ S) (h1 : S ⊆ Icc a b) (h2 : is_lub S x) :
 a ≤ x ∧ x ≤ b :=
@@ -80,8 +81,8 @@ begin
       exact h1.right, },
 end
 
--- This lemma is used later to derive a contradition given an element of a set
--- which is greater than an upper bound of that set.
+/- This lemma is used later to derive a contradition given an element of a set
+   which is greater than an upper bound of that set. -/
 lemma no_elem_gt_upper_bound {a b : ℝ} {S : set ℝ} (h0 : b ∈ upper_bounds S)
   (h1 : a ∈ S) (h2 : b < a) :
 false :=
@@ -90,9 +91,9 @@ begin
   linarith,
 end
 
--- This lemma proves that if we are given a closed interval [a,b] and a point
--- inside that interval which doesn't lie on either of the endpoints, then in fact
--- the point belongs to the open interval (a,b)
+/- This lemma proves that if we are given a closed interval [a,b] and a point
+   inside that interval which doesn't lie on either of the endpoints, then in fact
+   the point belongs to the open interval (a,b) -/
 lemma in_Icc_not_boundary_imp_in_Ioo {a b c : ℝ} (h0 : a ≠ c) (h1 : b ≠ c)
   (hIcc : c ∈ Icc a b) :  c ∈ Ioo a b :=
 begin
@@ -114,9 +115,9 @@ begin
   { simp, exact h.left, },
 end
 
--- The following section contains lemmas involving some elementary arithmetic
--- operations which are a bit difficult to show once the terms in the expressions
--- of the main proof get more complex.
+/- The following section contains lemmas involving some elementary arithmetic
+   operations which are a bit difficult to show once the terms in the expressions
+   of the main proof get more complex. -/
 
 -- Adding a positive constant makes a number bigger.
 lemma add_positive_gt_self (a b : ℝ) (h : 0 < b) : a < a + b :=
@@ -152,11 +153,11 @@ begin
   linarith,
 end
 
--- The following two lemmas deal with the fact that if we are given two numbers
--- a and b, then if c is not equal to either of them, then it won't be equal to
--- neither their min nor their max. It seems obvious, but I've decided to introduce
--- an additional lemma because writing the proofs inline was a bit difficult when
--- operating on terms more complicated than a, b, and c.
+/- The following two lemmas deal with the fact that if we are given two numbers
+   a and b, then if c is not equal to either of them, then it won't be equal to
+   neither their min nor their max. It seems obvious, but I've decided to introduce
+   an additional lemma because writing the proofs inline was a bit difficult when
+   operating on terms more complicated than a, b, and c. -/
 
 lemma not_eq_min {a b c : ℝ} (h0 : c ≠ a) (h1 : c ≠ b) : min a b ≠ c :=
 begin
@@ -184,9 +185,9 @@ begin
     exact h.left, },
 end
 
--- The following proves the special case of the IVT where we assume that
--- f(a) < c < f(b). The lemmas above are then used to prove the theorem in the
--- genreal case.
+/- The following proves the special case of the IVT where we assume that
+   f(a) < c < f(b). The lemmas above are then used to prove the theorem in the
+   genreal case. -/
 theorem intermediate_value_theorem_special {a b : ℝ} {f : ℝ  → ℝ} (h0 : a < b)
   (hfcont : continuous f) :
   ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
@@ -388,9 +389,9 @@ begin
   exact ⟨haxb, antisymm hgt hlt⟩,
 end
 
--- Below follows the proof of the theorem in full generality. No longer do we assume
--- that f(a) < c < f(b). Instead we first consider the special cases where c = f(a) or c = f(b).
--- if neither of these is true, we consider the lt_trichotomy on f(a) and f(b)
+/- Below follows the proof of the theorem in full generality. No longer do we assume
+   that f(a) < c < f(b). Instead we first consider the special cases where c = f(a) or c = f(b).
+   if neither of these is true, we consider the lt_trichotomy on f(a) and f(b) -/
 
 -- In order to siplify the statement of the theorem, I have introduced my own
 -- definitions of what it means for a number to be (strictly) between two other numbers.
@@ -411,7 +412,7 @@ notation a ` strictly_between ` b ` and ` c := is_strictly_between a b c
 
 -- Also we need to introduce an additional lemma to simplify the proposition that c is between
 -- a and b if we know what the order between a and b is.
-lemma simplify_between (a b c : ℝ) (h : c strictly_between a and b) :
+lemma simplify_between {a b c : ℝ} (h : c strictly_between a and b) :
 ((a < b) → c ∈ Ioo a b) ∧ ((b < a) -> c ∈ Ioo b a) :=
 begin
   split,
@@ -478,7 +479,7 @@ begin
     -- simplify the notion of being between. That is because, given that f(a) < f(b),
     -- we can get rid of the min/max and get a regular Ioo.
     { have hcfafb : c ∈ Ioo (f a) (f b),
-      { apply (simplify_between (f a) (f b) c hIoo).left,
+      { apply (simplify_between hIoo).left,
         exact hlt, },
       apply intermediate_value_theorem_special h0 hfcont,
       exact hcfafb, },
@@ -500,7 +501,7 @@ begin
 
       -- Continuity of g follows from the lemma which we previously defined.
       have hg : continuous g,
-      { exact negation_is_continuous f hfcont, },
+      { exact negation_is_continuous hfcont, },
 
       have hgab : g a < g b,
       { change - (f a) < - (f b),
@@ -509,7 +510,7 @@ begin
 
       -- Again we can use the fact that f(b) < f(a) to simplify the interval between min/max.
       have hcf : c ∈ Ioo (f b) (f a),
-      { apply (simplify_between (f a) (f b) c hIoo).right,
+      { apply (simplify_between hIoo).right,
         exact hgt, },
 
       have hcm : -c ∈ Ioo (g a) (g b),
