@@ -40,7 +40,7 @@ end
 -- This lemma proves that if we have some upper bound m for the set S, and
 -- in the interval (k,m] there are no elements of S, then we can improve the
 -- bound for S. It will be used in the proof of the special case of IVT.
-lemma no_elems_lt_upper_bound_imp_better_bound (k m : ℝ) (S : set ℝ)
+lemma no_elems_lt_upper_bound_imp_better_bound {k m : ℝ} {S : set ℝ}
   (h0 : m ∈ upper_bounds S) (h1 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
 begin
   intros a ha,
@@ -56,7 +56,7 @@ end
 
 -- This lemma asserts that any subset of a closed interval [a,b] is bounded above,
 -- it is used later to simplify some of the arguments in the special case of the proof.
-lemma subset_of_Icc_bdd_above (a b : ℝ) (S : set ℝ)
+lemma subset_of_Icc_bdd_above {a b : ℝ} {S : set ℝ}
   (h0 : S ⊆ Icc a b) : bdd_above S :=
 begin
  use b,
@@ -67,7 +67,7 @@ end
 
 -- The following lemma shows that if a set S is a subset of the closed interval
 -- [a,b] then its supremum must belong to that interval.
-lemma subset_of_Icc_sup_bounds (a b x : ℝ) (S : set ℝ)
+lemma subset_of_Icc_sup_bounds {a b x : ℝ} {S : set ℝ}
   (h0 : a ∈ S) (h1 : S ⊆ Icc a b) (h2 : is_lub S x) :
 a ≤ x ∧ x ≤ b :=
 begin
@@ -82,7 +82,7 @@ end
 
 -- This lemma is used later to derive a contradition given an element of a set
 -- which is greater than an upper bound of that set.
-lemma no_elem_gt_upper_bound (a b : ℝ) (S : set ℝ) (h0 : b ∈ upper_bounds S)
+lemma no_elem_gt_upper_bound {a b : ℝ} {S : set ℝ} (h0 : b ∈ upper_bounds S)
   (h1 : a ∈ S) (h2 : b < a) :
 false :=
 begin
@@ -93,7 +93,7 @@ end
 -- This lemma proves that if we are given a closed interval [a,b] and a point
 -- inside that interval which doesn't lie on either of the endpoints, then in fact
 -- the point belongs to the open interval (a,b)
-lemma in_Icc_not_boundary_imp_in_Ioo (a b c : ℝ) (h0 : a ≠ c) (h1 : b ≠ c)
+lemma in_Icc_not_boundary_imp_in_Ioo {a b c : ℝ} (h0 : a ≠ c) (h1 : b ≠ c)
   (hIcc : c ∈ Icc a b) :  c ∈ Ioo a b :=
 begin
   cases hIcc with hac hcb,
@@ -106,15 +106,13 @@ begin
     exact ⟨hcb, h1⟩ },
 end
 
-lemma neg_elem_reflection_Ioo (a b c : ℝ) (h : c ∈ Ioo a b):
+lemma neg_elem_reflection_Ioo {a b c : ℝ} (h : c ∈ Ioo a b):
 (-c) ∈ Ioo (-b) (-a) :=
 begin
   split,
   { simp, exact h.right, },
   { simp, exact h.left, },
 end
-
-
 
 -- The following section contains lemmas involving some elementary arithmetic
 -- operations which are a bit difficult to show once the terms in the expressions
@@ -135,7 +133,7 @@ begin
 end
 
 -- Given two numbers, their minimum is equal to the smaller one.
-lemma min_eq_smaller_number (a b : ℝ) (h : a < b) : a = min a b :=
+lemma min_eq_smaller_number {a b : ℝ} (h : a < b) : a = min a b :=
 begin
   apply eq.symm,
   rw min_eq_iff,
@@ -145,7 +143,7 @@ begin
 end
 
 -- Given two numbers, their maximum is equal to the larger one.
-lemma max_eq_larger_number (a b : ℝ) (h : a < b) : b = max a b :=
+lemma max_eq_larger_number {a b : ℝ} (h : a < b) : b = max a b :=
 begin
   apply eq.symm,
   rw max_eq_iff,
@@ -160,7 +158,7 @@ end
 -- an additional lemma because writing the proofs inline was a bit difficult when
 -- operating on terms more complicated than a, b, and c.
 
-lemma not_eq_min (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : min a b ≠ c :=
+lemma not_eq_min {a b c : ℝ} (h0 : c ≠ a) (h1 : c ≠ b) : min a b ≠ c :=
 begin
   by_contra,
   rw min_eq_iff at h,
@@ -173,7 +171,7 @@ begin
     exact h.left, },
 end
 
-lemma not_eq_max (a b c : ℝ) (h0 : c ≠ a) (h1 : c ≠ b) : max a b ≠ c :=
+lemma not_eq_max {a b c : ℝ} (h0 : c ≠ a) (h1 : c ≠ b) : max a b ≠ c :=
 begin
   by_contra,
   rw max_eq_iff at h,
@@ -186,17 +184,10 @@ begin
     exact h.left, },
 end
 
--- One can multiply both sides of an equation by (-1).
-lemma neg_one_mul2 (a b : ℝ) (h : a = -b) : (-a) = b :=
-begin
-  exact neg_eq_iff_neg_eq.mp (eq.symm h),
-end
-
-
 -- The following proves the special case of the IVT where we assume that
 -- f(a) < c < f(b). The lemmas above are then used to prove the theorem in the
 -- genreal case.
-theorem intermediate_value_theorem_special (a b : ℝ) (f : ℝ  → ℝ) (h0 : a < b)
+theorem intermediate_value_theorem_special {a b : ℝ} {f : ℝ  → ℝ} (h0 : a < b)
   (hfcont : continuous f) :
   ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
@@ -226,7 +217,7 @@ begin
     exact hy.left },
 
   have hba : bdd_above S,
-  { exact subset_of_Icc_bdd_above a b S hSab },
+  { exact subset_of_Icc_bdd_above hSab },
 
   -- Now we argue that S has a supremum as it is nonempty and bounded.
   obtain ⟨x, hxlub⟩ : ∃ (x : ℝ), is_lub S x,
@@ -234,7 +225,7 @@ begin
 
   -- Let us use the previously proven lemma to obtain the bounds for x.
   have haxb : a ≤ x ∧ x ≤ b,
-  { exact subset_of_Icc_sup_bounds a b x S ha hSab hxlub, },
+  { exact subset_of_Icc_sup_bounds ha hSab hxlub, },
 
   -- Now comes the main part of the proof of the special case, we show that
   -- both f(x) ≥ c and f(x) ≤ c and so by antisymmetry we'll conclude f(x) = c,
@@ -279,15 +270,13 @@ begin
       { simp,
         split,
         { linarith },
-        { have hyle : y ≤ x + (b - x) / 2,
-          { simp,
-            change (1 / 2) * (min δ (b - x)) ≤ (b - x) / 2,
-            simp,
-            rw div_eq_inv_mul,
-            simp,
-          },
-          linarith,
-        }, },
+        { -- We need to rewrite the goal explicitly to make it easier to work with
+          -- for linarith.
+          change x + 1 / 2 * min δ (b - x) ≤ b,
+          have hmin: (min δ (b - x)) ≤ (b - x),
+          { rw min_le_iff, simp, },
+          linarith, }, },
+
       { -- Here we show that y belongs to the δ-neighbourhood of x and thus
         -- we'll be able to apply the bound on |f(x) - f(y)| which continuity
         -- gives us.
@@ -297,13 +286,9 @@ begin
           split,
           { linarith, },
           { change (1 / 2) * (min δ (b - x)) < δ,
-            simp,
-            rw <- div_eq_inv_mul,
-            apply div_lt_iff_mul_pos,
-            { exact two_pos, },
-            { rw min_lt_iff,
-              left,
-              linarith, }, }, },
+            have hmin: min δ (b - x) ≤ δ,
+            { rw min_le_iff, simp, },
+            linarith, }, },
 
         -- Below we apply continuity and perform arithmetic manipulation of the
         -- terms to show the desired inequality.
@@ -315,7 +300,7 @@ begin
       },
     },
     -- Finally we apply the lemma which we've defined above to arrive at the contradiction.
-    exact no_elem_gt_upper_bound y x S hxlub.left hy hymx,
+    exact no_elem_gt_upper_bound hxlub.left hy hymx,
   end,
 
   -- Here follows the second part of the main body of the argument. It aims to
@@ -333,7 +318,7 @@ begin
     -- least upper bound for S thus contradicting with Sup S = x.
     let m := max (x-δ / 2) a,
 
-    -- First we show that m < x indeed.
+    -- First we show that m < x.
     have hm : m < x,
     { simp,
       split,
@@ -359,7 +344,7 @@ begin
       cases hSy,
       linarith, },
 
-    -- Now we need to narrow down the interval of points where none of them
+    -- We also need to narrow down the interval of points where none of them
     -- belong to S so that we can apply the lemma.
     have hmS : ∀ y ∈ Ioc m x, y ∉ S,
     { intros y hy2,
@@ -387,7 +372,7 @@ begin
     -- Finally we apply use the lemma by supplying the the hypotheses which we
     -- have derived above.
     have hmu : m ∈ upper_bounds S,
-     { exact no_elems_lt_upper_bound_imp_better_bound m x S hxlub.left hmS, },
+     { exact no_elems_lt_upper_bound_imp_better_bound hxlub.left hmS, },
 
     -- Now we need to unpack the definition of is_lub S x and extract from it that
     -- ∀ k ∈ upper_bounds S, x ≤ k. And then specialize it with m ∈ upper_bounds S.
@@ -432,16 +417,16 @@ begin
   split,
   { intro hab,
     have hMin : a = min a b,
-    { exact min_eq_smaller_number a b hab },
+    { exact min_eq_smaller_number hab },
     have hMax : b = max a b,
-    { exact max_eq_larger_number a b hab },
+    { exact max_eq_larger_number hab },
     rw [is_strictly_between, <- hMin, <- hMax] at h,
     exact h, },
   { intro hba,
     have hMin : b = min b a,
-    { exact min_eq_smaller_number b a hba },
+    { exact min_eq_smaller_number hba },
     have hMax : a = max b a,
-    { exact max_eq_larger_number b a hba },
+    { exact max_eq_larger_number hba },
     rw [is_strictly_between, min_comm, max_comm, <- hMin, <- hMax] at h,
     exact h, },
 end
@@ -478,10 +463,10 @@ begin
     { let minimum := (min (f a) (f b)),
       let maximum := (max (f a) (f b)),
       have hMin : minimum ≠ c,
-      { exact not_eq_min (f a) (f b) c h.left h.right, },
+      { exact not_eq_min h.left h.right, },
       have hMax : maximum ≠ c,
-      { exact not_eq_max (f a) (f b) c h.left h.right, },
-      exact in_Icc_not_boundary_imp_in_Ioo minimum maximum c hMin hMax hIcc},
+      { exact not_eq_max h.left h.right, },
+      exact in_Icc_not_boundary_imp_in_Ioo hMin hMax hIcc},
 
     -- Here we consider the trichotomy : (f(a) < f(b)) ∨ (f(a) = f(b)) ∨ (f(b) < f(a)).
     have htri := lt_trichotomy (f a) (f b),
@@ -495,7 +480,7 @@ begin
     { have hcfafb : c ∈ Ioo (f a) (f b),
       { apply (simplify_between (f a) (f b) c hIoo).left,
         exact hlt, },
-      apply intermediate_value_theorem_special a b f h0 hfcont,
+      apply intermediate_value_theorem_special h0 hfcont,
       exact hcfafb, },
 
     -- The case (f(a) = f(b)) follows trivially as in our current situation it can never occur,
@@ -528,11 +513,11 @@ begin
         exact hgt, },
 
       have hcm : -c ∈ Ioo (g a) (g b),
-      { exact neg_elem_reflection_Ioo (f b) (f a) c hcf, },
+      { exact neg_elem_reflection_Ioo hcf, },
 
       -- Now, we apply the special case of the IVT to g and -c.
       have hx : ∃ (x : ℝ), x ∈ Icc a b ∧ g x = - c,
-      { exact intermediate_value_theorem_special a b g h0 hg (-c) hcm,},
+      { exact intermediate_value_theorem_special h0 hg (-c) hcm,},
 
       -- Given the above we need to unwrap the statement and extract
       -- the x satisfying g(x) = -c. After that it suffices to show that
