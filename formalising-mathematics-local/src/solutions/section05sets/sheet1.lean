@@ -23,10 +23,10 @@ So `set X` could have been called `subset X` or `powerset X`; I guess they chose
 because it was the shortest.
 
 Note that `X` is a type, but `A` is a term; the type of `A` is `set X`. This means
-that `a : A` doesn't make sense. What we say instead is `a : X` and `a ∈ A`.
-Of course `a ∈ A` is a true-false statement, so `a ∈ A : Prop`.
+that `a : A` doesn't make sense. What we say instead is `a : X` and `a ∈ A`. 
+Of course `a ∈ A` is a true-false statement, so `a ∈ A : Prop`. 
 
-All the sets `A`, `B`, `C` etc we consider will be subsets of `X`.
+All the sets `A`, `B`, `C` etc we consider will be subsets of `X`. 
 If `x : X` then `x` may or may not be an element of `A`, `B`, `C`,
 but it will always be a term of type `X`.
 
@@ -46,7 +46,7 @@ Here are some mathematical facts:
 
 `A ⊆ B` is equivalent to `∀ x, x ∈ A → x ∈ B`;
 `x ∈ A ∪ B` is equivalent to `x ∈ A ∨ x ∈ B`;
-`x ∈ A ∩ B` is equivalent to `x ∈ A ∧ x ∈ B`.
+`x ∈ A ∩ B` is equivalent to `x ∈ A ∧ x ∈ B`. 
 
 All of these things are true *by definition* in Lean. Let's
 check this.
@@ -79,114 +79,55 @@ Let's prove some theorems.
 
 example : A ⊆ A :=
 begin
-  intros x hx,
-  exact hx,
+  rw subset_def, -- don't need this
+  intro x,
+  exact id, -- could do intro h, exact h
 end
 
 example : A ⊆ B → B ⊆ C → A ⊆ C :=
-λ hAB hBC x hxA, hBC (hAB hxA)
-
-example : A ⊆ B → B ⊆ C → A ⊆ C :=
 begin
-  intros h1 h2,
-  intros a ha,
-  apply h2,
-  apply h1,
-  exact ha,
+  intros hAB hBC x hxA,
+  apply hBC,
+  apply hAB hxA, -- or apply hAB, exact hxA
 end
 
 example : A ⊆ A ∪ B :=
 begin
-  intros a ha,
+  intros x hx,
   left,
-  exact ha,
+  assumption,
 end
 
 example : A ∩ B ⊆ A :=
 begin
-  intros x hx,
-  exact hx.left,
+  rintro x ⟨hxA, -⟩,
+  exact hxA,
 end
 
 example : A ⊆ B → A ⊆ C → A ⊆ (B ∩ C) :=
 begin
   intros hAB hAC x hxA,
-  exacts ⟨hAB hxA, hAC hxA⟩,
-end
-
-
-example : A ⊆ B → A ⊆ C → A ⊆ (B ∩ C) :=
-begin
-  intros h1 h2,
-  intros a ha,
+  -- exact ⟨hAB hxA, hAC hxA⟩, -- finishes the level in one line
   split,
-  {
-    apply h1,
-    exact ha,
-  },
-  {
-    apply h2,
-    exact ha,
-  },
+  { apply hAB,
+    exact hxA },
+  { exact hAC hxA },
 end
 
 example : B ⊆ A → C ⊆ A → B ∪ C ⊆ A :=
 begin
-  intros h1 h2,
-  intros x hx,
-  cases hx,
-  {
-    apply h1,
-    exact hx,
-  },
-  {
-    apply h2,
-    exact hx,
-  },
+  rintros hBA hCA x (hxB | hxC),
+  { exact hBA hxB },
+  { exact hCA hxC }
 end
 
 example : A ⊆ B → C ⊆ D → A ∪ C ⊆ B ∪ D :=
 begin
- rintros hAB hCD x (hxA | hxC),
- { left, exact hAB hxA, },
- { right, exact hCD hxC, },
-end
-
-example : A ⊆ B → C ⊆ D → A ∪ C ⊆ B ∪ D :=
-begin
-  rintros hAB hCD x (hxA | hxC),
-  { left, exact hAB hxA },
-  { right, exact hCD hxC },
-end
-example : A ⊆ B → C ⊆ D → A ∪ C ⊆ B ∪ D :=
-begin
-  intros h1 h2,
-  intros x hx,
-  cases hx,
-  {
-    left,
-    apply h1,
-    exact hx,
-  },
-  {
-    right,
-    apply h2,
-    exact hx,
-  },
+  exact set.union_subset_union, -- found this with `library_search`
 end
 
 example : A ⊆ B → C ⊆ D → A ∩ C ⊆ B ∩ D :=
 begin
-  intros h1 h2,
-  intros x hx,
-  split,
-  {
-    apply h1,
-    exact hx.left,
-  },
-  {
-    apply h2,
-    exact hx.right,
-  },
+  rintro hAB hCD x ⟨hxA, hxC⟩,
+  exact ⟨hAB hxA, hCD hxC⟩,
 end
-

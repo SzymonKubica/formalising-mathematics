@@ -26,6 +26,25 @@ solving them.
 Good luck!
 -/
 
+lemma triangle_inequality (a: ℝ) (b: ℝ) (c: ℝ) :
+| a + b + c| ≤ | a | + | b | + | c | :=
+begin
+  have h1: |b + c| ≤ | b | + | c |,
+  {
+    exact abs_add b c,
+  },
+
+  have h2: | a + b + c| ≤ | a | + | b + c |,
+  {
+    rw add_assoc,
+    exact abs_add a (b + c),
+  },
+  have h3:  | a | + | b + c | ≤ | a | + | b | + | c |,
+  {
+    linarith,
+  },
+  linarith,
+end
 
 /-- If `a(n)` tends to `t` then `37 * a(n)` tends to `37 * t`-/
 theorem tends_to_thirtyseven_mul (a : ℕ → ℝ) (t : ℝ) (h : tends_to a t) :
