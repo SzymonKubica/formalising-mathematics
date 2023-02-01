@@ -93,7 +93,7 @@ end
 -- This lemma proves that if we are given a closed interval [a,b] and a point
 -- inside that interval which doesn't lie on either of the endpoints, then in fact
 -- the point belongs to the open interval (a,b)
-lemma elem_in_Icc_not_at_endpoints_in_Ioo (a b c : ℝ) (h0 : a ≠ c) (h1 : b ≠ c)
+lemma in_Icc_not_boundary_imp_in_Ioo (a b c : ℝ) (h0 : a ≠ c) (h1 : b ≠ c)
   (hIcc : c ∈ Icc a b) :  c ∈ Ioo a b :=
 begin
   cases hIcc with hac hcb,
@@ -192,20 +192,6 @@ begin
   exact neg_eq_iff_neg_eq.mp (eq.symm h),
 end
 
--- If we know that a number c is between two numbers a and b, then given the ordering of a, b
--- we can simplify the expression.
-lemma simplify_between (a b c : ℝ) (h : c ∈ Ioo (min a b) (max a b)) :
-((a < b) → c ∈ Ioo a b) ∧ ((b < a) -> c ∈ Ioo b a) :=
-begin
-  sorry,
-      have hMin : f b = min (f b) (f a),
-      { exact min_eq_smaller_number (f b) (f a) hgt },
-      have hMax : f a = max (f b) (f a),
-      { exact max_eq_larger_number (f b) (f a) hgt },
-      rw [min_comm, max_comm] at hIoo,
-      rw [<- hMin, <- hMax]  at hIoo,
-      exact hIoo,
-end
 
 -- The following proves the special case of the IVT where we assume that
 -- f(a) < c < f(b). The lemmas above are then used to prove the theorem in the
@@ -421,8 +407,47 @@ end
 -- that f(a) < c < f(b). Instead we first consider the special cases where c = f(a) or c = f(b).
 -- if neither of these is true, we consider the lt_trichotomy on f(a) and f(b)
 
-theorem intermediate_value_theorem (a b : ℝ) (f : ℝ  → ℝ) (h0: a < b) (hfcont : continuous f) :
-  ∀ (c : ℝ), c ∈ Icc (min (f a) (f b)) (max (f a) (f b)) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
+-- In order to siplify the statement of the theorem, I have introduced my own
+-- definitions of what it means for a number to be (strictly) between two other numbers.
+def is_between (a b c : ℝ) : Prop :=
+a ∈ Icc (min b c) (max b c)
+
+def is_strictly_between (a b c : ℝ) : Prop :=
+a ∈ Ioo (min b c) (max b c)
+
+-- Then I introduced some shorthand notation to be able to express these
+-- propositions in a readable way (using infix notation).
+reserve infix ` between `:65
+reserve infix ` strictly_between `:65
+reserve infix ` and `:66
+
+notation a ` between ` b ` and ` c := is_between a b c
+notation a ` strictly_between ` b ` and ` c := is_strictly_between a b c
+
+-- Also we need to introduce an additional lemma to simplify the proposition that c is between
+-- a and b if we know what the order between a and b is.
+lemma simplify_between (a b c : ℝ) (h : c strictly_between a and b) :
+((a < b) → c ∈ Ioo a b) ∧ ((b < a) -> c ∈ Ioo b a) :=
+begin
+  split,
+  { intro hab,
+    have hMin : a = min a b,
+    { exact min_eq_smaller_number a b hab },
+    have hMax : b = max a b,
+    { exact max_eq_larger_number a b hab },
+    rw [is_strictly_between, <- hMin, <- hMax] at h,
+    exact h, },
+  { intro hba,
+    have hMin : b = min b a,
+    { exact min_eq_smaller_number b a hba },
+    have hMax : a = max b a,
+    { exact max_eq_larger_number b a hba },
+    rw [is_strictly_between, min_comm, max_comm, <- hMin, <- hMax] at h,
+    exact h, },
+end
+
+theorem intermediate_value_theorem (a b : ℝ) (f : ℝ  → ℝ) (h0 : a < b) (hfcont : continuous f) :
+  ∀ (c : ℝ), (c between (f a) and (f b)) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
   intro c,
 
@@ -445,42 +470,48 @@ begin
     -- so we rewite it using De Morgan's law.
     rw not_or_distrib at h,
 
-    -- We assume that c ∈ [min{f(a),f(b)},max{f(a),f(b)}] and since we know that it is not
-    -- equal to either of f(a), f(b), we use the previously defined lemmas to show that c must
-    -- in fact belong to the open interval.
+    -- We assume that c ∈ [min{f(a),f(b)},max{f(a),f(b)}] (c is between f(a) and f(b))
+    -- and since we know that it is not equal to either of f(a), f(b), we use the previously
+    -- defined lemmas to show that c must in fact belong to the open interval.
     intro hIcc,
-    have hIoo : c ∈ Ioo (min (f a) (f b)) (max (f a) (f b)),
-    { have hMin : (min (f a) (f b)) ≠ c,
+    have hIoo : c strictly_between (f a) and (f b),
+    { let minimum := (min (f a) (f b)),
+      let maximum := (max (f a) (f b)),
+      have hMin : minimum ≠ c,
       { exact not_eq_min (f a) (f b) c h.left h.right, },
-      have hMax : (max (f a) (f b)) ≠ c,
+      have hMax : maximum ≠ c,
       { exact not_eq_max (f a) (f b) c h.left h.right, },
-      exact elem_in_Icc_not_at_endpoints_in_Ioo (min (f a) (f b)) (max (f a) (f b)) c hMin hMax hIcc},
+      exact in_Icc_not_boundary_imp_in_Ioo minimum maximum c hMin hMax hIcc},
 
-    -- At this point we consider the trichotomy: (f(a) < f(b)) ∨ (f(a) = f(b)) ∨ (f(b) < f(a)).
+    -- Here we consider the trichotomy : (f(a) < f(b)) ∨ (f(a) = f(b)) ∨ (f(b) < f(a)).
     have htri := lt_trichotomy (f a) (f b),
-    rcases htri with hlt | heq | hgt, -- The rest of the proof is split into 3 cases.
-    { -- In the case (f(a) < f(b)) we need to use this fact to determine the minima and maxima in
-      -- the expression for the Ioo, after that we can simplify it and apply the special case
-      -- of the theorem
-      have hMin : f a = min (f a) (f b),
-      { exact min_eq_smaller_number (f a) (f b) hlt },
-      have hMax : f b = max (f a) (f b),
-      { exact max_eq_larger_number (f a) (f b) hlt },
-      rw [<- hMin, <- hMax] at hIoo,
+
+    -- The rest of the proof is split into 3 cases.
+    rcases htri with hlt | heq | hgt,
+
+    -- In the case (f(a) < f(b)) we need to use this fact to
+    -- simplify the notion of being between. That is because, given that f(a) < f(b),
+    -- we can get rid of the min/max and get a regular Ioo.
+    { have hcfafb : c ∈ Ioo (f a) (f b),
+      { apply (simplify_between (f a) (f b) c hIoo).left,
+        exact hlt, },
       apply intermediate_value_theorem_special a b f h0 hfcont,
-      exact hIoo, },
-    { -- The case (f(a) = f(b)) follows trivially as in our current situation it can never occur,
-      -- that is because if f(a) = f(b) then the open interval (f(a),f(b)) is empty and so
-      -- c cannot belong to it which leads to a contradiction.
+      exact hcfafb, },
+
+    -- The case (f(a) = f(b)) follows trivially as in our current situation it can never occur,
+    -- that is because if f(a) = f(b) then the open interval (f(a),f(b)) is empty and so
+    -- c cannot belong to it which leads to a contradiction.
+    { rw is_strictly_between at hIoo,
       rw heq at hIoo,
       simp at hIoo,
       exfalso,
       exact hIoo,
      },
-    { -- The case (f(b) < f(a)), we preform a reflection of f along the x-axis to obtain g = -f.
-      -- Then we adapt the hypotheses so that we can apply the special case of the theorem to
-      -- g and -c. Afterwards, we can find x by preforming usual arithmetic operations.
-      let g := -f,
+
+    -- For the case (f(b) < f(a)), we preform a reflection of f along the x-axis to obtain g = -f.
+    -- Then we adapt the hypotheses so that we can apply the special case of the theorem to
+    -- g and -c. Afterwards, we can find x by preforming usual arithmetic operations.
+    { let g := -f,
 
       -- Continuity of g follows from the lemma which we previously defined.
       have hg : continuous g,
@@ -491,15 +522,21 @@ begin
         simp,
         exact hgt, },
 
+      -- Again we can use the fact that f(b) < f(a) to simplify the interval between min/max.
       have hcf : c ∈ Ioo (f b) (f a),
       { apply (simplify_between (f a) (f b) c hIoo).right,
         exact hgt, },
 
       have hcm : -c ∈ Ioo (g a) (g b),
       { exact neg_elem_reflection_Ioo (f b) (f a) c hcf, },
+
+      -- Now, we apply the special case of the IVT to g and -c.
       have hx : ∃ (x : ℝ), x ∈ Icc a b ∧ g x = - c,
       { exact intermediate_value_theorem_special a b g h0 hg (-c) hcm,},
 
+      -- Given the above we need to unwrap the statement and extract
+      -- the x satisfying g(x) = -c. After that it suffices to show that
+      -- it also satisfies f(x) = c and we are done.
       rcases hx with ⟨x , ⟨hIcc, hgx⟩⟩,
       use x,
       split,
@@ -507,6 +544,5 @@ begin
       { have hfx : -(f x) = -c,
         { rw <- hgx, refl, },
         simp at hfx,
-        exact hfx, }, },
-  },
+        exact hfx, }, }, },
 end
