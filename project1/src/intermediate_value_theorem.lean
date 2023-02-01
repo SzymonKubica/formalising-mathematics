@@ -192,10 +192,26 @@ begin
   exact neg_eq_iff_neg_eq.mp (eq.symm h),
 end
 
+-- If we know that a number c is between two numbers a and b, then given the ordering of a, b
+-- we can simplify the expression.
+lemma simplify_between (a b c : ℝ) (h : c ∈ Ioo (min a b) (max a b)) :
+((a < b) → c ∈ Ioo a b) ∧ ((b < a) -> c ∈ Ioo b a) :=
+begin
+  sorry,
+      have hMin : f b = min (f b) (f a),
+      { exact min_eq_smaller_number (f b) (f a) hgt },
+      have hMax : f a = max (f b) (f a),
+      { exact max_eq_larger_number (f b) (f a) hgt },
+      rw [min_comm, max_comm] at hIoo,
+      rw [<- hMin, <- hMax]  at hIoo,
+      exact hIoo,
+end
+
 -- The following proves the special case of the IVT where we assume that
 -- f(a) < c < f(b). The lemmas above are then used to prove the theorem in the
 -- genreal case.
-theorem intermediate_value_theorem_special (a b : ℝ) (h0 : a < b) (f : ℝ  → ℝ) (hfcont : continuous f) :
+theorem intermediate_value_theorem_special (a b : ℝ) (f : ℝ  → ℝ) (h0 : a < b)
+  (hfcont : continuous f) :
   ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
   rintro c ⟨hfac, hcfb⟩, -- Introduce the arbitrary c and break down the fact that c ∈ (f(a), f(b)).
@@ -401,90 +417,96 @@ begin
   exact ⟨haxb, antisymm hgt hlt⟩,
 end
 
--- Below
+-- Below follows the proof of the theorem in full generality. No longer do we assume
+-- that f(a) < c < f(b). Instead we first consider the special cases where c = f(a) or c = f(b).
+-- if neither of these is true, we consider the lt_trichotomy on f(a) and f(b)
 
-theorem intermediate_value_theorem (a b : ℝ) (h0: a < b) (f : ℝ  → ℝ) (hc : continuous f) :
+theorem intermediate_value_theorem (a b : ℝ) (f : ℝ  → ℝ) (h0: a < b) (hfcont : continuous f) :
   ∀ (c : ℝ), c ∈ Icc (min (f a) (f b)) (max (f a) (f b)) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
 begin
   intro c,
+
+  -- First we need to deal with the case when c is equal to the value at either of the endpoints.
   by_cases (c = f a ∨ c = f b),
-    { cases h,
-      repeat { intro hIcc,
-        use a,
-        split,
-        { simp, linarith, },
-        { rw h, }, },
-      { intro hIcc,
-        use b,
-        split,
-        { simp, linarith, },
-        { rw h, }, }, },
-    { rw not_or_distrib at h,
-      intro hIcc,
-      have himp : c ∈ Ioo (min (f a) (f b)) (max (f a) (f b)),
-      { have hMin : (min (f a) (f b)) ≠ c,
-          { exact not_eq_min (f a) (f b) c h.left h.right, },
-        have hMax : (max (f a) (f b)) ≠ c,
-          { exact not_eq_max (f a) (f b) c h.left h.right, },
-        exact elem_in_Icc_not_at_endpoints_in_Ioo (min (f a) (f b)) (max (f a) (f b)) c hMin hMax hIcc},
-      by_cases (f a) < (f b),
-      { dedup,
-        have hMin : f a = min (f a) (f b),
-          { exact min_eq_smaller_number (f a) (f b) h_1 },
-        have hMax : f b = max (f a) (f b),
-          { exact max_eq_larger_number (f a) (f b) h_1 },
-        rw <- hMin at himp,
-        rw <- hMax at himp,
-        apply intermediate_value_theorem_special a b h0 f hc,
-        exact himp,
-        },
-      { let g := -f,
+  { -- Here we use x := a and x := b respectively and show that the required f(x) = c is satisfied.
+    cases h,
+    { intro hIcc,
+      use a,
+      split,
+      { simp, linarith, },
+      { rw h, }, },
+    { intro hIcc,
+      use b,
+      split,
+      { simp, linarith, },
+      { rw h, }, }, },
 
-        have hg : continuous g,
-          { exact negation_is_continuous f hc, },
+  { -- At this point we know that (c = f(a) ∨ c = f(b)) is false,
+    -- so we rewite it using De Morgan's law.
+    rw not_or_distrib at h,
 
-        have hfba : f b < f a,
-          { rw not_lt at h,
-            by_contra,
-            dedup,
-            rw not_lt at h_2,
-            have h_3: f a = f b,
-              { linarith },
-            rw h_3 at himp,
-            simp at himp,
-            exact himp, },
+    -- We assume that c ∈ [min{f(a),f(b)},max{f(a),f(b)}] and since we know that it is not
+    -- equal to either of f(a), f(b), we use the previously defined lemmas to show that c must
+    -- in fact belong to the open interval.
+    intro hIcc,
+    have hIoo : c ∈ Ioo (min (f a) (f b)) (max (f a) (f b)),
+    { have hMin : (min (f a) (f b)) ≠ c,
+      { exact not_eq_min (f a) (f b) c h.left h.right, },
+      have hMax : (max (f a) (f b)) ≠ c,
+      { exact not_eq_max (f a) (f b) c h.left h.right, },
+      exact elem_in_Icc_not_at_endpoints_in_Ioo (min (f a) (f b)) (max (f a) (f b)) c hMin hMax hIcc},
 
-        have hgab : g a < g b,
-          { change - (f a) < - (f b),
-            simp,
-            exact hfba, },
+    -- At this point we consider the trichotomy: (f(a) < f(b)) ∨ (f(a) = f(b)) ∨ (f(b) < f(a)).
+    have htri := lt_trichotomy (f a) (f b),
+    rcases htri with hlt | heq | hgt, -- The rest of the proof is split into 3 cases.
+    { -- In the case (f(a) < f(b)) we need to use this fact to determine the minima and maxima in
+      -- the expression for the Ioo, after that we can simplify it and apply the special case
+      -- of the theorem
+      have hMin : f a = min (f a) (f b),
+      { exact min_eq_smaller_number (f a) (f b) hlt },
+      have hMax : f b = max (f a) (f b),
+      { exact max_eq_larger_number (f a) (f b) hlt },
+      rw [<- hMin, <- hMax] at hIoo,
+      apply intermediate_value_theorem_special a b f h0 hfcont,
+      exact hIoo, },
+    { -- The case (f(a) = f(b)) follows trivially as in our current situation it can never occur,
+      -- that is because if f(a) = f(b) then the open interval (f(a),f(b)) is empty and so
+      -- c cannot belong to it which leads to a contradiction.
+      rw heq at hIoo,
+      simp at hIoo,
+      exfalso,
+      exact hIoo,
+     },
+    { -- The case (f(b) < f(a)), we preform a reflection of f along the x-axis to obtain g = -f.
+      -- Then we adapt the hypotheses so that we can apply the special case of the theorem to
+      -- g and -c. Afterwards, we can find x by preforming usual arithmetic operations.
+      let g := -f,
 
-        have hcf : c ∈ Ioo (f b) (f a),
-          { have hMin : f b = min (f b) (f a),
-              { exact min_eq_smaller_number (f b) (f a) hfba },
-            have hMax : f a = max (f b) (f a),
-              { exact max_eq_larger_number (f b) (f a) hfba },
-            rw min_comm at himp,
-            rw max_comm at himp,
-            rw <- hMin at himp,
-            rw <- hMax at himp,
-            exact himp,
-          },
+      -- Continuity of g follows from the lemma which we previously defined.
+      have hg : continuous g,
+      { exact negation_is_continuous f hfcont, },
 
-        have hcm : -c ∈ Ioo (g a) (g b),
-          { exact neg_elem_reflection_Ioo (f b) (f a) c hcf, },
-        have hx : ∃ (x : ℝ), x ∈ Icc a b ∧ g x = - c,
-          { exact intermediate_value_theorem_special a b h0 g hg (-c) hcm,},
+      have hgab : g a < g b,
+      { change - (f a) < - (f b),
+        simp,
+        exact hgt, },
 
-        rcases hx with ⟨x , ⟨ hIcc, hgx ⟩⟩,
-        use x,
-        split,
-        { exact hIcc },
-        { have hfx : -(f x) = -c,
-            { rw <- hgx, refl, },
-          simp at hfx,
-          exact hfx,
-        },
-      },
-    },
+      have hcf : c ∈ Ioo (f b) (f a),
+      { apply (simplify_between (f a) (f b) c hIoo).right,
+        exact hgt, },
+
+      have hcm : -c ∈ Ioo (g a) (g b),
+      { exact neg_elem_reflection_Ioo (f b) (f a) c hcf, },
+      have hx : ∃ (x : ℝ), x ∈ Icc a b ∧ g x = - c,
+      { exact intermediate_value_theorem_special a b g h0 hg (-c) hcm,},
+
+      rcases hx with ⟨x , ⟨hIcc, hgx⟩⟩,
+      use x,
+      split,
+      { exact hIcc },
+      { have hfx : -(f x) = -c,
+        { rw <- hgx, refl, },
+        simp at hfx,
+        exact hfx, }, },
+  },
 end
