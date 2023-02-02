@@ -1,1 +1,3 @@
-test
+ def continuous (f : ℝ → ℝ) : Prop :=
+∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x - y| < δ → |f x - f y| < ε
+
