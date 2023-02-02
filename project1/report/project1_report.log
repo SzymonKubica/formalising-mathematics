@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.8)  1 FEB 2023 23:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.8)  2 FEB 2023 00:21
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -206,97 +206,243 @@ Package: amsthm 2020/05/29 v2.20.6
 \thm@postskip=\skip55
 \thm@headsep=\skip56
 \dth@everypar=\toks34
-) (/usr/share/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
-Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and footers
-\f@nch@headwidth=\skip57
-\f@nch@O@elh=\skip58
-\f@nch@O@erh=\skip59
-\f@nch@O@olh=\skip60
-\f@nch@O@orh=\skip61
-\f@nch@O@elf=\skip62
-\f@nch@O@erf=\skip63
-\f@nch@O@olf=\skip64
-\f@nch@O@orf=\skip65
-) (/usr/share/texmf-dist/tex/latex/enumitem/enumitem.sty
-Package: enumitem 2019/06/20 v3.9 Customized lists
-\labelindent=\skip66
-\enit@outerparindent=\dimen180
-\enit@toks=\toks35
-\enit@inbox=\box55
-\enit@count@id=\count285
-\enitdp@description=\count286
+) (/usr/share/texmf-dist/tex/latex/minted/minted.sty
+Package: minted 2021/12/24 v2.6 Yet another Pygments shim for LaTeX
+ (/usr/share/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
+ (/usr/share/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+) (/usr/share/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+)) (/usr/share/texmf-dist/tex/latex/fvextra/fvextra.sty
+Package: fvextra 2019/02/04 v1.4 fvextra - extensions and patches for fancyvrb
+ (/usr/share/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2020/11/24 v1.1c Standard LaTeX ifthen package (DPC)
+) (/usr/share/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count285
+) (/usr/share/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2022/04/12 4.2 verbatim text (tvz,hv)
+\FV@CodeLineNo=\count286
+\FV@InFile=\read3
+\FV@TabBox=\box55
+\c@FancyVerbLine=\count287
+\FV@StepNumber=\count288
+\FV@OutFile=\write3
+) (/usr/share/texmf-dist/tex/latex/upquote/upquote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verbatim
+)
+(/usr/share/texmf-dist/tex/latex/lineno/lineno.sty
+Package: lineno 2005/11/02 line numbers on paragraphs v4.41
+\linenopenalty=\count289
+\output=\toks35
+\linenoprevgraf=\count290
+\linenumbersep=\dimen180
+\linenumberwidth=\dimen181
+\c@linenumber=\count291
+\c@pagewiselinenumber=\count292
+\c@LN@truepage=\count293
+\c@internallinenumber=\count294
+\c@internallinenumbers=\count295
+\quotelinenumbersep=\dimen182
+\bframerule=\dimen183
+\bframesep=\dimen184
+\bframebox=\box56
+LaTeX Info: Redefining \\ on input line 3056.
+)
+\c@FV@TrueTabGroupLevel=\count296
+\c@FV@TrueTabCounter=\count297
+\FV@TabBox@Group=\box57
+\FV@TmpLength=\skip57
+\c@FV@HighlightLinesStart=\count298
+\c@FV@HighlightLinesStop=\count299
+\FV@LoopCount=\count300
+\FV@NCharsBox=\box58
+\FV@BreakIndent=\dimen185
+\FV@BreakIndentNChars=\count301
+\FV@BreakSymbolSepLeft=\dimen186
+\FV@BreakSymbolSepLeftNChars=\count302
+\FV@BreakSymbolSepRight=\dimen187
+\FV@BreakSymbolSepRightNChars=\count303
+\FV@BreakSymbolIndentLeft=\dimen188
+\FV@BreakSymbolIndentLeftNChars=\count304
+\FV@BreakSymbolIndentRight=\dimen189
+\FV@BreakSymbolIndentRightNChars=\count305
+\c@FancyVerbLineBreakLast=\count306
+\FV@LineBox=\box59
+\FV@LineIndentBox=\box60
+\FV@LineWidth=\dimen190
+) (/usr/share/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count307
+\calc@Bcount=\count308
+\calc@Adimen=\dimen191
+\calc@Bdimen=\dimen192
+\calc@Askip=\skip58
+\calc@Bskip=\skip59
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count309
+\calc@Cskip=\skip60
+) (/usr/share/texmf-dist/tex/latex/tools/shellesc.sty
+Package: shellesc 2019/11/08 v1.0c unified shell escape interface for LaTeX
+Package shellesc Info: Restricted shell escape enabled on input line 77.
+) (/usr/share/texmf-dist/tex/latex/ifplatform/ifplatform.sty
+Package: ifplatform 2017/10/13 v0.4a Testing for the operating system
+ (/usr/share/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
+ (/usr/share/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+) (/usr/share/texmf-dist/tex/generic/catchfile/catchfile.sty
+Package: catchfile 2019/12/09 v1.8 Catch the contents of a file (HO)
+ (/usr/share/texmf-dist/tex/generic/etexcmds/etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)) (/usr/share/texmf-dist/tex/generic/iftex/ifluatex.sty
+Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
 )
 
-./project1_report.tex:32: LaTeX Error: Command \l already defined.
+Package ifplatform Warning: 
+    shell escape is disabled, so I can only detect \ifwindows.
+
+) (/usr/share/texmf-dist/tex/generic/xstring/xstring.sty (/usr/share/texmf-dist/tex/generic/xstring/xstring.tex
+\integerpart=\count310
+\decimalpart=\count311
+)
+Package: xstring 2021/07/21 v1.84 String manipulations (CT)
+) (/usr/share/texmf-dist/tex/latex/framed/framed.sty
+Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
+\OuterFrameSep=\skip61
+\fb@frw=\dimen193
+\fb@frh=\dimen194
+\FrameRule=\dimen195
+\FrameSep=\dimen196
+)
+\minted@appexistsfile=\read4
+\minted@bgbox=\box61
+\minted@code=\write4
+\c@minted@FancyVerbLineTemp=\count312
+\c@minted@pygmentizecounter=\count313
+\@float@every@listing=\toks36
+\c@listing=\count314
+)
+runsystem(mkdir -p _minted-project1_report)...disabled (restricted).
+
+
+
+./project1_report.tex:17: Package minted Error: You must invoke LaTeX with the -shell-escape flag.
+
+See the minted package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.17 \usepackage
+                {fancyhdr}
+Pass the -shell-escape flag to LaTeX. Refer to the minted.sty documentation for more information.
+
+(/usr/share/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and footers
+\f@nch@headwidth=\skip62
+\f@nch@O@elh=\skip63
+\f@nch@O@erh=\skip64
+\f@nch@O@olh=\skip65
+\f@nch@O@orh=\skip66
+\f@nch@O@elf=\skip67
+\f@nch@O@erf=\skip68
+\f@nch@O@olf=\skip69
+\f@nch@O@orf=\skip70
+) (/usr/share/texmf-dist/tex/latex/enumitem/enumitem.sty
+Package: enumitem 2019/06/20 v3.9 Customized lists
+\labelindent=\skip71
+\enit@outerparindent=\dimen197
+\enit@toks=\toks37
+\enit@inbox=\box62
+\enit@count@id=\count315
+\enitdp@description=\count316
+)
+
+./project1_report.tex:33: LaTeX Error: Command \l already defined.
                Or name \end... illegal, see p.192 of the manual.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.32 \newcommand\l{\mathcal{l}}
+l.33 \newcommand\l{\mathcal{l}}
                                
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
+(/usr/share/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2021/10/31 v2.13 LaTeX color extensions (UK)
+ (/usr/share/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 227.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1352.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1356.
+Package xcolor Info: Model `RGB' extended on input line 1368.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1370.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1372.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1373.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1374.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1375.
+)
+runsystem(which pygmentize && touch project1_report.aex)...disabled (restricted).
+
+
+
+./project1_report.tex:46: Package minted Error: You must have `pygmentize' installed to use this package.
+
+See the minted package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.46 \begin{document}
+                     
+Refer to the installation instructions in the minted documentation for more information.
+
 (./project1_report.aux)
 \openout1 = `project1_report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
  (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count287
-\scratchdimen=\dimen181
-\scratchbox=\box56
-\nofMPsegments=\count288
-\nofMParguments=\count289
-\everyMPshowfont=\toks36
-\MPscratchCnt=\count290
-\MPscratchDim=\dimen182
-\MPnumerator=\count291
-\makeMPintoPDFobject=\count292
-\everyMPtoPDFconversion=\toks37
+\scratchcounter=\count317
+\scratchdimen=\dimen198
+\scratchbox=\box63
+\nofMPsegments=\count318
+\nofMParguments=\count319
+\everyMPshowfont=\toks38
+\MPscratchCnt=\count320
+\MPscratchDim=\dimen199
+\MPnumerator=\count321
+\makeMPintoPDFobject=\count322
+\everyMPtoPDFconversion=\toks39
 ) (/usr/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
- (/usr/share/texmf-dist/tex/generic/infwarerr/infwarerr.sty
-Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
-) (/usr/share/texmf-dist/tex/latex/grfext/grfext.sty
-Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
- (/usr/share/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
-Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
-)) (/usr/share/texmf-dist/tex/latex/kvoptions/kvoptions.sty
-Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
- (/usr/share/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
-Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
-) (/usr/share/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
-Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
-)) (/usr/share/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
-Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
-Package pdftexcmds Info: \pdf@primitive is available.
-Package pdftexcmds Info: \pdf@ifprimitive is available.
-Package pdftexcmds Info: \pdfdraftmode found.
-)
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
-Package grfext Info: Graphics extension search list:
-(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPEG,.JBIG2,.JB2,.eps]
-(grfext)             \AppendGraphicsExtensions on input line 504.
  (/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
@@ -334,35 +480,40 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 50.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 51.
 (/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 50.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 51.
  (/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Underfull \hbox (badness 10000) in paragraph at lines 54--62
+Underfull \hbox (badness 10000) in paragraph at lines 55--63
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 63--70
+Underfull \hbox (badness 10000) in paragraph at lines 64--71
 
  []
 
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 97--102
+Underfull \hbox (badness 10000) in paragraph at lines 98--103
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--110
+Underfull \hbox (badness 10000) in paragraph at lines 104--111
 
  []
 
+<long_code.png, id=10, 432.6564pt x 113.223pt>
+File: long_code.png Graphic file (type png)
+<use long_code.png>
+Package pdftex.def Info: long_code.png  used on input line 122.
+(pdftex.def)             Requested size: 475.92352pt x 124.54567pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -370,20 +521,31 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[2] (./project1_report.aux) ) 
+[2 <./long_code.png>]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[3] (./project1_report.aux)
+runsystem(rm project1_report.pyg)...disabled (restricted).
+
+ ) 
 Here is how much of TeX's memory you used:
- 6579 strings out of 478238
- 106248 string characters out of 5850456
- 397435 words of memory out of 5000000
- 24730 multiletter control sequences out of 15000+600000
+ 10212 strings out of 478238
+ 178400 string characters out of 5850456
+ 520236 words of memory out of 5000000
+ 28302 multiletter control sequences out of 15000+600000
  477363 words of font info for 58 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,11n,77p,342b,238s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 74i,11n,77p,342b,312s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on project1_report.pdf (2 pages, 119484 bytes).
+Output written on project1_report.pdf (3 pages, 256682 bytes).
 PDF statistics:
- 61 PDF objects out of 1000 (max. 8388607)
- 36 compressed objects within 1 object stream
+ 67 PDF objects out of 1000 (max. 8388607)
+ 39 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

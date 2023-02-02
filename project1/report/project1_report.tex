@@ -13,6 +13,7 @@
 \usepackage{float}
 \usepackage{verbatim}
 \usepackage{amsthm}
+\usepackage{minted}
 \usepackage{fancyhdr}
 \usepackage[shortlabels]{enumitem}
 \renewcommand{\baselinestretch}{1.5}
@@ -109,14 +110,22 @@ Consequently, if the proof that we write is correct, then Lean should compile
 it without producing any errors.\\
 
 After trying to formalise my argument in one monolithic proof, I eventually
-managed to fill in all of the gaps and make it compile. The main issue I
+managed to complete it and successfully compile. The main issue I
 encountered was that because of the lack of modularity, the proof was very long
-and the compilation times were roughly 5-6 seconds. At some point it started
+and the compilation times were about 5-6 seconds. At some point it started
 negatively affecting my experience of using the language, as I couldn't quickly
 make adjustments to the proof and see the instant response from the compiler.
 
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=1.1]{long_code.png}
+  \caption{The first inefficient version of the proof}
+	\label{long_code}
 
+\end{figure}
+
+In order to solve this issue.
 
 \section*{ Proof of The theorem }
 
