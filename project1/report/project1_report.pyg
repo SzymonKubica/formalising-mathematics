@@ -1,3 +1,5 @@
- def continuous (f : ℝ → ℝ) : Prop :=
-∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x - y| < δ → |f x - f y| < ε
-
+    intro hIcc,
+    have hIoo : c strictly_between (f a) and (f b),
+    { let minimum := (min (f a) (f b)),
+      let maximum := (max (f a) (f b)),
+      ...},

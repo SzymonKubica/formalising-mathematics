@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+    \PYG{n}{change} \PYG{n}{x} \PYG{n+nb+bp}{+} \PYG{l+m+mi}{1} \PYG{n+nb+bp}{/} \PYG{l+m+mi}{2} \PYG{n+nb+bp}{*} \PYG{n}{min} \PYG{n}{δ} \PYG{o}{(}\PYG{n}{b} \PYG{n+nb+bp}{\PYGZhy{}} \PYG{n}{x}\PYG{o}{)} \PYG{n+nb+bp}{≤} \PYG{n}{b}\PYG{o}{,}
+    \PYG{k}{have} \PYG{n}{hmin}\PYG{o}{:} \PYG{o}{(}\PYG{n}{min} \PYG{n}{δ} \PYG{o}{(}\PYG{n}{b} \PYG{n+nb+bp}{\PYGZhy{}} \PYG{n}{x}\PYG{o}{))} \PYG{n+nb+bp}{≤} \PYG{o}{(}\PYG{n}{b} \PYG{n+nb+bp}{\PYGZhy{}} \PYG{n}{x}\PYG{o}{),}
+    \PYG{o}{\PYGZob{}} \PYG{n}{rw} \PYG{n}{min\PYGZus{}le\PYGZus{}iff}\PYG{o}{,} \PYG{n}{simp}\PYG{o}{,} \PYG{o}{\PYGZcb{},}
+    \PYG{n}{linarith}\PYG{o}{,} \PYG{o}{\PYGZcb{},} \PYG{o}{\PYGZcb{},}
+\end{Verbatim}

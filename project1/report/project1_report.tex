@@ -15,9 +15,20 @@
 \usepackage{amsthm}
 \usepackage{minted}
 \usepackage{fancyhdr}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{parskip}
 \usepackage{minted}
-\usepackage[shortlabels]{enumitem}
+\usepackage{newunicodechar}
+\usepackage{blindtext}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    anchorcolor=cyan,
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
 \renewcommand{\baselinestretch}{1.5}
 
 %% Commands for inserting big braces.
@@ -27,14 +38,29 @@
 %% Commands for set such that notation
 \newcommand\st{\text{ } | \text{ }}
 
+\definecolor{bg}{RGB}{240, 240, 240}
+
 %% Math symbols
 \newcommand\Q{\mathbb{Q}}
 \newcommand\R{\mathbb{R}}
 \newcommand\N{\mathbb{N}}
 \newcommand\C{\mathbb{C}}
-\newcommand\l{\mathcal{l}}
 \newcommand\sucht{\text{ such that }}
 \newcommand\weh{\text{ we have }}
+
+\newunicodechar{ℝ}{\ensuremath{\mathbb{R}}}
+\newunicodechar{ε}{\ensuremath{\epsilon}}
+\newunicodechar{δ}{\ensuremath{\delta}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{∃}{\ensuremath{\exists}}
+\newunicodechar{∉}{\ensuremath{\not\in}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∧}{\ensuremath{\land}}
+\newunicodechar{≤}{\ensuremath{\le}}
+
+
+\usepackage[shortlabels]{enumitem}
+
 
 \newtheorem*{theorem}{Theorem}
 \renewcommand\qedsymbol{$\blacksquare$}
@@ -65,33 +91,29 @@ knowledge of formalising proofs in mathematical analysis.
 
 This report documents the process of formalising IVT using the Lean programming
 language. It is a functional language which can also be used as an interactive
-theorem prover. Programming in Lean involves using a wide range of tools, which
-given a set of hypotheses allow the programmer to prove a certain statement
-(later referred to as the goal). Those tools are called "tactics" in Lean.
-These tactics allow the user to perform usual manipulations on the state of the
-argument (e.g. introduction of hypotheses).
+theorem prover. I used Lean together with the mathlib library which contains many
+fundamental theorems and identities which are useful to build more complex proofs
+with.
 
-The main advantage of using Lean in order to formalise a theorem is that we can
-easily modularise the argument into a set of lemmas which we can then combine
-in order to get our desired proof. This is achieved because Lean is a
-functional programming language and so the proofs that we formulate are
-actually represented as functions which take hypotheses as input and return the
-proof of a particular claim a output. That way formulating a proof can in some
-cases be thought of as a function composition.
+In the following I state the intermediate value theorem, prove it and
+explain the approach that I followed in order to formalise it. I document the
+difficulties that I encounered while learning how to formalise arguments
+efficiently and also focus on the surprising observations that I made during the process.
+I also introduce an overview of adding new notation to the proof to make it
+easier to follow.
 
-\pagebreak
 
-\section*{ Proof of IVT }
+\section*{ Proof of Intermediate Value Theorem }
 
-Before we go over the process of formalising the theorem, let us start by
-considering the proof of it which I followed when formalising the theorem.
+\hypertarget{statement}{Before} we go over the process of formalising the theorem, let us start by
+considering its proof.
 \begin{theorem}[Intermediate Value Theorem]
   Let $f : [a, b] \to \R  $ be a continuous function, then for all $c$ between
   $f(a)$ and $f(b)$, there exists $x \in [a, b] $ satisfying $f(x) = c$.
 \end{theorem}
 
 \begin{proof}
-  Let us first assume without loss of generality that $f(a) < c < f(b)$. We can
+  \hypertarget{general_cases}{Let} us first assume without loss of generality that $f(a) < c < f(b)$. We can
   do this because if we consider the other possible cases, we get the following:
   \begin{itemize}
     \item if either $f(a) = c$ or $f(b) = c$ we take $a$ or $b$ respectively
@@ -123,7 +145,7 @@ will follow from antisymmetry.
 To show that $f(x) \ge c$ let us argue by contradiction and assume $f(x) < c$.
 In in this case, we'll use continuity at  $x$ with  $\epsilon = c - f(x) $
 which satisfies  $\epsilon > 0$. Observe that now if $f(x) < c$ then as $c <
-f(b)$, we deduce  $x \ne b$, thus we get  $x < b$. Using continuity at x, we have:
+f(b)$, we deduce  $x \ne b$, thus we get  $x < b$. Using continuity at $x$, we have:
 \[
 \exists \delta > 0 \sucht \forall y \in [a, b] \weh | x - y | < \delta \implies |f(y) - f(x)| < \epsilon .\]
 
@@ -146,7 +168,7 @@ $\delta > 0$ such that:
   \forall y \in (x - \delta, x + \delta) \cap [a, b] \weh |f(y) - f(x)| < \epsilon
 .\end{equation}
 
-Now, similar as before, if for some $y$ we have  $|f(y) - f(x)| < \epsilon$, then
+\hypertarget{upper_bound}{Now, similar as before}, if for some $y$ we have  $|f(y) - f(x)| < \epsilon$, then
 in particular $f(x) - \epsilon < f(y) $ and by our definition of  $\epsilon$,
 we have $f(x) - \epsilon = c $. We get  $c < f(y)$, and none of such
 $y$ belong to $S$. By letting:
@@ -166,51 +188,231 @@ In the next sections I will explain the methodology that I used to
 formalise the theorem, and contrast the proof above with the implementation
 that I developed in Lean to formalise it.
 \section*{ The Process of Formalising }
-In order to formalise the theorem I took the following approach. First, I
-started by formulating a hand-written proof of the theorem using the course
-notes. After I familiarised myself with the argument, I tried to directly
-translate it into the Lean code without thinking about the overall structure of
-the argument.
+In order to formalise the theorem I started by formulating a hand-written proof
+of the theorem using the course notes. After I familiarised myself with the
+argument, I tried to directly translate it into the Lean code without thinking
+about the overall structure and logical components of the argument.
 
-The interactive theorem proving in Lean works similarly to compiling a program
-in any given programming language. The programmer is writing the code in the
-editor, while simultaneously the Lean language server protocol is trying to
-"compile" the code which effectively checks the validity of the proof (and
-incomplete or incorrect proof results in a compilation error). Consequently, if
-the proof that we write is correct, then Lean should compile it without
-producing any errors.
+Because of that approach, I encountered some technical issues with the
+interactive prover functionality. The interactive theorem proving in Lean works
+similarly to compiling a program in any given programming language. The
+programmer is writing the code in the editor, while simultaneously the code
+editor is trying to "compile" the code which effectively
+checks the validity of the proof (and incomplete or incorrect proofs result in
+a compilation error). Consequently, if the proof that we write is correct, then
+Lean should compile it without producing any errors.
 
 After trying to formalise my argument in one monolithic proof, I eventually
-managed to complete it and successfully compile. The main issue I
-encountered was that because of the lack of modularity, the proof was very long
-and the compilation times were about 5-6 seconds. At some point it started
-negatively affecting my experience of using the language, as I couldn't quickly
-make adjustments to the proof and see the instant response from the compiler.
+managed to complete it and successfully compile. The main issue I faced was
+that because of the lack of modularity, the proof was very long and the
+compilation times took about 5-6 seconds on average. At some point it
+started slowing down my progress towards the goal, as I couldn't quickly make
+adjustments to the proof and see the instant response from the compiler.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=1.1]{long_code.png}
-  \caption{The first inefficient version of the proof}
-	\label{long_code}
-
-\end{figure}
-
-In order to solve this issue, I've decided to introduce multiple lemmas, which
-aimed at proving facts which are true in general settings and were used within
-my argument. I also isolated the special case of the theorem which was then
+In order to solve this issue, I needed to introduce multiple lemmas (e.g. the one below), which
+aimed at proving facts which are true in the general setting and were used within
+my main argument. I also isolated the special case of the theorem which was then
 used to prove the main statement in full generality.
 
-This change of approach allowed me to get a better understanding of the actual
-proof, I needed to identify the parts of it which were true in a more general
-setting and abstract them out into their separate lemmas.
-
-\begin{minted}{lean}
- def continuous (f : ℝ → ℝ) : Prop :=
-∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x - y| < δ → |f x - f y| < ε
-
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+/- The following theorem proves that if a function f is continuous then its
+   reflection along x-axis is also continuous. It will be used int the last part
+   of the proof to achieve the full generality of the statement of IVT. -/
+theorem negation_is_continuous {f : ℝ → ℝ} (h : continuous f) : continuous (-f) :=
+begin
+ intros x ε hε,
+ -- Unwrapping the definition of continuity of f to get the required δ.
+ specialize h x ε hε,
+ rcases h with ⟨δ, ⟨hδ, hy⟩⟩,
+ use δ,
+ split,
+ { exact hδ },
+ { simp,
+   intros y hxyδ,
+   specialize hy y hxyδ,
+   rw abs_sub_comm,
+   exact hy },
+end
 \end{minted}
 
-\section*{ Conclusion }
+An important difference between using Lean to prove a theorem and following a
+written argument is that certain claims which are obvious to us might not be so
+obvious to a computer program. A good illustration of this is the claim
+that if we know that $x$ is an upper bound for $S$ and we show that no points
+in the half-open interval $(m, x]$ belong to  $S$ then m is an upper bound for  $S$.
+This logical transition was used \hyperlink{upper_bound}{here} in the
+second part of the proof. In order to be able to use it within my proof, I
+needed to introduce a new lemma which can be seen below
+
+\pagebreak
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+lemma no_elems_lt_upper_bound_imp_better_bound {k m : ℝ} {S : set ℝ}
+  (h0 : m ∈ upper_bounds S) (h1 : ∀ x ∈ Ioc k m, x ∉ S) : k ∈ upper_bounds S :=
+begin
+  intros a ha,              -- Let a ∈ S be arbitrary.
+  specialize h1 a,          -- Deduce a ∈ (k,m] -> a ∉ S from h1.
+  by_contra,                -- Argue by contradiction.
+  rw not_le at h,           -- Simplify
+  have hlub : a ∈ Ioc k m,  -- Show a ∈ (k, m] from definition and previous
+  { rw <- Ioc_def,          -- hypotheses.
+    exact ⟨h, h0 ha⟩, },
+  apply h1,                 -- Apply a ∈ (k,m] -> (a ∈ S -> false) to the goal
+  exacts [hlub, ha],        -- Conclude the proof using hypotheses.
+end
+\end{minted}
+The lemma above illustrates how simple facts which seem trivial to human beings
+require a certain degree of care when proving the formally. Let us try to
+translage the formal Lean proof into an informal argument to get an
+understanding of the lemma. In the code snippet above on line 2 we can see the
+hypotheses that we are given to show the goal: "$k \in \texttt{ upper\_bounds }
+S$". The first one of them (\texttt{h0}) assumes that  $m$ is an upper bound
+for  $S$, whereas the second one (\texttt{h1}) states that for all elements in
+the half open interval $(k, m]$, none of them are in  $S$. After that, the
+argument goes as follows: first (on line 4) we unwrap the definition of the set
+$\texttt{ upper\_bounds S }$. By definition $k$ is in that set if for any $a
+\in S$, we have that  $a \le k$. This is precisely what happens on line 4, we
+let  $a$ be a real number and assume that it belongs to  $S$ (that introduces
+the variable a and the hypothesis  $\texttt{ha:} a \in S$). After that, we
+apply the hypothesis \texttt{h1} to the assumption $a \in S$ (line 5). This
+action gives us a hypothesis \texttt{h1}:$ a \in (k,m] \implies a \not\in S$ .
+Since previously we have assumed that $a \in S$, it makes sense to try and
+finish the proof by contradiction (line 6). To conclude the proof, we perform
+arithmetic simplifications and then show that given all our assumptions it is
+possible to deduce that $ a \in (k, m]$ (lines 7-8). Having shown that, on line
+12 we use backwards reasoning. Effectively what happens is that, at that point
+in the proof, the hypothesis \texttt{h1} is internally represented as: $ a \in
+(k,m] \implies (a \in S \implies \texttt{false}) $. Hence, intuitively, given
+that our aim is to show \texttt{false}, if we use \texttt{h1} it suffices to
+show that both $ a \in (k,m] $ and $a \in S$ are true and the goal will follow.
+This is precisely what happens on line 11, our previous goal (\texttt{false})
+gets replaced by the two separate goals $ a \in (k,m] $ and $a \in S$, but we
+already have them in our hypotheses so the proof is finished (line 12).
+
+Now that we've seen the correspondence between an informal argument and the
+Lean code, let me go over the structure of the main proof and my approach for
+proving it.
+
+In order to prove the IVT first I needed to introduce the definition of
+continuity as it is the main tool that was used in the informal proof above.
+I've decided to use a simple $\epsilon-\delta$ definition rather than relying
+on the mathlib library. That library provides a wide range of theorems and
+identities which were very useful when proving the main statement of the
+theorem. However, the definition of continuity that it contains involves
+topological spaces and it would be a bit difficult to apply it to the simple
+setting of first year university mathematics. Therefore, I decided to define
+the notion of continuity as follows:
+
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+def continuous (f : ℝ → ℝ) : Prop := ∀ (x : ℝ), ∀ ε > 0, ∃ δ > 0, ∀ (y : ℝ), |x
+- y| < δ → |f x - f y| < ε \end{minted}
+
+Having introduced this definition I first formulated the special case of the
+IVT and proved it in a single argument. The way I stated it was the following:
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+theorem intermediate_value_theorem_special {a b : ℝ} {f : ℝ  → ℝ} (h0 : a < b)
+(hfcont : continuous f) : ∀ (c : ℝ), c ∈ Ioo (f a) (f b) -> ∃ (x : ℝ), (x ∈ Icc
+a b) ∧ (f x = c) := begin rintro c ⟨hfac, hcfb⟩, ... end \end{minted}
+
+One of the most important steps that I needed to justify in the proof of the
+above theorem, was that a bounded and nonempty set of real numbers has a
+supremum. At the time of writing the first version of the proof, I didn't have
+as much experience with searching the mathlib library, and so I couldn't find
+that particular theorem in there. I tried proving it myself but that wasn't
+successful. Here I wanted to acknowledge the members of the Xena Project
+discord server who helped me find the required statement in the library, the
+usage of it can be seen below:
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+-- Now we argue that S has a supremum as it is nonempty and bounded. obtain ⟨x,
+hxlub⟩ : ∃ (x : ℝ), is_lub S x, { apply real.exists_is_lub S hSnoe hba, },
+\end{minted}
+
+An important observation that I made when proving the theorem was that
+surprisingly the parts of the proof that were the most fiddly and required
+writing multiply nested arguments were the ones that in a regular writenn proof
+can be trivially shown using simple arithmetic operations. For instance, the
+snippet below aims to show that if we have $\delta > 0$ and $x < b$ and if we
+let $y := x + \frac{1}{2}\min(\delta, b - x)$, then $y < b$. This seems
+relatively simple in a written argument, however translating that to Lean was
+more difficult than expected.
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+    change x + 1 / 2 * min δ (b - x) ≤ b,
+    have hmin: (min δ (b - x)) ≤ (b - x),
+    { rw min_le_iff, simp, },
+    linarith, }, },
+\end{minted}
+
+After proving the special case of IVT, I was expecting the case analysis
+\hyperlink{general_cases}{in the proof} of the general case to be relatively straightforward.
+However, it turned out that there was a number of issues that I needed to think
+about before being able to fully generalise my argument. Firstly, if we look at
+the \hyperlink{statement}{statement} of the intermediate value theorem, we can
+see the hypothesis: " for all $c$ \textbf{between}  $f(a)$ and $f(b)$ ". That
+notion of being "between" turned out to be more complicated than anticipated.
+I tried searching through the library to see if there is a proposition which
+conveniently takes three numbers and states that the first one is between the
+two others. However, after not being able to find anything applicable, I decided
+to define it myself. The obvious way of stating that is as follows:
+\[
+  a \text{ is between } b \text{ and } c \iff a \in [\min(b, c), \max(b,c)]
+.\]
+
+I started by formulating the statement of the theorem using this definition, by
+replacing the "is between" with the $c \in [\min(f(a), f(b)), \max(f(a),f(b)]$.
+However, that definition made it less readable as it wasn't immediately obvious
+what it represented. I thought it would be very convenient to be able to write
+\[
+\texttt{c between f a and f b}
+.\]
+directly in my code. In order to achieve this, I added the following two definitions:
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+def is_between (a b c : ℝ) : Prop :=
+a ∈ Icc (min b c) (max b c)
+def is_strictly_between (a b c : ℝ) : Prop :=
+a ∈ Ioo (min b c) (max b c)
+\end{minted}
+
+and also introduced new notation so that I can represent "being between" in a concise manner.
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+reserve infix ` between `:65
+reserve infix ` strictly_between `:65
+reserve infix ` and `:66
+notation a ` between ` b ` and ` c := is_between a b c
+notation a ` strictly_between ` b ` and ` c := is_strictly_between a b c
+\end{minted}
+With that custom notation in place, I was finally able to formulate the general
+statement of the theorem without losing any readability:
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+theorem intermediate_value_theorem (a b : ℝ) (f : ℝ  → ℝ)
+  (h0 : a < b) (hfcont : continuous f) :
+  ∀ (c : ℝ), (c between (f a) and (f b)) -> ∃ (x : ℝ), (x ∈ Icc a b) ∧ (f x = c) :=
+begin
+  ...
+end
+\end{minted}
+The new notation was also very useful within the proof itself, as it allowed me
+to keep the code concise and maximise readability. An example of this can be seen
+below:
+
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+    intro hIcc,
+    have hIoo : c strictly_between (f a) and (f b),
+    { let minimum := (min (f a) (f b)),
+      let maximum := (max (f a) (f b)),
+      ...},
+\end{minted}
+
+\section*{Conclusions}
+
+
+
 
 \end{document}
 
