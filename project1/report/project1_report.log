@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.8)  3 FEB 2023 00:24
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.8)  3 FEB 2023 10:53
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -498,37 +498,37 @@ runsystem(which pygmentize && touch project1_report.aex)...disabled (restricted)
 
 
 
-./project1_report.tex:74: Package minted Error: You must have `pygmentize' installed to use this package.
+./project1_report.tex:76: Package minted Error: You must have `pygmentize' installed to use this package.
 
 See the minted package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.74 \begin{document}
+l.76 \begin{document}
                      
 Refer to the installation instructions in the minted documentation for more information.
 
 (./project1_report.aux)
 \openout1 = `project1_report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 76.
+LaTeX Font Info:    ... okay on input line 76.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
@@ -592,7 +592,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 74.
+Package hyperref Info: Link coloring ON on input line 76.
 (/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
  (/usr/share/texmf-dist/tex/latex/refcount/refcount.sty
@@ -602,18 +602,18 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 \c@section@level=\count351
 )
-LaTeX Info: Redefining \ref on input line 74.
-LaTeX Info: Redefining \pageref on input line 74.
-LaTeX Info: Redefining \nameref on input line 74.
+LaTeX Info: Redefining \ref on input line 76.
+LaTeX Info: Redefining \pageref on input line 76.
+LaTeX Info: Redefining \nameref on input line 76.
  (./project1_report.out) (./project1_report.out)
 \@outlinefile=\write5
 \openout5 = `project1_report.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 80.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 82.
  (/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 80.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 82.
  (/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
@@ -627,6 +627,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [2]
+\openout3 = `project1_report.pyg'.
+
+ (./_minted-project1_report/default.pygstyle)
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -634,13 +637,14 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[3]
+[3] (./_minted-project1_report/90379C2DE6EF9EBD8545EC6E450F74796D3BB91C282153487D9DF60E99FD92E0.pygtex
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 4.
+)
 \openout3 = `project1_report.pyg'.
 
- (./_minted-project1_report/default.pygstyle) (./_minted-project1_report/0DA33D4810B83D65EB34E609CCF04FED6D3BB91C282153487D9DF60E99FD92E0.pygtex
-LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 5.
-LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 5.
+ (./_minted-project1_report/C84ED3371D652F021B67D54E321B1F2D6D3BB91C282153487D9DF60E99FD92E0.pygtex
+LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 11.
  (/usr/share/texmf-dist/tex/latex/base/ts1cmtt.fd
 File: ts1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 ))
@@ -654,7 +658,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [4]
 \openout3 = `project1_report.pyg'.
 
- (./_minted-project1_report/C84ED3371D652F021B67D54E321B1F2D6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+ (./_minted-project1_report/579FEE12F0AAFBB615603759E35C820D6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+\openout3 = `project1_report.pyg'.
+
+ (./_minted-project1_report/22CC20147B7F0AFB5A2F833E17BFEADB6D3BB91C282153487D9DF60E99FD92E0.pygtex)
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -665,16 +672,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [5]
 \openout3 = `project1_report.pyg'.
 
- (./_minted-project1_report/ACC32CACEE352D29071C56119ADF440D6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+ (./_minted-project1_report/2DB58BFBBB04E053C6FDD8D38F2167E06D3BB91C282153487D9DF60E99FD92E0.pygtex)
 \openout3 = `project1_report.pyg'.
 
- (./_minted-project1_report/2474303A633A4E6119A68E6A5A4C1B456D3BB91C282153487D9DF60E99FD92E0.pygtex)
-\openout3 = `project1_report.pyg'.
-
- (./_minted-project1_report/557762F985EB44FCB1D61C35C5ADC1556D3BB91C282153487D9DF60E99FD92E0.pygtex)
-\openout3 = `project1_report.pyg'.
-
- (./_minted-project1_report/A26974F8E3CFCFC5110413E4EB0DA1186D3BB91C282153487D9DF60E99FD92E0.pygtex)
+ (./_minted-project1_report/9E202D68EB68631F3CEB9F044CF0C4E16D3BB91C282153487D9DF60E99FD92E0.pygtex)
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -686,12 +687,19 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 \openout3 = `project1_report.pyg'.
 
  (./_minted-project1_report/1665099CB8FBDA2F3D782220A8C907036D3BB91C282153487D9DF60E99FD92E0.pygtex)
+Overfull \hbox (5.5604pt too wide) in paragraph at lines 371--376
+\OT1/cmr/m/n/10.95 However that wasn't a per-fect so-lu-tion ei-ther as us-ing the def-i-ni-tions above would re-quire typ-ing \OT1/cmtt/m/n/10.95 is[]between
+ []
+
 \openout3 = `project1_report.pyg'.
 
- (./_minted-project1_report/6D8F369C8B830D1051238B02EC68C25E6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+(./_minted-project1_report/6D8F369C8B830D1051238B02EC68C25E6D3BB91C282153487D9DF60E99FD92E0.pygtex)
 \openout3 = `project1_report.pyg'.
 
- (./_minted-project1_report/8718ACEFBD534ADC5E6659A765FE6FEC6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+ (./_minted-project1_report/28CF7CA060B54219DA9D16966A4EBC3C6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+\openout3 = `project1_report.pyg'.
+
+ (./_minted-project1_report/ECCC1815E606FD05FE794BA70B1D9C626D3BB91C282153487D9DF60E99FD92E0.pygtex)
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -702,7 +710,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [7]
 \openout3 = `project1_report.pyg'.
 
- (./_minted-project1_report/D9EE09F657B9D2364E7486DABBA3E31B6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+ (./_minted-project1_report/EB9E0A0EA25171556369E4C43AF473BA6D3BB91C282153487D9DF60E99FD92E0.pygtex)
+\openout3 = `project1_report.pyg'.
+
+ (./_minted-project1_report/EBB8EB8D9B28B32E0B6728129B3409B46D3BB91C282153487D9DF60E99FD92E0.pygtex)
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -717,18 +728,18 @@ runsystem(rm project1_report.pyg)...disabled (restricted).
 
  ) 
 Here is how much of TeX's memory you used:
- 16951 strings out of 478238
- 287820 string characters out of 5850456
- 629635 words of memory out of 5000000
- 34882 multiletter control sequences out of 15000+600000
- 481184 words of font info for 75 fonts, out of 8000000 for 9000
+ 16963 strings out of 478238
+ 288894 string characters out of 5850456
+ 629823 words of memory out of 5000000
+ 34889 multiletter control sequences out of 15000+600000
+ 480886 words of font info for 74 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,12n,77p,597b,593s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfit1000.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on project1_report.pdf (8 pages, 236927 bytes).
+ 74i,12n,77p,639b,582s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
+Output written on project1_report.pdf (8 pages, 231454 bytes).
 PDF statistics:
- 154 PDF objects out of 1000 (max. 8388607)
- 104 compressed objects within 2 object streams
+ 150 PDF objects out of 1000 (max. 8388607)
+ 102 compressed objects within 2 object streams
  17 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

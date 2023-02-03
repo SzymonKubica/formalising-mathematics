@@ -1,5 +1,4 @@
-    intro hIcc,
-    have hIoo : c strictly_between (f a) and (f b),
-    { let minimum := (min (f a) (f b)),
-      let maximum := (max (f a) (f b)),
-      ...},
+    -- Here we consider the trichotomy : (f(a) < f(b)) ∨ (f(a) = f(b)) ∨ (f(b) < f(a)).
+    have htri := lt_trichotomy (f a) (f b),
+    -- The rest of the proof is split into 3 cases.
+    rcases htri with hlt | heq | hgt,
