@@ -24,9 +24,9 @@ The truth is the following. The definition of a vector space `V` over a field `k
 3) Axioms for `•`: `(r + s) • v = r • v + s • v`, `r • (v + w) = r • v = r • w`,
   `1 • v = v` and `(r * s) • v = r • (s • v)`.
 
-Recall that `k` was a field. Fields have division and inverses (except for 0), 
+Recall that `k` was a field. Fields have division and inverses (except for 0),
 but look at those axioms: there is no mention of inverses or division for `k` in the axioms
-of a vector space. The only things we use on `k` are `1`, `+` and `*`. 
+of a vector space. The only things we use on `k` are `1`, `+` and `*`.
 
 This means that we can make the *definition* of a vector space just under
 the assumption that `k` is a `ring`, rather than a `field`, although of course
@@ -42,7 +42,7 @@ But let's just tell them it's French for vector space.
 -- Let `k` be a field and let `V` be a vector space over `k`
 variables (k : Type) [field k] (V : Type) [add_comm_group V] [module k V]
 
--- The field `k` acts on the vector space `V` and the notation for this is `•`, 
+-- The field `k` acts on the vector space `V` and the notation for this is `•`,
 -- which is notation for `smul`. We don't use `mul` because for `a * b` to make
 -- sense in Lean we need `a` and `b` to have the same type. Here `a : k` and `v : V`
 -- so this isn't satisfied.
@@ -59,7 +59,7 @@ example : (1 : k) • v = v := one_smul k v
 example : a • (b • v) = (a * b) • v := smul_smul a b v
 
 -- Other standard facts about vector spaces:
-example : (a - b) • v = a • v - b • v := sub_smul a b v 
+example : (a - b) • v = a • v - b • v := sub_smul a b v
 example : (0 : k) • v = 0 := zero_smul k v
 
 /-
@@ -69,7 +69,7 @@ example : (0 : k) • v = 0 := zero_smul k v
 The type of subspaces of a vector space is called `subspace k V`. You
 have to mention `k` because there are real world examples like `ℂⁿ` which
 are vector spaces over both the reals and the complexes, so they have
-more real subspaces than complex subspaces. 
+more real subspaces than complex subspaces.
 
 Subspaces of a vector space form a complete lattice, so Lean uses lattice notation for them.
 
@@ -82,7 +82,7 @@ variables (X Y : subspace k V)
 
 -- How do we say `X ⊆ Y`?
 
--- #check X ⊆ Y -- doesn't work! `⊆` only works for terms of type `set V`. 
+-- #check X ⊆ Y -- doesn't work! `⊆` only works for terms of type `set V`.
 
 -- We use *lattice notation* and it works fine.
 
@@ -124,7 +124,7 @@ example := V ⧸ X
 
 example : V →ₗ[k] V ⧸ X := submodule.mkq X
 
--- ...which is inconsistent with the group theory quotient conventions, something I only 
+-- ...which is inconsistent with the group theory quotient conventions, something I only
 -- just spotted when preparing this course sheet.
 
 -- You can take the image and preimage of subspaces along a linear map.
@@ -136,5 +136,16 @@ example (Y : subspace k W) : subspace k V := Y.comap φ
 -- if X is a subspace of V and Y a subspace of W, prove that φ(X) ⊆ Y iff X ⊆ φ⁻¹(Y)
 example (X : subspace k V) (Y : subspace k W) : X.map φ ≤ Y ↔ X ≤ Y.comap φ :=
 begin
-  sorry,
+  split,
+  {
+    intros h x hx,
+    rw submodule.mem_comap,
+    apply h,
+    rw submodule.mem_map,
+    exact ⟨x, hx, rfl⟩,
+  },
+  { rintro h y ⟨x, hx, rfl⟩,
+    apply h,
+    exact hx,
+  },
 end
