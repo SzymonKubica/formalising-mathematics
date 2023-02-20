@@ -30,25 +30,23 @@ the reals, so let's talk first about finite subsets.
 
 Let `X` be a type. We've already seen the type `set X` of subsets of `X`,
 so one way to let `S` be a finite subset of `X` would be to make a term
-`S : set X` and then to have a hypothesis that `S` is finite.
+`S : set X` and then to have a hypothesis that `S` is finite. 
 In Lean the predicate which says a set is finite is `set.finite`. So here
 is one way of saying "let `S` be a finite subset of `X`":
 
 -/
 
-#check set.finite
+example (X : Type) (S : set X) (T : set X)
+  (hs : set.finite S) (ht : T.finite) : (S ∪ T).finite :=
+begin
+  -- you cannot hope to prove this from first principles unless you really know
+  -- what you're doing! How are you going to find out the name of this lemma?
+  sorry
+end
 
--- "Let X be a type, let `S` be a subset of `X`, and assume `S` is finite.
--- Then S = S"
-example (X : Type) (S : set X) (hs : set.finite S) : S = S :=
-begin refl end
-
-
-example (X : Type) (S : set X) (T : set X) (hs : set.finite S) (ht : set.finite T) : (S ∪ T).finite :=
-begin simp [hs, ht], end
 /-
 
-But Lean has another way.
+But Lean has another way. 
 
 ### Second way: the type of all finite subsets of X
 
@@ -57,12 +55,12 @@ Lean has a dedicated type whose terms are finite subsets of `X`. It's called `fi
 Clearly, for a general infinite type `X`, `set X` and `finset X` are not "the same".
 In type theory, *distinct types are disjoint*. That means if we have a term `S : finset X`
 then *`S` does not have type `set X`*. A finset is not *equal to* a set. This is the
-same phenomenon which says that a natural number in Lean is not *equal to* a real number.
+same phenomenon which says that a natural number in Lean is not *equal to* a real number. 
 There is a *map* from the natural numbers to the real numbers, and it's a map which
 mathematicians don't notice and so it's called a *coercion* and is represented by a little
 up-arrow. The same is true here.
 
-If `S : finset X` then you can coerce `S` to `set X`, and this coerced term will be
+If `S : finset X` then you can coerce `S` to `set X`, and this coerced term will be 
 displayed as `↑S` in Lean, with this arrow meaning "the obvious map from `finset X` to `set X`".
 
 -/
@@ -77,7 +75,7 @@ begin
 end
 
 -- Lean has the theorem that if you start with a finset, then the coerced set is finite.
-example (S : finset X) : set.finite (S : set X) :=
+example (S : finset X) : set.finite (↑S : set X) :=
 begin
   exact set.to_finite S,
 end
@@ -101,22 +99,21 @@ the sum of i^2 from i=0 to n-1 is (some random cubic with 6 in the denominator).
 
 -/
 
-
 open_locale big_operators -- enable ∑ notation
 
 example : ∑ i in finset.range 10, i = 45 :=
 begin
-  -- refl, -- refl does work because everything is nicely defined internally
-  refl,
+  refl, -- the advantage of constructive finiteness is that Lean knows a complete list of 
+  -- the numbers in `finset.range 10` so `refl` works.
 end
 
-example (n : ℕ) : ∑ i in finset.range n,
+example (n : ℕ) : ∑ i in finset.range n, 
   (i : ℚ)^2 = n * (n - 1) * (2 * n - 1) / 6 :=
 begin
   induction n with d hd,
   { -- base case n = 0 will follow by rewriting lemmas such as `∑ i in finset.range 0 f(i) = 0`
     -- and `0 * x = 0` etc, and the simplifier knows all these things.
-    simp },
+    simp, },
   { -- inductive step
     -- We're summing to `finset.range succ(d)`, and so we next use the lemma saying
     -- that equals the sum over `finset.range d`, plus the last term.
@@ -137,7 +134,7 @@ end
 -- return the wrong answer). So we coerce everything to the rationals first, and then the
 -- problem goes away.
 
--- See if you can can sum the first n cubes.
+-- See if you can can sum the first n cubes. 
 example (n : ℕ) : ∑ i in finset.range n, (i : ℚ)^3 = n^2 * (n - 1)^2 / 4 :=
 begin
   sorry
