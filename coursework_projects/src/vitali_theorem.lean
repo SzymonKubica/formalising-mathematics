@@ -250,21 +250,39 @@ begin
 
   exact ennreal_squeeze_zero h_a_lt_top h_b_lt_top h_0_le_b h_b_le_a h_a_tendsto_0,
 end
+/-- This theorem states that if a function is in L1 then it has uniformly absolutely
+    continuous integrals. --/
+theorem unif_integrable_of_tendsto_L1 {m : measurable_space X} {μ : measure X}
+{f : ℕ → X → ℝ} {g : X → ℝ} (hf : ∀ n, mem_ℒp (f n) 1 μ) (hg : mem_ℒp g 1 μ)
+(hfg : tendsto_in_L1 μ f g) : unif_integrable f 1 μ :=
+begin
+  intros ε hε,
+  rw [tendsto_in_L1, ennreal.tendsto_at_top_zero] at hfg,
+  have hε2 : ennreal.of_real(ε / 2) > 0,
+  { simp, linarith },
+  -- Here, given the fact that fₙ converges to g in L1, we extract a constant
+  -- n₀ such that ∀ n ≥ n₀ we have ‖ fₙ - g ‖ < ε/2
+  obtain ⟨n_0, hn_0⟩ := hfg (ennreal.of_real (ε/2)) hε2,
+
+
+  -- Getting there -> a lot of progress made today !!!
+  sorry,
+end
+
+#check unif_integrable_of_tendsto_Lp
 
 /-- This is a special case of the Vitali's theorem in L1. -/
 theorem vitali_theorem {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
 (f : ℕ → X → ℝ) (g : X → ℝ) (hf : ∀ (n : ℕ), mem_ℒp (f n) (1 : ℝ≥0∞) μ) (hg : mem_ℒp g 1 μ) :
 tendsto_in_measure μ f filter.at_top g ∧ unif_integrable f 1 μ ↔
-filter.tendsto (λ (n : ℕ), snorm (f n - g) 1 μ) filter.at_top (𝓝  0) :=
+tendsto_in_L1 μ f g :=
 begin
   split,
   { sorry,  },
   { intro h_tendsto_L1,
     split,
-    { exact tendsto_in_measure_of_tendsto_L1 hf hg h_tendsto_L1},
-    { intros ε hε,
-      sorry,
-    },},
+    { exact tendsto_in_measure_of_tendsto_L1 hf hg h_tendsto_L1 },
+    { exact unif_integrable_of_tendsto_L1 hf hg h_tendsto_L1, },},
 end
 
 end measure_theory
