@@ -255,6 +255,32 @@ begin
   exact ennreal_squeeze_zero h_a_lt_top h_b_lt_top h_0_le_b h_b_le_a h_a_tendsto_0,
 end
 
+/-- This lemma proves that if we take a single function in L1(μ) then it this set
+    has uniformly absolutely continuous integrals. -/
+theorem unif_integrable_singleton {m : measurable_space X} {μ : measure X}
+{g : X → ℝ} (hg : mem_ℒp g 1 μ) :
+∀ ⦃ε : ℝ⦄ (hε : 0 < ε), ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s
+→ μ s ≤ ennreal.of_real δ → snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real ε :=
+begin
+  have h_one_le_one: (1 : ℝ≥0∞) ≤ 1, {exact le_refl 1, }, -- Used below
+  have h_one_ne_top: (1 : ℝ≥0∞) ≠ ⊤, {simp, },            -- Used below
+
+  -- We define a finite set {g}.
+  let G : fin 1 → X → ℝ := λ i, g,
+  have hG: ∀ (i : fin 1), mem_ℒp (G i) 1 μ, { intro i, exact hg, },
+  have hG_unif_integrable : unif_integrable G 1 μ,
+  -- Here we show that it is has uniformly abs. cont. integrals.
+  { exact unif_integrable_fin μ h_one_le_one h_one_ne_top hG, },
+  intros ε hε,
+  specialize hG_unif_integrable hε,
+  rcases hG_unif_integrable with ⟨δ, hδ, hG⟩,
+  use δ,
+  split,
+  { exact hδ },
+  { intros s hs,
+    specialize hG 1 s hs,
+    exact hG, },
+end
 
 /-- This theorem states that if a function is in L1 then it has uniformly absolutely
     continuous integrals. --/
@@ -283,20 +309,19 @@ begin
   have hF_unif_integrable : unif_integrable F 1 μ,
   { exact unif_integrable_fin μ h_one_le_one h_one_ne_top hF, },
 
-  -- Here we show that G = {g} has uniformly abs. cont. integrals.
-  let G : fin 1 → X → ℝ := λ i, g,
-  have hG: ∀ (i : fin 1), mem_ℒp (G i) 1 μ, { intro i, exact hg, },
-  have hG_unif_integrable : unif_integrable G 1 μ,
-  { exact unif_integrable_fin μ h_one_le_one h_one_ne_top hG, },
+  -- Here we use the fact that G = {g} has uniformly abs. cont. integrals
+  -- to obtain the following expression:
+  have hg_uaci: ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
+      μ s ≤ ennreal.of_real δ → snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 2),
+  { exact unif_integrable_singleton hg (half_pos hε) },
 
-  -- Now since we know that F and G have u.a.c.i, we can extract the corresponding
+  -- Now since we know that F and {g} have u.a.c.i, we can extract the corresponding
   -- δ's and take the minimum of them to get a δ such that for all s ∈ m with
   -- μ(s) < δ we have that for all functions in the family {g, f₁, ..., fₙ₀}
   -- we have that ∫ₛ|f|dμ < ε/2.
   have hε2' : 0 < ε/2, { exact half_pos hε, },
-  specialize hG_unif_integrable hε2',
   specialize hF_unif_integrable hε2',
-  rcases hG_unif_integrable with ⟨δ₁, hδ₁, h_snorm1⟩,
+  rcases hg_uaci with ⟨δ₁, hδ₁, h_snorm1⟩,
   rcases hF_unif_integrable with ⟨δ₂, hδ₂, h_snorm2⟩,
   let δ := min δ₁ δ₂,
   have hδ : 0 < δ, {rw lt_min_iff, exact ⟨hδ₁, hδ₂⟩},
@@ -341,9 +366,7 @@ begin
             exact le_refl δ₁, },
           { linarith, }, },
         exact le_trans hμs hδ1δ, },
-      specialize h_snorm1 0 s hs hμs,
-      have hGg : G 0 = g, { simp, },
-      rw hGg at h_snorm1,
+      specialize h_snorm1 s hs hμs,
       have hε2_sum_eq_ε: ennreal.of_real(ε / 2) + ennreal.of_real(ε / 2) ≤ ennreal.of_real(ε),
       { rw ← ennreal.of_real_add,
         { simp, },
@@ -390,12 +413,16 @@ begin
     { exact limsup_pos_of_not_tendsto_L1 h, },
     have h_lim_along_Λ: ∃ (l : set ℕ), lim at_top (λ (i : l), snorm(f i - g) 1 μ) > 0,
     { exact extract_subseq_of_limsup_pos (λ (n : ℕ), snorm(f n - g) 1 μ) h_limsup, },
+    have h_g_uaci: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s
+      → μ s ≤ ennreal.of_real δ → snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
+    { intros ε hε,
+      have hε3: 0 < ε / 3, { linarith, },
+      exact unif_integrable_singleton hg hε3},
 
-
-
-
-
-
+    -- Apply Egorov.
+    -- choose n₀ in a clever way
+    -- hard manipulations
+    -- finish off with ε / 3 proof to contradict the h_lim_along_Λ > 0.
 
     },
   { intro h_tendsto_L1,
