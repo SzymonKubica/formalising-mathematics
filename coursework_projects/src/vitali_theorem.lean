@@ -19,10 +19,16 @@ open set filter topological_space
 
 variables {X : Type} {m : measure_space X}
 
--- Additional notation for convergence in L1 which makes the code more readable :
+/-- I decided to add alias definitions for the two notions of convergence that
+    we deal with in the proof. They improve readability at a cost of sometimes
+    introducing an additional rewrite step. -/
 def tendsto_in_L1 {m : measurable_space X}
 (μ : measure X) (f : ℕ → X → ℝ) (g : X → ℝ) : Prop :=
-filter.tendsto (λ (n : ℕ), snorm (f n - g) 1 μ) filter.at_top (𝓝  0)
+filter.tendsto (λ (n : ℕ), snorm (f n - g) 1 μ) filter.at_top (𝓝 0)
+
+def tendsto_μ_ae {m : measurable_space X} (μ : measure X)
+(f : ℕ → X → ℝ) (g : X → ℝ) (l : set ℕ) : Prop :=
+∀ᵐ (x : X) ∂μ, filter.tendsto (λ (n : l), f n x) filter.at_top (𝓝 (g x))
 
 /-- This theorem allows to use squeeze_zero theorem on two sequences of non-negative
     real numbers. It is used by ennreal_squeeze_zero. -/
@@ -350,17 +356,48 @@ begin
     exact le_trans h_snorm_le h_snorm_sum_le_ε, },
 end
 
-#check unif_integrable_of_tendsto_Lp
-#check unif_integrable_finite
+/-- This lemma is used in the forward direction of the theorem. It asserts that
+    if fₙ doesn't converge to g in L1 then limsup of ∫|fₙ - g|dμ > 0 -/
+lemma limsup_pos_of_not_tendsto_L1 {m : measurable_space X} {μ : measure X}
+{f : ℕ → X → ℝ} { g : X → ℝ } (h : ¬tendsto_in_L1 μ f g) :
+limsup (λ n, snorm (f n - g) 1 μ) at_top > 0 :=
+begin
+  sorry,
+end
+
+/-- This lemma allows us to extract a subsequence from a limsup such that it's
+    limit is still positive. -/
+lemma extract_subseq_of_limsup_pos {V : Type} [has_zero V]
+[conditionally_complete_lattice V] [topological_space V]
+(f : ℕ → V) (hf : limsup f at_top > 0) :
+∃ (l : set ℕ), lim at_top (λ (i : l), f i) > 0 :=
+begin
+ sorry,
+end
 
 /-- This is a special case of the Vitali's theorem in L1. -/
 theorem vitali_theorem {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
 (f : ℕ → X → ℝ) (g : X → ℝ) (hf : ∀ (n : ℕ), mem_ℒp (f n) (1 : ℝ≥0∞) μ) (hg : mem_ℒp g 1 μ) :
-tendsto_in_measure μ f filter.at_top g ∧ unif_integrable f 1 μ ↔
+tendsto_in_measure μ f at_top g ∧ unif_integrable f 1 μ ↔
 tendsto_in_L1 μ f g :=
 begin
   split,
-  { sorry,  },
+  { rintro ⟨h_tendsto_measure, h_unif_integrable⟩,
+    by_contra,
+    rw tendsto_in_L1 at h,
+    -- If fₙ doesn't converge to g in L1 we can deduce that limsup of snorms is > 0.
+    have h_limsup: limsup (λ n, snorm (f n - g) 1 μ) at_top > 0,
+    { exact limsup_pos_of_not_tendsto_L1 h, },
+    have h_lim_along_Λ: ∃ (l : set ℕ), lim at_top (λ (i : l), snorm(f i - g) 1 μ) > 0,
+    { exact extract_subseq_of_limsup_pos (λ (n : ℕ), snorm(f n - g) 1 μ) h_limsup, },
+
+
+
+
+
+
+
+    },
   { intro h_tendsto_L1,
     split,
     { exact tendsto_in_measure_of_tendsto_L1 hf hg h_tendsto_L1 },
