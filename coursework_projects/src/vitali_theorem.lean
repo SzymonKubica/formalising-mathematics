@@ -423,6 +423,78 @@ begin
  sorry,
 end
 
+/-- This theorem is the forward direction of the Vitali's theorem. -/
+theorem tendsto_L1_of_unif_integr_of_tendsto_in_μ
+{m : measurable_space X} {μ : measure X} [is_finite_measure μ]
+{ f : ℕ → X → ℝ } { g : X → ℝ } (hf : ∀ (n : ℕ), mem_ℒp (f n) (1 : ℝ≥0∞) μ) (hg : mem_ℒp g 1 μ)
+(h_tendsto: tendsto_in_measure μ f at_top g) (h_unif: unif_integrable f 1 μ) :
+tendsto_in_L1 μ f g :=
+begin
+    by_contra,
+    rw tendsto_in_L1 at h,
+    -- If fₙ doesn't converge to g in L1 we can deduce that limsup of snorms is > 0.
+    have h_limsup: limsup (λ n, snorm (f n - g) 1 μ) at_top > 0,
+    { exact limsup_pos_of_not_tendsto_L1 h, },
+    -- Then given that limsup we pass down to a subsequence along Λ.
+    have h_lim_along_Λ: ∃ (l : set ℕ), lim at_top (λ (i : l), snorm(f i - g) 1 μ) > 0,
+    { exact extract_subseq_of_limsup_pos (λ (n : ℕ), snorm(f n - g) 1 μ) h_limsup, },
+
+    -- Now we extract the uniformly abs cont integrals condition from the singleton
+    -- set {g} but so that for any ε it gives us the criterion with ε / 3.
+    have h_g_uaci: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s
+      → μ s ≤ ennreal.of_real δ → snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
+    { intros ε hε,
+      have hε3: 0 < ε / 3, { linarith, },
+      exact unif_integrable_singleton hg hε3},
+
+    -- Now we need to extract a similar proposition from the family F = {fₙ | n ∈ ℕ}.
+    have h_f_n_uaci: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ (n : ℕ) s, measurable_set s →
+         μ s ≤ ennreal.of_real δ → snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3),
+    { intros ε hε,
+      have hε3: 0 < ε / 3, { linarith, },
+      exact h_unif hε3, },
+
+    -- At this point we need to have a statement which gives as one δ for both
+    -- of the above. It can be done by picking the min of both deltas.
+
+    have h_uaci: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ),
+         ∀ s, measurable_set s → μ s ≤ ennreal.of_real δ →
+         ∀ (n : ℕ), snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3) ∧
+         snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
+    { intros ε hε,
+      rcases h_g_uaci ε hε with ⟨δ₁, hδ₁, h_g_snorm⟩,
+      rcases h_f_n_uaci ε hε with ⟨δ₂ , hδ₂, h_f_n_snorm⟩,
+      use min δ₁ δ₂,
+      split,
+      { exact lt_min hδ₁ hδ₂ },
+      {
+        intros s hs hμs n,
+        specialize h_g_snorm s hs,
+        specialize h_f_n_snorm n s hs,
+        split,
+        { apply h_f_n_snorm,
+          exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂)
+                                (eq.refl (min δ₁ δ₂))).right, },
+        { apply h_g_snorm,
+          exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂)
+                                (eq.refl (min δ₁ δ₂))).left, }, }, },
+
+    -- Now we need to apply Egorov's theorem to (fₙ) along Λ.
+    have h_set_from_Egorov : ∀ (δ : ℝ) , δ > 0 → ∃ s, measurable_set s ∧ μ s ≤ ennreal.of_real δ
+                             ∧ tendsto_uniformly_on f g filter.at_top sᶜ,
+    { intros δ hδ,
+
+
+    },
+
+    -- choose n₀ in a clever way (using obtain as before)
+    -- hard manipulations
+    -- finish off with ε / 3 proof to contradict the h_lim_along_Λ > 0.
+
+
+  sorry,
+end
+
 /-- This is a special case of the Vitali's theorem in L1. -/
 theorem vitali_theorem {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
 (f : ℕ → X → ℝ) (g : X → ℝ) (hf : ∀ (n : ℕ), mem_ℒp (f n) (1 : ℝ≥0∞) μ) (hg : mem_ℒp g 1 μ) :
@@ -430,30 +502,12 @@ tendsto_in_measure μ f at_top g ∧ unif_integrable f 1 μ ↔
 tendsto_in_L1 μ f g :=
 begin
   split,
-  { rintro ⟨h_tendsto_measure, h_unif_integrable⟩,
-    by_contra,
-    rw tendsto_in_L1 at h,
-    -- If fₙ doesn't converge to g in L1 we can deduce that limsup of snorms is > 0.
-    have h_limsup: limsup (λ n, snorm (f n - g) 1 μ) at_top > 0,
-    { exact limsup_pos_of_not_tendsto_L1 h, },
-    have h_lim_along_Λ: ∃ (l : set ℕ), lim at_top (λ (i : l), snorm(f i - g) 1 μ) > 0,
-    { exact extract_subseq_of_limsup_pos (λ (n : ℕ), snorm(f n - g) 1 μ) h_limsup, },
-    have h_g_uaci: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s
-      → μ s ≤ ennreal.of_real δ → snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
-    { intros ε hε,
-      have hε3: 0 < ε / 3, { linarith, },
-      exact unif_integrable_singleton hg hε3},
-
-    -- Apply Egorov.
-    -- choose n₀ in a clever way
-    -- hard manipulations
-    -- finish off with ε / 3 proof to contradict the h_lim_along_Λ > 0.
-
-    },
+  { rintro ⟨h_tendsto_μ , h_unif_int⟩,
+    exact tendsto_L1_of_unif_integr_of_tendsto_in_μ hf hg h_tendsto_μ  h_unif_int, },
   { intro h_tendsto_L1,
     split,
     { exact tendsto_in_measure_of_tendsto_L1 hf hg h_tendsto_L1 },
-    { exact unif_integrable_of_tendsto_L1 hf hg h_tendsto_L1, },},
+    { exact unif_integrable_of_tendsto_L1 hf hg h_tendsto_L1, }, },
 end
 
 end measure_theory
