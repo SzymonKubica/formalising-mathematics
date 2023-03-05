@@ -262,15 +262,12 @@ theorem unif_integrable_singleton {m : measurable_space X} {μ : measure X}
 ∀ ⦃ε : ℝ⦄ (hε : 0 < ε), ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s
 → μ s ≤ ennreal.of_real δ → snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real ε :=
 begin
-  have h_one_le_one: (1 : ℝ≥0∞) ≤ 1, {exact le_refl 1, }, -- Used below
-  have h_one_ne_top: (1 : ℝ≥0∞) ≠ ⊤, {simp, },            -- Used below
-
   -- We define a finite set {g}.
   let G : fin 1 → X → ℝ := λ i, g,
   have hG: ∀ (i : fin 1), mem_ℒp (G i) 1 μ, { intro i, exact hg, },
   have hG_unif_integrable : unif_integrable G 1 μ,
   -- Here we show that it is has uniformly abs. cont. integrals.
-  { exact unif_integrable_fin μ h_one_le_one h_one_ne_top hG, },
+  { exact unif_integrable_fin μ (le_refl 1) ennreal.one_ne_top hG, },
   intros ε hε,
   specialize hG_unif_integrable hε,
   rcases hG_unif_integrable with ⟨δ, hδ, hG⟩,
@@ -280,6 +277,45 @@ begin
   { intros s hs,
     specialize hG 1 s hs,
     exact hG, },
+end
+
+/-- This lemma allows for the usual manipulations of minimums within the world of
+    ℝ≥0∞ numbers. It states that if we have two non-neg numbers a, b and we take the minimum
+    of them, then ennreal.of_real(min a b) ≤ ennreal.of_real(a) and
+    ennreal.of_real(min a b) ≤ ennreal.of_real(b) -/
+lemma ennreal_min_le {a b c: ℝ} (ha: 0 ≤ a) (hb: 0 ≤ b) (hmin : c = min a b) :
+ennreal.of_real(c) ≤ ennreal.of_real(a) ∧ ennreal.of_real(c) ≤ ennreal.of_real(b) :=
+begin
+  rw hmin,
+  split,
+  { rw ennreal.of_real_le_of_real_iff,
+    { exact min_le_left a b },
+    { exact ha }, },
+  { rw ennreal.of_real_le_of_real_iff,
+    { exact min_le_right a b },
+    { exact hb }, },
+end
+
+/-- This lemma allows us to use the triangle inequality on snorms over a specified
+    set (i.e. the ones that have an indicator function inside). -/
+lemma snorm_triangle_ineq {m : measurable_space X} {μ : measure X}
+{ f g : X → ℝ } (hf :  ae_strongly_measurable f μ) (hg : ae_strongly_measurable g μ) {s : set X} (hs: measurable_set s):
+snorm (s.indicator (f + g)) 1 μ ≤ snorm (s.indicator f) 1 μ + snorm (s.indicator g) 1 μ :=
+begin
+  rw set.indicator_add',
+      exact snorm_add_le (ae_strongly_measurable.indicator hf hs)
+        (ae_strongly_measurable.indicator hg hs) (le_refl 1),
+end
+
+/-- This trivial lemma simplivies calculations in ennreal. -/
+lemma two_halves_le_sum {a : ℝ} (ha : 0 < a) :
+ennreal.of_real(a / 2) + ennreal.of_real(a / 2) ≤ ennreal.of_real(a) :=
+begin
+  have ha2 : 0 ≤ a / 2, {exact le_of_lt (half_pos ha), },
+  rw ← ennreal.of_real_add,
+  { simp, },
+  { exact ha2 },
+  { exact ha2 },
 end
 
 /-- This theorem states that if a function is in L1 then it has uniformly absolutely
@@ -298,16 +334,14 @@ begin
 
   -- Now the idea is to show that the family {g, f₁, ..., fₙ₀} has uniformly
   -- absolutely continuous integrals. We need to first show it for the fₙ's and
-  -- separately for g and then pick the maximum of the resulting deltas.
-  have h_one_le_one: (1 : ℝ≥0∞) ≤ 1, {exact le_refl 1, }, -- Used below
-  have h_one_ne_top: (1 : ℝ≥0∞) ≠ ⊤, {simp, },            -- Used below
+  -- separately for g and then pick the minimum of the resulting deltas.
 
   -- Here we show that F = {f₁, ..., fₙ₀} has uniformly abs. cont. integrals.
   -- We need to add 1 to n₀ because fin only includes strictly smaller numbers.
   let F : fin (n₀ + 1) → X → ℝ := λ i, f i,
   have hF : ∀ (i : fin (n₀ + 1)), mem_ℒp (F i) 1 μ, { intro i, exact hf i, },
   have hF_unif_integrable : unif_integrable F 1 μ,
-  { exact unif_integrable_fin μ h_one_le_one h_one_ne_top hF, },
+  { exact unif_integrable_fin μ (le_refl 1) ennreal.one_ne_top hF, },
 
   -- Here we use the fact that G = {g} has uniformly abs. cont. integrals
   -- to obtain the following expression:
@@ -324,20 +358,16 @@ begin
   rcases hg_uaci with ⟨δ₁, hδ₁, h_snorm1⟩,
   rcases hF_unif_integrable with ⟨δ₂, hδ₂, h_snorm2⟩,
   let δ := min δ₁ δ₂,
+  have hδ' : δ = min δ₁ δ₂, { simp, }, -- Some lemmas used later need this explicit proposition.
   have hδ : 0 < δ, {rw lt_min_iff, exact ⟨hδ₁, hδ₂⟩},
   use [δ, hδ],
   intros n s hs hμs,
   -- At this point we need to handle two cases depeding on whether n ≤ n₀
   by_cases n ≤ n₀,
   { have hμs: μ s ≤ ennreal.of_real(δ₂),
-    { have hδ2δ : ennreal.of_real(δ) ≤ ennreal.of_real(δ₂),
-      { rw ennreal.of_real_le_of_real_iff,
-        { apply min_le_iff.mpr,
-          right,
-          exact le_refl δ₂, },
-        { linarith, }, },
-      exact le_trans hμs hδ2δ, },
+    { exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂) hδ').right, },
     specialize h_snorm2 n s hs hμs,
+    -- Here we need to coerce between the definition of F on fin (n₀ + 1) to ℕ.
     have hfF: ∀ n : ℕ, n ≤ n₀ → f n = F ↑n,
     { intros n hn,
       change f n = (λ i : fin (n₀ + 1), f ↑i) n,
@@ -348,31 +378,26 @@ begin
     have hε2_le: ennreal.of_real(ε / 2) ≤ ennreal.of_real(ε),
     { rw ennreal.of_real_le_of_real_iff; linarith, },
     exact le_trans h_snorm2 hε2_le, },
-  { have h_add_zero: ∀ (n : ℕ), f n = g + (f n - g), { intro n, simp, },
-    rw (h_add_zero n),
+  { have h_manipulate: ∀ (n : ℕ), f n = g + (f n - g), { intro n, simp, },
+    rw (h_manipulate n),
+    -- Here we need to use the triangle inequality of snorm and distributivity
+    -- of taking the indicator to get the desired inequality below.
     have h_snorm_le: snorm (s.indicator (g + (f n - g))) 1 μ ≤
         snorm (s.indicator g) 1 μ  + snorm (s.indicator (f n - g)) 1 μ,
-    { rw set.indicator_add',
-      exact snorm_add_le (ae_strongly_measurable.indicator hg.left hs)
-        (ae_strongly_measurable.indicator (ae_strongly_measurable.sub (hf n).left hg.left) hs) (le_refl 1), },
+    { exact snorm_triangle_ineq hg.left (ae_strongly_measurable.sub (hf n).left hg.left) hs, },
+
     have h_snorm_sum_le_ε: snorm (s.indicator g) 1 μ  + snorm (s.indicator (f n - g)) 1 μ ≤ ennreal.of_real(ε),
     { have hn : n ≥ n₀, { linarith, },
       specialize hn₀ n hn,
+      -- Here we need to use again the lemma which pushes a ≤ min a b into ennreal.
       have hμs: μ s ≤ ennreal.of_real(δ₁),
-      { have hδ1δ : ennreal.of_real(δ) ≤ ennreal.of_real(δ₁),
-        { rw ennreal.of_real_le_of_real_iff,
-          { apply min_le_iff.mpr,
-            left,
-            exact le_refl δ₁, },
-          { linarith, }, },
-        exact le_trans hμs hδ1δ, },
+      { exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂) hδ').left, },
+
+      -- The rest of the proof follows from specializing hypotheses and manipulating
+      -- inequalities to show ≤ ε.
       specialize h_snorm1 s hs hμs,
       have hε2_sum_eq_ε: ennreal.of_real(ε / 2) + ennreal.of_real(ε / 2) ≤ ennreal.of_real(ε),
-      { rw ← ennreal.of_real_add,
-        { simp, },
-        { exact le_of_lt hε2', },
-        exact le_of_lt hε2', },
-
+      { exact two_halves_le_sum hε, },
       have h_indicator_n₀ : snorm (s.indicator (f n - g)) 1 μ ≤ ennreal.of_real(ε / 2),
       { exact le_trans (snorm_indicator_le (f n - g)) hn₀, },
       exact le_trans (add_le_add h_snorm1 h_indicator_n₀) hε2_sum_eq_ε, },
