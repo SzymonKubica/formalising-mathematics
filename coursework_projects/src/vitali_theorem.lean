@@ -522,7 +522,11 @@ begin
     apply tendsto_of_subseq_tendsto,
     intros ns hns,
     have hns_tendsto_μ : tendsto_in_measure μ (λ i , f (ns i)) at_top g,
-    {sorry,},
+    { rw tendsto_in_measure,
+      rw tendsto_in_measure at h_tendsto_μ,
+      intros ε hε,
+      specialize h_tendsto_μ ε hε,
+      exact h_tendsto_μ.comp hns, }, -- Here we compose the filters.
     have h_ae: ∃ (Λ : ℕ → ℕ), strict_mono Λ  ∧
                ∀ᵐ x ∂μ, tendsto (λ (i : ℕ), f (ns (Λ i)) x) at_top (𝓝 (g x)),
     {exact tendsto_in_measure.exists_seq_tendsto_ae hns_tendsto_μ, },
@@ -531,126 +535,15 @@ begin
     have hf2Λ : ∀ (n : ℕ), ae_strongly_measurable (f (ns (Λ n))) μ,
     { intro n, exact (hf (ns (Λ n))).left, },
     have h_unif_Λ : unif_integrable (λ n, f (ns (Λ n))) 1 μ,
-    { sorry, },
+    { intros ε hε,
+      specialize h_unif hε,
+      rcases h_unif with ⟨δ, hδ, hδ_snorm⟩,
+      use δ,
+      split,
+      { exact hδ, },
+      { intros n s hs hμs,
+        exact hδ_snorm (ns (Λ n)) s hs hμs, }, },
     exact tendsto_Lp_of_tendsto_ae μ (le_refl 1) ennreal.one_ne_top hf2Λ hg h_unif_Λ h_tendsto_ae,
-    by_contra,
-    -- Here we assume that there is a sequence ns such that along that sequence
-    -- lim ∫|fₙ - f|dμ > 0.
-    by_cases h1: ∃ (ns : ℕ → ℕ), strict_mono ns ∧ ¬ tendsto_in_L1 μ (λ i, f (ns i)) g,
-    { rcases h1 with ⟨ns, hns, hns_not_tendsto⟩,
-      rw tendsto_in_L1 at h,
-      -- If fₙ doesn't converge to g in L1 we can deduce that limsup of snorms is > 0.
-      have h_limsup: limsup (λ n, snorm (f n - g) 1 μ) at_top > 0,
-      { exact limsup_pos_of_not_tendsto_L1 h, },
-
-      -- Show that along ns we get convergence in measure!!! -> new lemma needed.
-      -- Now we need to show that along ns it also converges in measure and extract
-      -- the desired susequence out of that.
-      have hns_tendsto_μ : tendsto_in_measure μ (λ i , f (ns i)) at_top g,
-      {sorry,},
-
-      -- Given that fₙ → g in measure, we extract the subsequence along which it
-      -- converges μ-ae.
-      have h_ae: ∃ (Λ : ℕ → ℕ), strict_mono Λ  ∧
-                 ∀ᵐ x ∂μ, tendsto (λ (i : ℕ), f (ns (Λ i)) x) at_top (𝓝 (g x)),
-      {exact tendsto_in_measure.exists_seq_tendsto_ae hns_tendsto_μ, },
-
-      rcases h_ae with ⟨Λ, hΛ, h_tendsto_ae⟩,
-
-      -- Then given that limsup we pass down to a subsequence along Λ.
-      -- have h_lim_along_Λ: lim at_top (λ (i : ℕ), snorm(f (Λ i) - g) 1 μ) > 0,
-      -- { exact extract_subseq_of_limsup_pos (λ (n : ℕ), snorm(f n - g) 1 μ) hΛ h_limsup, },
-
-      -- Idea:
-      -- Given that there exists ns such that along it we don't have convergence
-      -- in L1, we pass to a subsequence Λ which converges in measure
-      -- then from uaci we extract the information we need and after that
-      -- we need to show convergence in L1 using a epsilon delta proof.
-
-      -- Given that F has u.a.c.i and so does {g} we want to show that for all ε
-      -- we can pick a δ such that for all measurable sets with μ(s) < δ we have
-      -- the u.a.c.i condition of ∫ₛ|f|dμ < ε satisifed for all fₙ and g
-      have h_uaci: ∀ (ε : ℝ), 0 < ε  →  ∃ (δ : ℝ) (hδ : 0 < δ),
-                   ∀ s, measurable_set s → μ s ≤ ennreal.of_real δ →
-                   ∀ (n : ℕ), snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3) ∧
-                     snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
-      { -- I have moved the hypotheses which the goal depends on below here so that
-        -- they don't pollute the infoview.
-        -- Now we extract the uniformly abs cont integrals condition from the singleton
-        -- set {g} but so that for any ε it gives us the criterion with ε / 3.
-        have h_g_uaci: ∀ (ε : ℝ), 0 < ε  →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
-                       μ s ≤ ennreal.of_real δ →
-                       snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
-        { intros ε hε,
-          have hε3: 0 < ε / 3, { linarith, },
-          exact unif_integrable_singleton hg hε3 },
-
-        -- Now we need to extract a similar proposition from the family F = {fₙ | n ∈ ℕ}.
-        have h_f_n_uaci: ∀ (ε : ℝ), 0 < ε →  ∃ (δ : ℝ) (hδ : 0 < δ),
-                         ∀ (n : ℕ) s, measurable_set s → μ s ≤ ennreal.of_real δ →
-                           snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3),
-        { intros ε hε,
-          have hε3: 0 < ε / 3, { linarith, },
-          exact h_unif hε3, },
-        exact extract_δ_uaci h_f_n_uaci h_g_uaci, },
-
-      -- Now we need to apply Egorov's theorem to (fₙ) along Λ.
-      have h_set_from_Egorov : ∀ (δ : ℝ) , δ > 0 → ∃ s, measurable_set s ∧ μ s ≤ ennreal.of_real δ
-                               ∧ tendsto_uniformly_on (λ n, f (ns (Λ n))) g filter.at_top sᶜ,
-      { intros δ hδ,
-        have hfΛ2 : ∀ n : ℕ, strongly_measurable (f (ns (Λ n))),
-        { intro n, exact hf2 (ns (Λ n)) },
-        exact tendsto_uniformly_on_of_ae_tendsto' hfΛ2 hg2 h_tendsto_ae hδ, },
-
-      --
-
-      have h_exists_ε : ∃ (ε : ℝ≥0∞), 0 < ε ∧ ε < lim at_top (λ (i : ℕ), snorm(f (Λ i) - g) 1 μ),
-      { exact exists_ε_between_of_pos h_lim_along_Λ },
-
-      rcases h_exists_ε with ⟨ε, ⟨hε, hεlt⟩⟩,
-
-      have hε_ne_0 : ε ≠ 0, { rw ← ne_zero_iff, exact ne_zero.of_pos hε },
-      have hε_ne_top : ε ≠ ⊤, { exact ne_top_of_lt hεlt },
-      specialize h_uaci (ennreal.to_real ε) (ennreal.to_real_pos hε_ne_0 hε_ne_top),
-
-      rcases h_uaci with ⟨δ, hδ, hδ_set⟩,
-
-      specialize h_set_from_Egorov δ hδ,
-      rcases h_set_from_Egorov with ⟨s, hs, hμs, hs_tendsto⟩,
-
-      specialize hδ_set s hs hμs,
-
-      rw metric.tendsto_uniformly_on_iff at hs_tendsto,
-      specialize hs_tendsto (ennreal.to_real(ε)/(3 * ennreal.to_real(μ univ) + 1)),
-      specialize hs_tendsto (ε_div_3_μX_pos hε hε_ne_0 hε_ne_top),
-
-      rw eventually_at_top at hs_tendsto,
-      cases hs_tendsto with n₀ hn₀,
-
-      have h_contradiction : lim at_top (λ (i : ℕ), snorm (f (Λ i) - g) 1 μ) < ε,
-      { sorry, },
-      have h_ε_lt_ε : ε < ε,
-      { exact lt_trans hεlt h_contradiction },
-      have h_irrefl : ¬ ε < ε,
-      { exact lt_irrefl ε },
-      exact h_irrefl h_ε_lt_ε, },
-    { -- For the other case, If no such subsequence exists we can show convergence
-      -- in L1 and arrive at a contradiciton.
-      apply h,
-      rw tendsto_in_L1,
-      apply tendsto_of_subseq_tendsto,
-      push_neg at h1,
-      intros ns hns,
-      have h_ns_mono: ∃ (φ : ℕ → ℕ), strict_mono φ ∧ strict_mono (ns ∘ φ),
-      { exact strict_mono_subseq_of_tendsto_at_top hns, },
-      rcases h_ns_mono with ⟨φ, hφ, hnsφ⟩,
-      use φ,
-      specialize h1 (ns ∘ φ) hnsφ,
-      simp at h1,
-      rw tendsto_in_L1 at h1,
-      exact h1,
-    },
-
 end
 
 /-- This is a special case of the Vitali's theorem in L1. -/
