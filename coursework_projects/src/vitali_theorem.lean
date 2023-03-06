@@ -48,6 +48,20 @@ notation f `-→` g `{` μ `}_a-e` := tendsto_μ_ae μ f g
 -- Also the notion of being a member of L1 is somewhat hard to decipher.
 notation f `∈_L1{` μ `}` :=  mem_ℒp f 1 μ
 
+-- When dealing with snorm it is nicer to be able to see them written as integrals
+-- One thing to note is that sometimes the whole expression for the integrals
+-- needs to be wrapped in a set of brackets as those custom operators have a low
+-- precedence so that they don't interfere with other syntax.
+reserve prefix `∫|`:55
+reserve infix `|d`:55
+notation `∫|` f `|d` μ :=  (snorm (f) 1 μ)
+
+-- Also integrals over subsets are supported.
+reserve prefix `∫_{`:55
+reserve infix `}_|`:55
+reserve infix `|d`:55
+notation `∫_{` s `}_|` f `|d` μ :=  snorm (s.indicator f) 1 μ
+
 -- I also found that I was using ennreal.of_real very frequently in the code
 -- which sometimes made it overly verbose and cluttered. I decided to introduce
 -- this shortcuts:
@@ -58,7 +72,6 @@ notation `ennreal{` a `}` := ennreal.of_real(a)
 reserve prefix `real{`:65
 reserve postfix `}`:65
 notation `real{` a `}` := ennreal.to_real(a)
-
 
 /-- This theorem allows to use squeeze_zero theorem on two sequences of non-negative
     real numbers. It is used by ennreal_squeeze_zero. -/
@@ -158,7 +171,7 @@ end
     next theorem. -/
 theorem markov_ineq_L1 {m : measurable_space X} (μ : measure X)
 {f : X → ℝ} (hf : ae_strongly_measurable f μ) :
-∀ (ε : ℝ≥0∞), ε ≠ 0 → μ { x | ε ≤ ‖ f x ‖₊ } ≤ ε⁻¹ * snorm f 1 μ :=
+∀ (ε : ℝ≥0∞), ε ≠ 0 → μ { x | ε ≤ ‖ f x ‖₊ } ≤ ε⁻¹ * ∫|f|dμ  :=
 begin
   intros ε hε,
   -- Before we apply the Markov's inequality in the special case where p = 1,
@@ -196,8 +209,7 @@ end
 /-- This lemma shows that snorm of a difference of two functions in L1 when multiplied
     by a constant is less that ∞. -/
 lemma const_mul_sub_snorm_lt_top {m : measurable_space X} {μ : measure X} {f g : X → ℝ}
-(k : ℝ≥0∞) (hk : k ≠ ⊤) (hf : f ∈_L1{μ}) (hg : g ∈_L1{μ}) :
-k * snorm (f - g) 1 μ < ⊤ :=
+(k : ℝ≥0∞) (hk : k ≠ ⊤) (hf : f ∈_L1{μ}) (hg : g ∈_L1{μ}) : k * (∫|f - g|dμ) < ⊤ :=
 begin
   apply ennreal.mul_lt_top,
   { exact hk },
@@ -215,7 +227,7 @@ theorem tendsto_in_measure_of_tendsto_L1 {m : measurable_space X} {μ : measure 
 begin
   -- Here we aim to apply the Markov's inequality to fₙ - g for all n ∈ ℕ.
   have h2 : ∀ (ε : ℝ≥0∞), ε ≠ 0 →  ∀ (n : ℕ), μ { x | ε ≤ ‖f n x - g x‖₊ } ≤
-    ε⁻¹  * snorm ((f n) - g) 1 μ ,
+    ε⁻¹  * ∫|(f n) - g|dμ,
   { intros ε hε n,
     -- We use sub_strongly_measruable to show that fₙ - g is ae_strongly_measurable.
     exact markov_ineq_L1 μ (sub_strongly_measurable (hf n) hg) ε hε, },
@@ -231,7 +243,7 @@ begin
 
   -- Here I define two sequences of numbers in ℝ≥0∞ to make the rest of the
   -- proof more readable.
-  let a : ℕ → ℝ≥0∞ := λ n, (ennreal{ε})⁻¹ * snorm ((f n) - g) 1 μ,
+  let a : ℕ → ℝ≥0∞ := λ n, (ennreal{ε})⁻¹ * ∫|(f n) - g|dμ,
   let b : ℕ → ℝ≥0∞ := λ n, μ {x : X | ε ≤ dist (f n x) (g x)},
 
   -- In order to apply the squeeze_zero theorem, we need to show the below:
@@ -242,7 +254,7 @@ begin
     { exact set_ε_le_dist_eq_set_ε_le_nnorm (f n) g ε },
 
     -- Here we need to use change to unwrap the definition back and make rw work.
-    change μ {x : X | ε ≤ dist (f n x) (g x)} ≤ (ennreal{ε})⁻¹ * snorm ((f n) - g) 1 μ,
+    change μ {x : X | ε ≤ dist (f n x) (g x)} ≤ (ennreal{ε})⁻¹ * ∫|(f n) - g|dμ,
     rw h_set_eq,
     exact h2 n, },
 
@@ -276,7 +288,7 @@ begin
   -- nnreal later on.
   have h_a_lt_top : ∀ (n : ℕ), a n < ∞,
   { intro n,
-    change (ennreal{ε})⁻¹ * snorm ((f n) - g) 1 μ < ⊤,
+    change (ennreal{ε})⁻¹ *  (∫|(f n) - g|dμ) < ⊤,
     exact const_mul_sub_snorm_lt_top (ennreal{ε})⁻¹ hε_ne_top (hf n) hg, },
   have h_b_lt_top : ∀ (n : ℕ), b n < ∞,
   { intro n, exact measure_lt_top μ ({x : X | ε ≤ dist (f n x) (g x)}), },
@@ -289,7 +301,7 @@ end
 theorem unif_integrable_singleton {m : measurable_space X} {μ : measure X}
 {g : X → ℝ} (hg :g ∈_L1{μ}) :
 ∀ ⦃ε : ℝ⦄ (hε : 0 < ε), ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s
-  → μ s ≤ ennreal{δ} → snorm (s.indicator (g)) 1 μ ≤ ennreal{ε} :=
+  → μ s ≤ ennreal{δ} → (∫_{s}_|g|dμ) ≤ ennreal{ε} :=
 begin
   -- We define a finite set {g}.
   let G : fin 1 → X → ℝ := λ i, g,
@@ -330,7 +342,7 @@ end
 lemma snorm_triangle_ineq {m : measurable_space X} {μ : measure X}
 { f g : X → ℝ } (hf :  ae_strongly_measurable f μ) (hg : ae_strongly_measurable g μ)
 {s : set X} (hs : measurable_set s) :
-snorm (s.indicator (f + g)) 1 μ ≤ snorm (s.indicator f) 1 μ + snorm (s.indicator g) 1 μ :=
+( ∫_{s}_|f + g|dμ ) ≤ ( ∫_{s}_|f|dμ ) + ( ∫_{s}_|g|dμ ) :=
 begin
   rw set.indicator_add',
       exact snorm_add_le (ae_strongly_measurable.indicator hf hs)
@@ -346,6 +358,42 @@ begin
   { simp, },
   { exact ha2 },
   { exact ha2 },
+end
+
+/-- This lemma allows us to get a δ := min δ₁ δ₂ such that if we get δ₁ from the
+    u.a.c.i. statement for g and δ₂ from the statement for {fₙ | n ∈ ℕ} then
+    both of the conclusions hold for sets of measure smaller than δ. The lemma
+    is a bit specific and was extracted out only to improve the speed of computation
+    when checking the main proof. If it were to be used in greater generality,
+    one would have to remove the ε/3 and replace it with just ε but then in the
+    main proof I would have to do some rearrangements which would slow down
+    the compilation -/
+lemma extract_δ_uaci {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
+{ f : ℕ → X → ℝ } { g : X → ℝ }
+(h_f_n_uaci : ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ (n : ℕ) s, measurable_set s →
+              μ s ≤ ennreal{δ} → ( ∫_{s}_|f n|dμ ) ≤ ennreal{ε / 3})
+(h_g_uaci : ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
+            μ s ≤ ennreal{δ} → ( ∫_{s}_|g|dμ ) ≤ ennreal{ε / 3})
+: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s → μ s ≤ ennreal{δ} →
+  ∀ (n : ℕ), ( ∫_{s}_|f n|dμ ) ≤ ennreal{ε / 3} ∧ ( ∫_{s}_|g|dμ ) ≤ ennreal{ε / 3} :=
+begin
+  intros ε hε,
+  rcases h_g_uaci ε hε with ⟨δ₁, hδ₁, h_g_snorm⟩,
+  rcases h_f_n_uaci ε hε with ⟨δ₂ , hδ₂, h_f_n_snorm⟩,
+  use min δ₁ δ₂,
+  split,
+  { exact lt_min hδ₁ hδ₂ },
+  {
+    intros s hs hμs n,
+    specialize h_g_snorm s hs,
+    specialize h_f_n_snorm n s hs,
+    split,
+    { apply h_f_n_snorm,
+      exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂)
+                            (eq.refl (min δ₁ δ₂))).right, },
+    { apply h_g_snorm,
+      exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂)
+                            (eq.refl (min δ₁ δ₂))).left, }, },
 end
 
 /-- This theorem states that if a function is in L1 then it has uniformly absolutely
@@ -376,7 +424,7 @@ begin
   -- Here we use the fact that G = {g} has uniformly abs. cont. integrals
   -- to obtain the following expression:
   have hg_uaci : ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
-      μ s ≤ ennreal{δ} → snorm (s.indicator (g)) 1 μ ≤ ennreal{ε / 2},
+      μ s ≤ ennreal{δ} → (∫_{s}_|g|dμ) ≤ ennreal{ε / 2},
   { exact unif_integrable_singleton hg (half_pos hε) },
 
   -- Now since we know that F and {g} have u.a.c.i, we can extract the corresponding
@@ -412,11 +460,10 @@ begin
     rw (h_manipulate n),
     -- Here we need to use the triangle inequality of snorm and distributivity
     -- of taking the indicator to get the desired inequality below.
-    have h_snorm_le : snorm (s.indicator (g + (f n - g))) 1 μ ≤
-        snorm (s.indicator g) 1 μ  + snorm (s.indicator (f n - g)) 1 μ,
+    have h_snorm_le : ( ∫_{s}_|g + (f n - g)|dμ ) ≤ ( ∫_{s}_|g|dμ )  + ( ∫_{s}_|f n - g|dμ ),
     { exact snorm_triangle_ineq hg.left (ae_strongly_measurable.sub (hf n).left hg.left) hs, },
 
-    have h_snorm_sum_le_ε : snorm (s.indicator g) 1 μ  + snorm (s.indicator (f n - g)) 1 μ ≤ ennreal{ε},
+    have h_snorm_sum_le_ε : ( ∫_{s}_|g|dμ )  + ( ∫_{s}_|f n - g|dμ ) ≤ ennreal{ε},
     { have hn : n ≥ n₀, { linarith, },
       specialize hn₀ n hn,
       -- Here we need to use again the lemma which pushes a ≤ min a b into ennreal.
@@ -428,7 +475,7 @@ begin
       specialize h_snorm1 s hs hμs,
       have hε2_sum_eq_ε : ennreal{ε / 2} + ennreal{ε / 2} ≤ ennreal{ε},
       { exact two_halves_le_sum hε, },
-      have h_indicator_n₀ : snorm (s.indicator (f n - g)) 1 μ ≤ ennreal{ε / 2},
+      have h_indicator_n₀ : ( ∫_{s}_|f n - g|dμ ) ≤ ennreal{ε / 2},
       { exact le_trans (snorm_indicator_le (f n - g)) hn₀, },
       exact le_trans (add_le_add h_snorm1 h_indicator_n₀) hε2_sum_eq_ε, },
     exact le_trans h_snorm_le h_snorm_sum_le_ε, },
@@ -479,7 +526,7 @@ end
 
 /-- This is a special case of the Vitali's theorem in L1. -/
 theorem vitali_theorem {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
-(f : ℕ → X → ℝ) (g : X → ℝ) (hf : ∀ (n : ℕ), mem_ℒp (f n) (1 : ℝ≥0∞) μ) (hg : mem_ℒp g 1 μ) :
+(f : ℕ → X → ℝ) (g : X → ℝ) (hf : ∀ (n : ℕ), (f n) ∈_L1{μ}) (hg : g ∈_L1{μ}) :
 f -→ g in_measure{μ} ∧ unif_integrable f 1 μ ↔ f -→ g in_L1{μ} :=
 begin
   split,
@@ -489,249 +536,6 @@ begin
     split,
     { exact tendsto_in_measure_of_tendsto_L1 hf hg h_tendsto_L1 },
     { exact unif_integrable_of_tendsto_L1 hf hg h_tendsto_L1, }, },
-end
-
----------------------------- Appendix -------------------------------------------
--- Initially I tried proving the forward direction of the Vitali theorem by
--- contradiction and some form of a epsilon/3 proof. Unfortunately converting
--- from tendsto filters to ε-δ is not always possible so I had some difficulty
--- with that approac and eventually decided to rethink my approach and prove that
--- statement in a different way. However, leading up to the initial version of the
--- proof, I introduced a number of interesting lemmas and so I decided to include
--- that initial attempt here because I've learned a lot by writing it.
-
-/-- This lemma is used in the forward direction of the theorem. It asserts that
-    if fₙ doesn't converge to g in L1 then limsup of ∫|fₙ - g|dμ > 0 -/
-lemma limsup_pos_of_not_tendsto_L1 {m : measurable_space X} {μ : measure X}
-{f : ℕ → X → ℝ} { g : X → ℝ } (h_not_tendsto : ¬(f -→ g in_L1{μ})) :
-limsup (λ n, snorm (f n - g) 1 μ) at_top > 0 :=
-begin
-  by_contra,
-  rw [tendsto_in_L1, not_tendsto_iff_exists_frequently_nmem] at h_not_tendsto,
-  have h_contra : limsup (λ n, snorm (f n - g) 1 μ) at_top = 0,
-  { sorry, },
-  sorry,
-end
-
-/-- This lemma allows us to extract a subsequence from a limsup such that it's
-    limit is still positive. -/
-lemma extract_subseq_of_limsup_pos {V : Type} [has_zero V]
-[conditionally_complete_lattice V] [topological_space V]
-(f : ℕ → V) {Λ : ℕ → ℕ} (hΛ : strict_mono Λ) (hf : limsup f at_top > 0) :
-lim at_top (λ (i : ℕ), f (Λ i)) > 0 :=
-begin
- sorry,
-end
-
-/-- This lemma allows us to get a δ := min δ₁ δ₂ such that if we get δ₁ from the
-    u.a.c.i. statement for g and δ₂ from the statement for {fₙ | n ∈ ℕ} then
-    both of the conclusions hold for sets of measure smaller than δ. The lemma
-    is a bit specific and was extracted out only to improve the speed of computation
-    when checking the main proof. If it were to be used in greater generality,
-    one would have to remove the ε/3 and replace it with just ε but then in the
-    main proof I would have to do some rearrangements which would slow down
-    the compilation -/
-lemma extract_δ_uaci {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
-{ f : ℕ → X → ℝ } { g : X → ℝ }
-(h_f_n_uaci : ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ (n : ℕ) s, measurable_set s →
-             μ s ≤ ennreal.of_real δ → snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3))
-(h_g_uaci : ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
-           μ s ≤ ennreal.of_real δ → snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3))
-: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ),
-  ∀ s, measurable_set s → μ s ≤ ennreal.of_real δ →
-  ∀ (n : ℕ), snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3) ∧
-  snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3) :=
-begin
-  intros ε hε,
-  rcases h_g_uaci ε hε with ⟨δ₁, hδ₁, h_g_snorm⟩,
-  rcases h_f_n_uaci ε hε with ⟨δ₂ , hδ₂, h_f_n_snorm⟩,
-  use min δ₁ δ₂,
-  split,
-  { exact lt_min hδ₁ hδ₂ },
-  {
-    intros s hs hμs n,
-    specialize h_g_snorm s hs,
-    specialize h_f_n_snorm n s hs,
-    split,
-    { apply h_f_n_snorm,
-      exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂)
-                            (eq.refl (min δ₁ δ₂))).right, },
-    { apply h_g_snorm,
-      exact le_trans hμs (ennreal_min_le (le_of_lt hδ₁) (le_of_lt hδ₂)
-                            (eq.refl (min δ₁ δ₂))).left, }, },
-end
-
-/-- This lemma states that if we have a ℝ≥0∞ number a then we can find an ε > 0
-    such that 0 < ε < a. -/
-lemma exists_ε_between_of_pos {a : ℝ≥0∞} (ha : 0 < a) : ∃ (ε : ℝ≥0∞), 0 < ε ∧ ε < a :=
-begin
-  by_cases a = ⊤,
-  { use 1,
-    rw h,
-    exact ⟨one_pos, ne.lt_top (ennreal.one_ne_top)⟩, },
-  { use a / 2,
-    have ha0 : a ≠ 0,
-      { rw ← ne_zero_iff, exact ne_zero.of_pos ha, },
-    split,
-    { exact ennreal.half_pos ha0, },
-    { rw ennreal.div_lt_iff,
-      { nth_rewrite 0 ← mul_one a,
-        rw (ennreal.mul_lt_mul_left ha0 h),
-        exact ennreal.one_lt_two, },
-      { right, exact ha0},
-      { right, exact h}, }, },
-end
-
-/-- This lemma shows that if we have a finite measure and 0 < ε then
-    0 < ε / 3μ(x). -/
-lemma ε_div_3_μX_pos {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
-{ε : ℝ≥0∞} (hε : 0 < ε) (hε_ne_0 : ε ≠ 0) (hε_ne_top : ε ≠ ⊤) :
-ennreal.to_real(ε) / (3 * ennreal.to_real(μ univ) + 1) > 0 :=
-begin
-    let ε₂ := ennreal.to_real(ε)/(3 * ennreal.to_real(μ univ) + 1),
-    have hε2 : 0 < ε₂,
-    { have hε2' : 0 < ennreal.to_real(ε),
-      { exact ennreal.to_real_pos hε_ne_0 hε_ne_top },
-      change 0 < ennreal.to_real(ε)/(3 * ennreal.to_real(μ univ) + 1),
-      rw lt_div_iff,
-      { simp,
-        exact hε2', },
-      { have hμ : 0 ≤ 3 * ennreal.to_real(μ univ), { simp, },
-        linarith, }, },
-    change ε₂ > 0,
-    linarith,
-end
-
-/-- This theorem is the forward direction of the Vitali's theorem. -/
-theorem tendsto_L1_of_unif_integr_of_tendsto_in_μ'
-{m : measurable_space X} {μ : measure X} [is_finite_measure μ]
-{ f : ℕ → X → ℝ } { g : X → ℝ } (hf : ∀ (n : ℕ), mem_ℒp (f n) (1 : ℝ≥0∞) μ) (hg : mem_ℒp g 1 μ)
-(hf2 : ∀ (n : ℕ), strongly_measurable (f n)) (hg2 : strongly_measurable g)
-(h_tendsto_μ : tendsto_in_measure μ f at_top g) (h_unif : unif_integrable f 1 μ) :
-tendsto_in_L1 μ f g :=
-begin
-    by_contra,
-    -- Here we assume that there is a sequence ns such that along that sequence
-    -- lim ∫|fₙ - f|dμ > 0.
-    by_cases h1 : ∃ (ns : ℕ → ℕ), strict_mono ns ∧ ¬ tendsto_in_L1 μ (λ i, f (ns i)) g,
-    { rcases h1 with ⟨ns, hns, hns_not_tendsto⟩,
-      rw tendsto_in_L1 at h,
-      -- If fₙ doesn't converge to g in L1 we can deduce that limsup of snorms is > 0.
-      have h_limsup : limsup (λ n, snorm (f n - g) 1 μ) at_top > 0,
-      { exact limsup_pos_of_not_tendsto_L1 h, },
-
-      -- Show that along ns we get convergence in measure!!! -> new lemma needed.
-      -- Now we need to show that along ns it also converges in measure and extract
-      -- the desired susequence out of that.
-      have hns_tendsto_μ : tendsto_in_measure μ (λ i , f (ns i)) at_top g,
-      {sorry,},
-
-      -- Given that fₙ → g in measure, we extract the subsequence along which it
-      -- converges μ-ae.
-      have h_ae : ∃ (Λ : ℕ → ℕ), strict_mono Λ  ∧
-                 ∀ᵐ x ∂μ, tendsto (λ (i : ℕ), f (ns (Λ i)) x) at_top (𝓝 (g x)),
-      {exact tendsto_in_measure.exists_seq_tendsto_ae hns_tendsto_μ, },
-
-      rcases h_ae with ⟨Λ, hΛ, h_tendsto_ae⟩,
-
-      -- Then given that limsup we pass down to a subsequence along Λ.
-      -- have h_lim_along_Λ : lim at_top (λ (i : ℕ), snorm(f (Λ i) - g) 1 μ) > 0,
-      -- { exact extract_subseq_of_limsup_pos (λ (n : ℕ), snorm(f n - g) 1 μ) hΛ h_limsup, },
-
-      -- Idea:
-      -- Given that there exists ns such that along it we don't have convergence
-      -- in L1, we pass to a subsequence Λ which converges in measure
-      -- then from uaci we extract the information we need and after that
-      -- we need to show convergence in L1 using a epsilon delta proof.
-
-      -- Given that F has u.a.c.i and so does {g} we want to show that for all ε
-      -- we can pick a δ such that for all measurable sets with μ(s) < δ we have
-      -- the u.a.c.i condition of ∫ₛ|f|dμ < ε satisifed for all fₙ and g
-      have h_uaci : ∀ (ε : ℝ), 0 < ε  →  ∃ (δ : ℝ) (hδ : 0 < δ),
-                     ∀ s, measurable_set s → μ s ≤ ennreal.of_real δ →
-                     ∀ (n : ℕ), snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3) ∧
-                       snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
-      { -- I have moved the hypotheses which the goal depends on below here so that
-        -- they don't pollute the infoview.
-        -- Now we extract the uniformly abs cont integrals condition from the singleton
-        -- set {g} but so that for any ε it gives us the criterion with ε / 3.
-        have h_g_uaci : ∀ (ε : ℝ), 0 < ε  →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
-                         μ s ≤ ennreal.of_real δ →
-                         snorm (s.indicator (g)) 1 μ ≤ ennreal.of_real (ε / 3),
-        { intros ε hε,
-          have hε3 : 0 < ε / 3, { linarith, },
-          exact unif_integrable_singleton hg hε3 },
-
-        -- Now we need to extract a similar proposition from the family F = {fₙ | n ∈ ℕ}.
-        have h_f_n_uaci : ∀ (ε : ℝ), 0 < ε →  ∃ (δ : ℝ) (hδ : 0 < δ),
-                         ∀ (n : ℕ) s, measurable_set s → μ s ≤ ennreal.of_real δ →
-                           snorm (s.indicator (f n)) 1 μ ≤ ennreal.of_real (ε / 3),
-        { intros ε hε,
-          have hε3 : 0 < ε / 3, { linarith, },
-          exact h_unif hε3, },
-        exact extract_δ_uaci h_f_n_uaci h_g_uaci, },
-
-      -- Now we need to apply Egorov's theorem to (fₙ) along Λ.
-      have h_set_from_Egorov : ∀ (δ : ℝ) , δ > 0 → ∃ s, measurable_set s ∧ μ s ≤ ennreal.of_real δ
-                               ∧ tendsto_uniformly_on (λ n, f (ns (Λ n))) g filter.at_top sᶜ,
-      { intros δ hδ,
-        have hfΛ2 : ∀ n : ℕ, strongly_measurable (f (ns (Λ n))),
-        { intro n, exact hf2 (ns (Λ n)) },
-        exact tendsto_uniformly_on_of_ae_tendsto' hfΛ2 hg2 h_tendsto_ae hδ, },
-
-      --
-
-      have h_exists_ε : ∃ (ε : ℝ≥0∞), 0 < ε ∧ ε < lim at_top (λ (i : ℕ), snorm(f (Λ i) - g) 1 μ),
-      { exact exists_ε_between_of_pos h_lim_along_Λ },
-
-      rcases h_exists_ε with ⟨ε, ⟨hε, hεlt⟩⟩,
-
-      have hε_ne_0 : ε ≠ 0, { rw ← ne_zero_iff, exact ne_zero.of_pos hε },
-      have hε_ne_top : ε ≠ ⊤, { exact ne_top_of_lt hεlt },
-      specialize h_uaci (ennreal.to_real ε) (ennreal.to_real_pos hε_ne_0 hε_ne_top),
-
-      rcases h_uaci with ⟨δ, hδ, hδ_set⟩,
-
-      specialize h_set_from_Egorov δ hδ,
-      rcases h_set_from_Egorov with ⟨s, hs, hμs, hs_tendsto⟩,
-
-      specialize hδ_set s hs hμs,
-
-      rw metric.tendsto_uniformly_on_iff at hs_tendsto,
-      specialize hs_tendsto (ennreal.to_real(ε)/(3 * ennreal.to_real(μ univ) + 1)),
-      specialize hs_tendsto (ε_div_3_μX_pos hε hε_ne_0 hε_ne_top),
-
-      rw eventually_at_top at hs_tendsto,
-      cases hs_tendsto with n₀ hn₀,
-
-      -- Here comes the ε/3 part of the proof.
-      have h_bound : ∀ (n : ℕ), n₀ < n → (λ (i : ℕ), snorm (f (Λ i) - g) 1 μ) < ε,
-      { sorry },
-
-      have h_contradiction : lim at_top (λ (i : ℕ), snorm (f (Λ i) - g) 1 μ) < ε,
-      { sorry, },
-      have h_ε_lt_ε : ε < ε,
-      { exact lt_trans hεlt h_contradiction },
-      have h_irrefl : ¬ ε < ε,
-      { exact lt_irrefl ε },
-      exact h_irrefl h_ε_lt_ε, },
-    { -- For the other case, If no such subsequence exists we can show convergence
-      -- in L1 and arrive at a contradiciton.
-      apply h,
-      rw tendsto_in_L1,
-      apply tendsto_of_subseq_tendsto,
-      push_neg at h1,
-      intros ns hns,
-      have h_ns_mono : ∃ (φ : ℕ → ℕ), strict_mono φ ∧ strict_mono (ns ∘ φ),
-      { exact strict_mono_subseq_of_tendsto_at_top hns, },
-      rcases h_ns_mono with ⟨φ, hφ, hnsφ⟩,
-      use φ,
-      specialize h1 (ns ∘ φ) hnsφ,
-      simp at h1,
-      rw tendsto_in_L1 at h1,
-      exact h1,
-    },
-
 end
 
 end measure_theory
