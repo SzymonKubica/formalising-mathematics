@@ -37,10 +37,31 @@ is a sigma algebra on `X`.
 def gen_by (A : set X) : measurable_space X :=
 { measurable_set' := λ S, S = ∅ ∨ S = A ∨ S = Aᶜ ∨ S = ⊤,
   measurable_set_empty := begin
-    sorry,
+    left,
+    refl,
   end,
   measurable_set_compl := begin
-    sorry,
+    intro s,
+    intro h,
+    cases h,
+    { right, right, right,
+      rw set.top_eq_univ,
+      simp,
+      exact h, },
+    { cases h,
+      { right, right, left,
+        simp,
+        exact h, },
+      { cases h,
+        { right, left,
+          rw compl_eq_comm,
+          rw eq_comm,
+          exact h, },
+        { left,
+          rw set.top_eq_univ at h,
+          rw <- set.compl_univ,
+          simp,
+          exact h, }, }, },
   end,
   measurable_set_Union := begin
     sorry,
@@ -53,7 +74,7 @@ example (A : set X) : measurable_space X := measurable_space.generate_from {A}
 
 -- But the problem with that approach is that you don't get the actual sets
 -- in the sigma algebra for free. Try this, to see what I mean!
-example (A : set X) : (measurable_space.generate_from {A}).measurable_set' = ({∅,A,Aᶜ,⊤} : set (set X)) := 
+example (A : set X) : (measurable_space.generate_from {A}).measurable_set' = ({∅,A,Aᶜ,⊤} : set (set X)) :=
 begin
   sorry,
 end
