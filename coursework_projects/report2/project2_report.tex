@@ -112,8 +112,8 @@
 
 \section*{Introduction}
 
-As the second part of the coursework I've decided to formalise the Vitali's theorem
-which is taught as a part of the second year measure theory course: MATH50006:
+As the second part of my coursework for the module I've decided to formalise the Vitali's theorem
+which is taught in the second year measure theory course: MATH50006:
 Lebesgue Measure and Integration. I made this decision because I thoroughly enjoyed
 learning about measure theory in my second year. On top of that, formalising measure
 theoretic concepts was somewhat similar to the process of formalising theorems
@@ -134,8 +134,8 @@ the mathlib library shouldn't be thought of as merely an extension of the basic
 capabilities of the language. Instead, mathlib provides all of the API's with which
 are needed when proving mathematical theorems. Without this library,
 proving complicated statements such as the Vitali's theorem would require us to
-first define all of the measure theory leading up to the statement of the theorem
-which would have taken thousands of lines of code.
+define all of the measure theory leading up to the statement of the theorem
+which would be quite a lentghy process.
 
 \section*{Proof of the Vitali's Theorem}
 Before I document the process of formalising, let us first state the
@@ -148,22 +148,22 @@ into Lean.
   the following are equivalent:
 \end{theorem}
     \hspace{1cm} (T1) $f_n \xrightarrow{\mu} f $ and $ \mathcal{F} = \lbrace f_n : n \in \N\rbrace$ has uniformly absolutely continuous
-     integrals
+     integrals,
 
-    \hspace{1cm} (T2) $\int |f_n - f| \diff\mu \to 0$, as $n \to \infty$
+    \hspace{1cm} (T2) $\int |f_n - f| \diff\mu \to 0$, as $n \to \infty$.
 
-It is also important to note that a family $\mathcal{F} \subset \Lmu$ of functions
+Note that a family $\mathcal{F} \subset \Lmu$ of functions
 has uniformly absolutely continuous integrals if
 \begin{equation}
-  \forall \varepsilon > 0, \exists \delta > 0, \sthat  \forall f \in \mathcal{F},
-  \forall A \in \mathcal{A}, \weh \mu(A) < \delta \implies \int_A |f|\diff \mu < \varepsilon.
+  \forall \varepsilon > 0, \sep \exists \delta > 0, \sthat  \forall f \in \mathcal{F},
+  \sep \forall A \in \mathcal{A}, \weh \mu(A) < \delta \implies \int_A |f|\diff \mu < \varepsilon.
 \end{equation}
 
-Where $\A$ is the sigma algebra on $X$.
+Where $\A$ is the sigma algebra on $X$ corresponding to $\mu$.
 
-Let us start by proving the backwards direction of the theorem i.e. that
-$(\text{T}2) \implies (\text{T}1)$. We assume that  $f_n$ converges to  $f$ in  $\Lmu$.
-Let us first focus on showing that  $f_n \xrightarrow{\mu} f$.
+Let us start by showing he backwards direction of the theorem i.e. that
+$(\text{T}2) \implies (\text{T}1)$. Let us assume that  $f_n$ converges to  $f$ in  $\Lmu$.
+We'll first focus on showing that  $f_n \xrightarrow{\mu} f$.
 
 By definition, $f_n$ converges to  $f$ in measure if:
   \[
@@ -178,13 +178,13 @@ Let $\varepsilon > 0$ be arbitrary, now by applying Markov's inequality we have:
 .\]
 Now by our assumption of convergence in $\Lmu$ we deduce that
 \[
-\frac{1}{\varepsilon}\int |f_n - f| \diff\mu \to 0 \as n \to \infty.
+\frac{1}{\varepsilon}\int |f_n - f| \diff\mu \to 0 \as n \to \infty
 .\]
 
 Hence, by applying the squeeze theorem we conclude that $f_n \xrightarrow{\mu} f$.
-Now let us show that the family $\mathcal{F} = \lbrace f_n \st n \in \N\rbrace $ has uniformly
-absolutely continuous integrals (i.e. that (1) holds for $\mathcal{F})$.
 
+Now let us show that the family $\mathcal{F} = \lbrace f_n \st n \in \N\rbrace $ has uniformly
+absolutely continuous integrals, i.e. that (1) holds for $\mathcal{F}$.
 Let $\varepsilon > 0$ be arbitrary, by convergence in $\Lmu$ we can find  $n_0 = n_0(\varepsilon)$
 satisfying :
 \[
@@ -195,18 +195,19 @@ using the fact that any finite family has uniformly absolutely continous integra
 we can find a $\delta > 0$, such that:
 \begin{equation}
   \forall \text{ } A \in \A \text{ with } \mu(A) < \delta, \weh \int_A |f| \diff\mu < \frac{\varepsilon}{2}
-  \text{ and } \max_{n \le n_0}\int_A |f_n| \diff\mu < \frac{\varepsilon}{2}
+  \text{ and } \max_{n \le n_0}\int_A |f_n| \diff\mu < \frac{\varepsilon}{2}.
 \end{equation}
 
 Now consider the following chain of inequalities for $n > n_0,\sep A \in \A,\sep \mu(A) < \delta$:
-\[
-\int_A |f_n| \diff\mu \le \int_A |f| \diff\mu + \int_A |f_n - f| \diff\mu \le \int_A |f| \diff\mu + \int |f_n - f| \diff\mu. < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon\]
-
+\begin{equation}
+\int_A |f_n| \diff\mu \le \int_A |f| \diff\mu + \int_A |f_n - f| \diff\mu \le \int_A |f| \diff\mu + \int |f_n - f| \diff\mu. < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon.
+\end{equation}
 From the second part of (2) we can deduce that:
-\[
-\max_{n \le n_0}\int_A |f_n| \diff\mu < \frac{\varepsilon}{2} < \varepsilon
-.\]
-Hence, by combining the above results we get that:
+\begin{equation}
+\max_{n \le n_0}\int_A |f_n| \diff\mu < \frac{\varepsilon}{2} < \varepsilon.
+\end{equation}
+Therefore, by combining the results (3) and (4) above we cover all $n \in \N$, hence
+we conclude that:
 \[
 \forall n \in \N, \int_A |f_n| \diff\mu < \varepsilon
 .\]
@@ -214,14 +215,14 @@ Hence, by combining the above results we get that:
 Therefore we have shown that $\mathcal{F}$ has uniformly absolutely continuous
 integrals and consequently the backwards direction of the theorem holds.
 
-Now let us show that $(\text{T}1) \implies (\text{T}2)$.
+Now we'll show that $(\text{T}1) \implies (\text{T}2)$.
 Let us assume that $f_n$ converges to $f$ in measure and that the family $\mathcal{F}$
 has uniformly absolutely continuous integrals. We'll prove that
 $\int |f_n - f| \diff\mu \to 0$, as $n \to \infty$ using the fact that a sequence
-converges if every subsequence has a convergent subsequence.
+converges 0 if every subsequence has a subsequence which converges to 0.
 Let $(f_{n_k})_{k\in\N}$ be an arbitrary subsequence of  $(f_{n})_{n\in\N}$.
 Consequently, $(\int |f_{n_k} - f| \diff\mu)_{k\in\N}$ is a subsequence of
-$(\int |f_{n} - f| \diff\mu)_{n\in\N}$. We'll show that it has a subsequence:
+$(\int |f_{n} - f| \diff\mu)_{n\in\N}$. We'll show that it has a subsequence such that:
 \[
   \int |f_{i} - f| \diff\mu \to 0 \as i \to \infty \text{ along } \Lambda
 .\]
@@ -234,7 +235,7 @@ is a subsequence of  $(f_{n})_{n\in\N}$, it implies that we also have:
 f_{n_k} \xrightarrow{\mu} f
 .\]
 Also given the fact that we have $\mu(X) < \infty$, we can apply the proposition
-(2.45) from the MATH50006: Lebesgue Measure and Integration course lecture notes, which
+(2.45) from the lecture notes for  MATH50006: Lebesgue Measure and Integration, which
 tells us that there exists a subsequence $\Lambda \subset n_k$ such that:
 \begin{equation}
   f_i \to f \text{ }\mu\text{-a.e.} \as n \in \Lambda \to \infty
@@ -270,7 +271,7 @@ In order to formalise Vitali's theorem, I followed a similar approach to what
 I did in my first project. This time however, I was able to avoid some of the mistakes that
 I made in my first project. The first modification was that I started proving the
 theorem by first breaking it down into separate lemmas which encapsulated the
-three 'branches' that one has to show in order to prove the theorem. In the proof
+three 'branches' that need to be shown in order to prove Vitali's theorem. In the proof
 presented above, we first needed to show that
 convergence in $\Lmu$ implies convergence in measure (first 'branch'), then we have shown that
 it implies that  $\mathcal{F}$ has uniformly absolutely continuous integrals. Finally,
@@ -347,7 +348,7 @@ begin
 As the scope of this project included interacting with more advanced theory
 from second year university mathematics, formalising it has proven more difficult
 than the first year analysis that I was working on in my first project. The two
-interesting challenges that I have overcome were type coercions and proving
+interesting challenges that I faced were type coercions and proving
 statements involving finite objects.
 
 The first one of these came up because I
@@ -360,7 +361,7 @@ Lean the extended non-negative real numbers (\texttt{ennreal}) are a completely
 different type from the usual real numbers. Therefore, if we for instance require
 that $\mu (A) < \varepsilon $ for some  $\varepsilon \in \R $ and  $A \in \A$, that
 proposition doesn't even make sense in the world of Lean. That is because the return
-type is \texttt{ennreal} whereas  $\varepsilon$ is an ordinary real number. Because
+type of $\mu$ is \texttt{ennreal} whereas  $\varepsilon$ is an ordinary real number. Because
 of this, in the code you need to convert types of variables using special functions
 which are called coercions. The difficult thing about this is that not always is
 it possible to coerce between types. For instance it doesn't make sense to convert
@@ -387,19 +388,20 @@ end
 \end{minted}
 \captionof{listing}{Coercions required to apply \texttt{squeeze\_zero}}
 \end{code}
-It is a proof of the squeeze theorem for \texttt{ennreal} numbers. In the main proof
-I needed to apply squeeze theorem to two sequences of ennreal numbers, in order
+It is a proof of the squeeze theorem for \texttt{ennreal} numbers, it was required
+by the main proof to apply squeeze theorem to two sequences of ennreal numbers. In order
 to do this, I needed to cast those sequences into non-negative real numbers,
 then perform coercions on the limits to make the types match up and finally
 I was able to apply the library version of the squeeze theorem for non-negative
 real numbers. It illustrates how coercions make the proofs much more complicated
 as the programmer needs to ensure that each variable if of precisely the right
-type when it is in some expression involving terms of the specific type.
+type when it is in an expression involving terms of the specific type.
 
 The second aspect of the proof that I found more difficult than expected was
 proving propositions for finite objects such as lists and sets. For instance,
 when proving that a singleton set $\lbrace g\rbrace$ containing a single measurable
-function  $g \in \Lmu $ was more involved than I anticipated (see Listing 4).
+function  $g \in \Lmu $ has uniformly absolutely continuous integrals was more
+involved than I anticipated. The proof of that claim can be seen in Listing 4 below.
 \begin{code}
 \begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
 /-- This lemma proves that if we take a single function in L1(μ) then this set
@@ -443,11 +445,11 @@ careful case analysis based on whether the item is equal to the first or second
 item in the list. The reason why I introduced this lemma was that I needed to show
 that if $f - g$ is strongly
 measurable. Hence I needed to form a finite list $[f, -g]$ and then apply the
-proposition \texttt{ae\_strongly\_measurable\_sum}  which shows that a sum a finite
+proposition \texttt{ae\_strongly\_measurable\_sum}  which shows that a sum of a finite
 list of strongly measurable functions is strongly measurable. However,
 after proving it I realised that it is actually a known fact in the
 library (called \texttt{ae\_strongly\_measurable.sub}) and I didn't need to do
-all of the list manipulations. Still, I decided to leave that proof in my implementation
+all of the list manipulations. In the end, I decided to leave that proof in my implementation
 because I think it is an interesting exercise illustrating proofs with finite sets.
 \begin{code}
 \begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
@@ -478,8 +480,8 @@ end
 
 One thing that I noticed when iterating with the API provided by mathlib is that
 even though it is very exhaustive and almost any imaginable theorem from measure
-theory is already available there, it sometimes isn't very easy to read or write
-the code because of the verbosity of the implementation that the library provides.
+theory is already available there, it sometimes isn't very easy to read
+the code because of the verbosity of the API that the library provides.
 
 Consider the following example: let $\varepsilon \in \R, \sep s \in \A$ and $f$ be
 any integrable function, suppose I wanted to express the following inequality
@@ -496,15 +498,16 @@ snorm (s.indicator (f)) 1 μ ≤ ennreal.of_real (ε)
 \captionof{listing}{Limited expressiveness of the API.}
 \end{code}
 
-Although it might not look too overwhelming, things can get out of control quite
-quickly if there are multiple integrals involved. Also another problem that I
-identified is that in the signature of the \texttt{snorm} function above, one
-has to write $1 \sep \mu $ at the end which specifies that we want to use the
-$\Lmu $ norm. It might not be a very big issue, however I kept forgetting
-the order in which those two need to be specified. Moreover, the fact that these
-trailing arguments are a common occurrence among many function in the library didn't
-make it easier. One has to remember all of the function signatures or look them up constantly which slows down the
-progress. The listing below illustrates how the verbose syntax.
+Although it might not look too overwhelming, if there are multiple integrals
+involved, things can get out of control quite quickly . Another problem
+that I identified is that in the signature of the \texttt{snorm} function
+above, one has to write $1 \sep \mu $ at the end which specifies that we want
+to use the $\Lmu $ norm. It might not be a very big issue, however I kept
+forgetting the order in which those two need to be specified. Moreover, the
+fact that these trailing arguments are a common occurrence among many functions
+in the library didn't make it easier. One has to remember all of the function
+signatures or look them up constantly which slows down the progress. The
+listing below illustrates how the verbose syntax impact readability.
 \begin{code}
 \begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
 lemma extract_δ_uaci {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
@@ -525,13 +528,13 @@ begin ...
 In order to solve the problem of readability, I decided to add new notation which
 was specific to the file that I was working in. It is important to note that
 overriding notation with new definitions should be done with caution and in a
-consistent manner, so the professionals maintaining the mathlib library probably
+consistent manner. That's why the professionals maintaining the mathlib library probably
 wouldn't opt for my custom definitions which are far from being perfect. I introduced
 the new notation only because it allowed me to explore some of the more advanced
 features of the language and make the code development process slightly more
 convenient. I wanted to indicate that I don't claim that the API in the mathlib
 library is flawed, my definitions were merely an exploration and shouldn't be
-considered an attempt to fix the library.
+considered as a claim that the library is not good enough.
 
 I began by introducing alias definitions and new notation for the basic measure theoretic concepts such
 as the notion of being in $\Lmu$ and the three types of convergence:
@@ -576,14 +579,23 @@ lemma extract_δ_uaci {m : measurable_space X} {μ : measure X} [is_finite_measu
 : ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s → μ s ≤ ennreal{δ} →
   ∀ (n : ℕ), ( ∫_{s}_|f n|dμ ) ≤ ennreal{ε / 3} ∧ ( ∫_{s}_|g|dμ ) ≤ ennreal{ε / 3} :=
 begin ...
+
+theorem tendsto_in_measure_of_tendsto_L1 {m : measurable_space X} {μ : measure X}
+{f : ℕ → X → ℝ} {g : X → ℝ} (hf : ∀ (n : ℕ), f n ∈_L1{μ}) (hg : g ∈_L1{μ})
+(h : f -→ g in_L1{μ}) : f -→ g in_measure{μ} := -- <- New notation for convergence.
+begin ...
 \end{minted}
-\captionof{listing}{Code from Listing 7 after refactoring.}
+\captionof{listing}{Code after introducing new notation.}
 \end{code}
 
 The impact of the applied refactoring might not be apparent at the first glance,
 especially given how complex the definition above still is. However, I find it
-more readable and it arguably faster to type out because the
-raw number of characters required is slightly lower.
+more readable and a bit faster to type out. The new definitions that I
+found particularly convenient were the ones for convergence $\mu$-a.e, in measure
+and in  $\Lmu$. It can be seen in the second part of the Listing 9 that now the
+API for convergence is consistent in that you need to specify that $f \to g$ and
+then state in what way.
+
 
 \section*{Conclusions}
 
@@ -592,18 +604,17 @@ more about proving theorems in Lean and also revise some concepts from my
 favourite second year module.
 
 Having proved Vitali's theorem I have learned
-how to use the toolkit provided by mathlib in measure theoretic context. I also
+how to use the toolkit provided by mathlib in the context of measure theory. I also
 gained appreciation for the usefulness of the library and how indispensable it
-is when proving more advanced propositions. I realised how important it is to be
+is when proving more advanced propositions. I realised that it is important to be
 able to search through the library efficiently and quickly identify if a given
 theorem in the library can be applied in the context of the proof that one is
 currently working on.
 
 The project also allowed me to explore some of the more advanced features of the
 Lean programming language. Introducing the new notation was an interesting way to
-learn how prefix and infix operators are handled in lean and how overriding the precedence of
-operators can lead to unexpected results.
-
+learn how prefix and infix operators are handled in lean and how overriding operators
+can be used to augment the syntax of the language.
 
 \begin{comment}
 
