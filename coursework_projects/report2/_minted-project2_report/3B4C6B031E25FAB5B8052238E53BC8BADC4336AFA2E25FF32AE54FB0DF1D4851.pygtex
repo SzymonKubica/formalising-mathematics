@@ -1,3 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-\PYG{n}{snorm} \PYG{o}{(}\PYG{n}{s.indicator} \PYG{o}{(}\PYG{n}{f}\PYG{o}{))} \PYG{l+m+mi}{1} \PYG{n}{μ} \PYG{n+nb+bp}{≤} \PYG{n}{ennreal.of\PYGZus{}real} \PYG{o}{(}\PYG{n}{ε}\PYG{o}{)}
-\end{Verbatim}

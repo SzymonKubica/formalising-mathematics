@@ -1,6 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-    \PYG{c+c1}{\PYGZhy{}\PYGZhy{} Here we consider the trichotomy : (f(a) \PYGZlt{} f(b)) ∨ (f(a) = f(b)) ∨ (f(b) \PYGZlt{} f(a)).}
-    \PYG{k}{have} \PYG{n}{htri} \PYG{o}{:=} \PYG{n}{lt\PYGZus{}trichotomy} \PYG{o}{(}\PYG{n}{f} \PYG{n}{a}\PYG{o}{)} \PYG{o}{(}\PYG{n}{f} \PYG{n}{b}\PYG{o}{),}
-    \PYG{c+c1}{\PYGZhy{}\PYGZhy{} The rest of the proof is split into 3 cases.}
-    \PYG{n}{rcases} \PYG{n}{htri} \PYG{k}{with} \PYG{n}{hlt} \PYG{n+nb+bp}{|} \PYG{n}{heq} \PYG{n+nb+bp}{|} \PYG{n}{hgt}\PYG{o}{,}
-\end{Verbatim}
