@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{reserve} \PYG{k+kd}{prefix} \PYG{n+nb+bp}{`∫|`}\PYG{o}{:}\PYG{l+m+mi}{55}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`|}\PYG{n}{d}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{55}
+\PYG{k+kd}{notation} \PYG{n+nb+bp}{`∫|`} \PYG{n}{f} \PYG{n+nb+bp}{`|}\PYG{n}{d}\PYG{n+nb+bp}{`} \PYG{n}{μ} \PYG{o}{:=}  \PYG{o}{(}\PYG{n}{snorm} \PYG{o}{(}\PYG{n}{f}\PYG{o}{)} \PYG{l+m+mi}{1} \PYG{n}{μ}\PYG{o}{)}
+
+\PYG{c+c1}{\PYGZhy{}\PYGZhy{} Also integrals over subsets are supported.}
+\PYG{k+kd}{reserve} \PYG{k+kd}{prefix} \PYG{n+nb+bp}{`∫}\PYG{n}{\PYGZus{}}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{55}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n}{\PYGZus{}}\PYG{n+nb+bp}{|`}\PYG{o}{:}\PYG{l+m+mi}{55}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`|}\PYG{n}{d}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{55}
+\PYG{k+kd}{notation} \PYG{n+nb+bp}{`∫}\PYG{n}{\PYGZus{}}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`} \PYG{n}{s} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n}{\PYGZus{}}\PYG{n+nb+bp}{|`} \PYG{n}{f} \PYG{n+nb+bp}{`|}\PYG{n}{d}\PYG{n+nb+bp}{`} \PYG{n}{μ} \PYG{o}{:=}  \PYG{n}{snorm} \PYG{o}{(}\PYG{n}{s.indicator} \PYG{n}{f}\PYG{o}{)} \PYG{l+m+mi}{1} \PYG{n}{μ}
+
+\PYG{k+kd}{reserve} \PYG{k+kd}{prefix} \PYG{n+nb+bp}{`}\PYG{n}{ennreal}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{postfix} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{notation} \PYG{n+nb+bp}{`}\PYG{n}{ennreal}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`} \PYG{n}{a} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`} \PYG{o}{:=} \PYG{n}{ennreal.of\PYGZus{}real}\PYG{o}{(}\PYG{n}{a}\PYG{o}{)}
+\PYG{k+kd}{reserve} \PYG{k+kd}{prefix} \PYG{n+nb+bp}{`}\PYG{n}{real}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{postfix} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{notation} \PYG{n+nb+bp}{`}\PYG{n}{real}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`} \PYG{n}{a} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`} \PYG{o}{:=} \PYG{n}{ennreal.to\PYGZus{}real}\PYG{o}{(}\PYG{n}{a}\PYG{o}{)}
+\end{Verbatim}

@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{theorem} \PYG{n}{intermediate\PYGZus{}value\PYGZus{}theorem\PYGZus{}special} \PYG{o}{\PYGZob{}}\PYG{n}{a} \PYG{n}{b} \PYG{o}{:} \PYG{n}{ℝ}\PYG{o}{\PYGZcb{}} \PYG{o}{\PYGZob{}}\PYG{n}{f} \PYG{o}{:} \PYG{n}{ℝ}  \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{o}{\PYGZcb{}} \PYG{o}{(}\PYG{n}{h0} \PYG{o}{:} \PYG{n}{a} \PYG{n+nb+bp}{\PYGZlt{}} \PYG{n}{b}\PYG{o}{)}
+\PYG{o}{(}\PYG{n}{hfcont} \PYG{o}{:} \PYG{n}{continuous} \PYG{n}{f}\PYG{o}{)} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{o}{(}\PYG{n}{c} \PYG{o}{:} \PYG{n}{ℝ}\PYG{o}{),} \PYG{n}{c} \PYG{n+nb+bp}{∈} \PYG{n}{Ioo} \PYG{o}{(}\PYG{n}{f} \PYG{n}{a}\PYG{o}{)} \PYG{o}{(}\PYG{n}{f} \PYG{n}{b}\PYG{o}{)} \PYG{n+nb+bp}{\PYGZhy{}\PYGZgt{}} \PYG{n+nb+bp}{∃} \PYG{o}{(}\PYG{n}{x} \PYG{o}{:} \PYG{n}{ℝ}\PYG{o}{),} \PYG{o}{(}\PYG{n}{x} \PYG{n+nb+bp}{∈} \PYG{n}{Icc}
+\end{Verbatim}

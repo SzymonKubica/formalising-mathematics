@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+    \PYG{n}{intro} \PYG{n}{hIcc}\PYG{o}{,}
+    \PYG{k}{have} \PYG{n}{hIoo} \PYG{o}{:} \PYG{n}{c} \PYG{n}{strictly\PYGZus{}between} \PYG{o}{(}\PYG{n}{f} \PYG{n}{a}\PYG{o}{)} \PYG{n}{and} \PYG{o}{(}\PYG{n}{f} \PYG{n}{b}\PYG{o}{),}
+    \PYG{o}{\PYGZob{}} \PYG{k}{let} \PYG{n}{minimum} \PYG{o}{:=} \PYG{o}{(}\PYG{n}{min} \PYG{o}{(}\PYG{n}{f} \PYG{n}{a}\PYG{o}{)} \PYG{o}{(}\PYG{n}{f} \PYG{n}{b}\PYG{o}{)),}
+      \PYG{k}{let} \PYG{n}{maximum} \PYG{o}{:=} \PYG{o}{(}\PYG{n}{max} \PYG{o}{(}\PYG{n}{f} \PYG{n}{a}\PYG{o}{)} \PYG{o}{(}\PYG{n}{f} \PYG{n}{b}\PYG{o}{)),} \PYG{n+nb+bp}{...}\PYG{o}{\PYGZcb{},}
+\end{Verbatim}

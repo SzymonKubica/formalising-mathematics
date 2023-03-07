@@ -1,0 +1,25 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{def} \PYG{n}{tendsto\PYGZus{}in\PYGZus{}L1} \PYG{o}{\PYGZob{}}\PYG{n}{m} \PYG{o}{:} \PYG{n}{measurable\PYGZus{}space} \PYG{n}{X}\PYG{o}{\PYGZcb{}}
+\PYG{o}{(}\PYG{n}{μ} \PYG{o}{:} \PYG{n}{measure} \PYG{n}{X}\PYG{o}{)} \PYG{o}{(}\PYG{n}{f} \PYG{o}{:} \PYG{n}{ℕ} \PYG{n+nb+bp}{→} \PYG{n}{X} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{o}{)} \PYG{o}{(}\PYG{n}{g} \PYG{o}{:} \PYG{n}{X} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{o}{)} \PYG{o}{:} \PYG{k+kt}{Prop} \PYG{o}{:=}
+\PYG{n}{filter.tendsto} \PYG{o}{(}\PYG{n+nb+bp}{λ} \PYG{o}{(}\PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{),} \PYG{n}{snorm} \PYG{o}{(}\PYG{n}{f} \PYG{n}{n} \PYG{n+nb+bp}{\PYGZhy{}} \PYG{n}{g}\PYG{o}{)} \PYG{l+m+mi}{1} \PYG{n}{μ}\PYG{o}{)} \PYG{n}{filter.at\PYGZus{}top} \PYG{o}{(}\PYG{n+nb+bp}{𝓝} \PYG{l+m+mi}{0}\PYG{o}{)}
+
+\PYG{k+kd}{def} \PYG{n}{tendsto\PYGZus{}μ\PYGZus{}ae} \PYG{o}{\PYGZob{}}\PYG{n}{m} \PYG{o}{:} \PYG{n}{measurable\PYGZus{}space} \PYG{n}{X}\PYG{o}{\PYGZcb{}} \PYG{o}{(}\PYG{n}{μ} \PYG{o}{:} \PYG{n}{measure} \PYG{n}{X}\PYG{o}{)}
+\PYG{o}{(}\PYG{n}{f} \PYG{o}{:} \PYG{n}{ℕ} \PYG{n+nb+bp}{→} \PYG{n}{X} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{o}{)} \PYG{o}{(}\PYG{n}{g} \PYG{o}{:} \PYG{n}{X} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{o}{)} \PYG{o}{:} \PYG{k+kt}{Prop} \PYG{o}{:=}
+\PYG{n+nb+bp}{∀ᵐ} \PYG{o}{(}\PYG{n}{x} \PYG{o}{:} \PYG{n}{X}\PYG{o}{)} \PYG{n+nb+bp}{∂}\PYG{n}{μ}\PYG{o}{,} \PYG{n}{filter.tendsto} \PYG{o}{(}\PYG{n+nb+bp}{λ} \PYG{o}{(}\PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{),} \PYG{n}{f} \PYG{n}{n} \PYG{n}{x}\PYG{o}{)} \PYG{n}{filter.at\PYGZus{}top} \PYG{o}{(}\PYG{n+nb+bp}{𝓝} \PYG{o}{(}\PYG{n}{g} \PYG{n}{x}\PYG{o}{))}
+
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`\PYGZhy{}→`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`}\PYG{n}{in\PYGZus{}L1}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`}\PYG{n}{in\PYGZus{}measure}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n}{\PYGZus{}a}\PYG{n+nb+bp}{\PYGZhy{}}\PYG{n}{e}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`∈}\PYG{n}{\PYGZus{}L1}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
+
+\PYG{c+c1}{\PYGZhy{}\PYGZhy{} Now three notions of convergence can be expressed using a consistent notation.}
+\PYG{k+kd}{notation} \PYG{n}{f} \PYG{n+nb+bp}{`\PYGZhy{}→`} \PYG{n}{g} \PYG{n+nb+bp}{`}\PYG{n}{in\PYGZus{}L1}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`} \PYG{n}{μ} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`} \PYG{o}{:=} \PYG{n}{tendsto\PYGZus{}in\PYGZus{}L1} \PYG{n}{μ} \PYG{n}{f} \PYG{n}{g}
+\PYG{k+kd}{notation} \PYG{n}{f} \PYG{n+nb+bp}{`\PYGZhy{}→`} \PYG{n}{g} \PYG{n+nb+bp}{`}\PYG{n}{in\PYGZus{}measure}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`} \PYG{n}{μ} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`} \PYG{o}{:=} \PYG{n}{tendsto\PYGZus{}in\PYGZus{}measure} \PYG{n}{μ} \PYG{n}{f} \PYG{n}{at\PYGZus{}top} \PYG{n}{g}
+\PYG{k+kd}{notation} \PYG{n}{f} \PYG{n+nb+bp}{`\PYGZhy{}→`} \PYG{n}{g} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`} \PYG{n}{μ} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n}{\PYGZus{}a}\PYG{n+nb+bp}{\PYGZhy{}}\PYG{n}{e}\PYG{n+nb+bp}{`} \PYG{o}{:=} \PYG{n}{tendsto\PYGZus{}μ\PYGZus{}ae} \PYG{n}{μ} \PYG{n}{f} \PYG{n}{g}
+
+\PYG{c+c1}{\PYGZhy{}\PYGZhy{} Also the notion of being a member of L1 is somewhat hard to decipher.}
+\PYG{k+kd}{notation} \PYG{n}{f} \PYG{n+nb+bp}{`∈}\PYG{n}{\PYGZus{}L1}\PYG{o}{\PYGZob{}}\PYG{n+nb+bp}{`} \PYG{n}{μ} \PYG{n+nb+bp}{`}\PYG{o}{\PYGZcb{}}\PYG{n+nb+bp}{`} \PYG{o}{:=}  \PYG{n}{mem\PYGZus{}ℒp} \PYG{n}{f} \PYG{l+m+mi}{1} \PYG{n}{μ}
+\end{Verbatim}
