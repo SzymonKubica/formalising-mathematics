@@ -1,23 +1,25 @@
 import tactic
 import measure_theory.measurable_space
-
 import measure_theory.function.uniform_integrable
 import measure_theory.function.lp_space
 import topology.metric_space.basic
 
-namespace measure_theory
 open_locale classical measure_theory nnreal ennreal topological_space
 
-open set filter topological_space
+open set filter topological_space measure_theory
 
-/-- Statement of the theorem
-    If X has finite measure and 'f : ℕ → a → ℝ is a sequence of functions and
-    g : a → ℝ is a function and all of them are in L_1(μ) then f n → g in measure
-    and {f n | n ∈ ℕ } has uniformly absolutely continuous integrals iff the integral
-    of |f n - g| dμ → 0 as n → ∞
- -/
+/-- Szymon Kubica (CID: 01871147, college username sk4520) March 6, 2023
 
-variables {X : Type} {m : measure_space X}
+This file contains a proof of the Vitali's theorem as well as all of the
+lemmas that I needed to prove it.
+
+Statement of the theorem :
+  If X has finite measure and 'f : ℕ → a → ℝ is a sequence of functions and
+  g : a → ℝ is a function and all of them are in L_1(μ) then fₙ  → g in measure
+  and {fₙ | n ∈ ℕ } has uniformly absolutely continuous integrals iff the integral
+  of |f n - g| dμ → 0 as n → ∞ (i.e. fₙ → g in L_1(μ))  -/
+
+variables {X : Type}
 
 /-- I decided to add alias definitions for the two notions of convergence that
     we deal with in the proof. They improve readability at a cost of sometimes
@@ -26,6 +28,7 @@ def tendsto_in_L1 {m : measurable_space X}
 (μ : measure X) (f : ℕ → X → ℝ) (g : X → ℝ) : Prop :=
 filter.tendsto (λ (n : ℕ), snorm (f n - g) 1 μ) filter.at_top (𝓝 0)
 
+/-- This is a custom aliasing definition for convergence μ-a.e. -/
 def tendsto_μ_ae {m : measurable_space X} (μ : measure X)
 (f : ℕ → X → ℝ) (g : X → ℝ) : Prop :=
 ∀ᵐ (x : X) ∂μ, filter.tendsto (λ (n : ℕ), f n x) filter.at_top (𝓝 (g x))
@@ -151,7 +154,7 @@ end
     it requires are easily accessible in the main theorem) and also it required
     some list manipulations and proving something for a finite list which I found
     quite interesting and more difficult than anticipated. -/
-theorem sub_strongly_measurable {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
+theorem sub_strongly_measurable {m : measurable_space X} {μ : measure X}
 {f g : X → ℝ} (hf : f ∈_L1{μ}) (hg : g ∈_L1{μ}) : ae_strongly_measurable (f - g) μ :=
 begin
   -- In order to apply ae_strongly_measurable_sum we need a list.
@@ -368,13 +371,13 @@ end
     one would have to remove the ε/3 and replace it with just ε but then in the
     main proof I would have to do some rearrangements which would slow down
     the compilation -/
-lemma extract_δ_uaci {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
+lemma extract_δ_uaci {m : measurable_space X} {μ : measure X}
 { f : ℕ → X → ℝ } { g : X → ℝ }
-(h_f_n_uaci : ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ (n : ℕ) s, measurable_set s →
+(h_f_n_uaci : ∀ (ε : ℝ), 0 < ε →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ (n : ℕ) s, measurable_set s →
               μ s ≤ ennreal{δ} → ( ∫_{s}_|f n|dμ ) ≤ ennreal{ε / 3})
-(h_g_uaci : ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
+(h_g_uaci : ∀ (ε : ℝ), 0 < ε →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s →
             μ s ≤ ennreal{δ} → ( ∫_{s}_|g|dμ ) ≤ ennreal{ε / 3})
-: ∀ (ε : ℝ), ε > 0 →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s → μ s ≤ ennreal{δ} →
+: ∀ (ε : ℝ), 0 < ε →  ∃ (δ : ℝ) (hδ : 0 < δ), ∀ s, measurable_set s → μ s ≤ ennreal{δ} →
   ∀ (n : ℕ), ( ∫_{s}_|f n|dμ ) ≤ ennreal{ε / 3} ∧ ( ∫_{s}_|g|dμ ) ≤ ennreal{ε / 3} :=
 begin
   intros ε hε,
@@ -484,7 +487,7 @@ end
 /-- This theorem is the forward direction of the Vitali's theorem. -/
 theorem tendsto_L1_of_unif_integr_of_tendsto_in_μ
 {m : measurable_space X} {μ : measure X} [is_finite_measure μ]
-{ f : ℕ → X → ℝ } { g : X → ℝ } (hf : ∀ (n : ℕ), mem_ℒp (f n) (1 : ℝ≥0∞) μ) (hg : mem_ℒp g 1 μ)
+{ f : ℕ → X → ℝ } { g : X → ℝ } (hf : ∀ n, (f n) ∈_L1{μ}) (hg : g ∈_L1{μ})
 (h_tendsto_μ :  f -→ g in_measure{μ}) (h_unif : unif_integrable f 1 μ) :
 f -→ g in_L1{μ} :=
 begin
@@ -537,5 +540,3 @@ begin
     { exact tendsto_in_measure_of_tendsto_L1 hf hg h_tendsto_L1 },
     { exact unif_integrable_of_tendsto_L1 hf hg h_tendsto_L1, }, },
 end
-
-end measure_theory
