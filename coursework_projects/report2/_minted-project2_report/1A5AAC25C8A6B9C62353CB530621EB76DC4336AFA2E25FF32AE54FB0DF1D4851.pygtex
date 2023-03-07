@@ -1,0 +1,19 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{theorem} \PYG{n}{ennreal\PYGZus{}squeeze\PYGZus{}zero} \PYG{o}{\PYGZob{}}\PYG{n}{a} \PYG{n}{b} \PYG{o}{:} \PYG{n}{ℕ} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{n+nb+bp}{≥}\PYG{l+m+mi}{0}\PYG{n+nb+bp}{∞}\PYG{o}{\PYGZcb{}}
+\PYG{o}{(}\PYG{n}{ha} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{o}{(}\PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{),} \PYG{n}{a} \PYG{n}{n} \PYG{n+nb+bp}{\PYGZlt{}} \PYG{n+nb+bp}{∞}\PYG{o}{)} \PYG{o}{(}\PYG{n}{hb} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{o}{(}\PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{),} \PYG{n}{b} \PYG{n}{n} \PYG{n+nb+bp}{\PYGZlt{}} \PYG{n+nb+bp}{∞}\PYG{o}{)}
+\PYG{o}{(}\PYG{n}{h0b} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{n}{n}\PYG{o}{,} \PYG{l+m+mi}{0} \PYG{n+nb+bp}{≤} \PYG{n}{b} \PYG{n}{n}\PYG{o}{)} \PYG{o}{(}\PYG{n}{hba} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{n}{n}\PYG{o}{,} \PYG{n}{b} \PYG{n}{n} \PYG{n+nb+bp}{≤} \PYG{n}{a} \PYG{n}{n}\PYG{o}{)} \PYG{o}{(}\PYG{n}{ha\PYGZus{}to\PYGZus{}0} \PYG{o}{:} \PYG{n}{tendsto} \PYG{n}{a} \PYG{n}{at\PYGZus{}top} \PYG{o}{(}\PYG{n+nb+bp}{𝓝} \PYG{l+m+mi}{0}\PYG{o}{))} \PYG{o}{:}
+\PYG{n}{tendsto} \PYG{n}{b} \PYG{n}{at\PYGZus{}top} \PYG{o}{(}\PYG{n+nb+bp}{𝓝} \PYG{l+m+mi}{0}\PYG{o}{)} \PYG{o}{:=}
+\PYG{k+kd}{begin}
+  \PYG{c+c1}{\PYGZhy{}\PYGZhy{} First we need to coerce the sequences to apply nnreal\PYGZus{}squeeze\PYGZus{}zero on them.}
+  \PYG{n}{lift} \PYG{n}{a} \PYG{n}{to} \PYG{n}{ℕ} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{n+nb+bp}{≥}\PYG{l+m+mi}{0}\PYG{o}{,} \PYG{o}{\PYGZob{}}\PYG{n}{exact} \PYG{n}{lift\PYGZus{}ennreal\PYGZus{}to\PYGZus{}nnreal} \PYG{n}{ha} \PYG{o}{\PYGZcb{},}
+  \PYG{n}{lift} \PYG{n}{b} \PYG{n}{to} \PYG{n}{ℕ} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{n+nb+bp}{≥}\PYG{l+m+mi}{0}\PYG{o}{,} \PYG{o}{\PYGZob{}}\PYG{n}{exact} \PYG{n}{lift\PYGZus{}ennreal\PYGZus{}to\PYGZus{}nnreal} \PYG{n}{hb} \PYG{o}{\PYGZcb{},}
+  \PYG{c+c1}{\PYGZhy{}\PYGZhy{} Now we need to rewrite to get rid of coercions from ℝ≥0 to ℝ≥0∞}
+  \PYG{n}{rw} \PYG{o}{[}\PYG{n+nb+bp}{←} \PYG{n}{ennreal.coe\PYGZus{}zero}\PYG{o}{,} \PYG{n}{ennreal.tendsto\PYGZus{}coe}\PYG{o}{]} \PYG{n}{at} \PYG{n+nb+bp}{*}\PYG{o}{,}
+  \PYG{n}{simp} \PYG{n}{at} \PYG{n}{hba}\PYG{o}{,}
+  \PYG{n}{dsimp} \PYG{n}{at} \PYG{n}{h0b}\PYG{o}{,}
+  \PYG{k}{have} \PYG{n}{h0b} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{o}{(}\PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{),} \PYG{l+m+mi}{0} \PYG{n+nb+bp}{≤} \PYG{n}{b} \PYG{n}{n}\PYG{o}{,}
+  \PYG{o}{\PYGZob{}} \PYG{n}{intro} \PYG{n}{n}\PYG{o}{,}\PYG{c+c1}{\PYGZhy{}\PYGZhy{} Here we need to rewrite so that h0b matches nnreal\PYGZus{}squeeze\PYGZus{}zero}
+    \PYG{n}{exact} \PYG{n}{ennreal.coe\PYGZus{}le\PYGZus{}coe.mp} \PYG{o}{(}\PYG{n}{h0b} \PYG{n}{n}\PYG{o}{),} \PYG{o}{\PYGZcb{},} \PYG{c+c1}{\PYGZhy{}\PYGZhy{}}
+  \PYG{n}{exact} \PYG{n}{nnreal\PYGZus{}squeeze\PYGZus{}zero} \PYG{n}{h0b} \PYG{n}{hba} \PYG{n}{ha\PYGZus{}to\PYGZus{}0}\PYG{o}{,}
+\PYG{k+kd}{end}
+\end{Verbatim}
