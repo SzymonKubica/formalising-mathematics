@@ -37,4 +37,6 @@ look up rfl tactic
 
 rwa -> rewrite and try to use the assumption tactic.
 
+avoid using complex proofs inside of let clauses.
+
 omega does arithmetic
