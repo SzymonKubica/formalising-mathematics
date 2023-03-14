@@ -39,4 +39,6 @@ rwa -> rewrite and try to use the assumption tactic.
 
 avoid using complex proofs inside of let clauses.
 
+for unfolding definitions use unfold tactic
+
 omega does arithmetic
