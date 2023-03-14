@@ -59,41 +59,27 @@ end differentiability_in_general
 open real -- because there is `real.cos` and `complex.cos`, 
 
 -- This says "the cos(sin(x))*exp(x) is differentiable"
+-- Hint: the theorems are called theorems like `differentiable.mul` etc.
+-- Try proving it by hand.
+
 example : differentiable ℝ (λ x, cos (sin x) * exp x) :=
 begin
-  apply differentiable.mul,
-  { -- ⊢ differentiable ℝ (λ (y : ℝ), cos (sin y))
-    apply differentiable.comp,
-    { exact differentiable_cos, },
-    { exact differentiable_sin, }, },
-  { exact differentiable_exp },
+  sorry,
 end
 
--- Alternative approach:
+-- Now see what `hint` has to say!
 example : differentiable ℝ (λ x, cos (sin x) * exp x) :=
 begin
-  simp, -- I am a bit freaked out that this works.
+  sorry,
 end
 
--- I am less freaked out about this though.
+-- The simplifier can even do this sort of thing:
 example (x : ℝ) : deriv (λ x, cos (sin x) * exp x) x = (cos(sin(x))-sin(sin(x))*cos(x))*exp(x) :=
 by { simp, ring }
 
 -- Try this one:
 example (a : ℝ) (x : ℝ) : differentiable_at ℝ (λ (y : ℝ), exp (-(a * y ^ 2))) x :=
 begin
-  apply differentiable_at.comp,
-  { apply differentiable_at.exp,
-    apply differentiable_at_id', },
-  { apply differentiable_at.neg,
-    apply differentiable_at.mul,
-    { apply differentiable_at_const, },
-    { apply differentiable_at.pow,
-      apply differentiable_at_id', } },
+  sorry,
 end
 
-example (a : ℝ) (x : ℝ) : differentiable_at ℝ (λ (y : ℝ), exp (-(a * y ^ 2))) x :=
-differentiable_at_id'.exp.comp x $ differentiable_at.neg $ (differentiable_at_const a).mul $ differentiable_at_id'.pow 2
-
-example (a : ℝ) (x : ℝ) : differentiable_at ℝ (λ (y : ℝ), exp (-(a * y ^ 2))) x :=
-by simp
