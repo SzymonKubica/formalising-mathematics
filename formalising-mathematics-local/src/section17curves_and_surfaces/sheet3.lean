@@ -14,13 +14,13 @@ import analysis.calculus.parametric_integral
 
 -/
 
-noncomputable def φ₁ : ℝ → ℝ × ℝ := 
+noncomputable def φ₁ : ℝ → ℝ × ℝ :=
 λ x, (real.cos x, real.sin x)
 
 -- `cont_diff_on.prod` is a thing etc etc
 example : cont_diff_on ℝ ⊤ φ₁ (set.Icc 0 1) :=
 begin
-  sorry,
+ sorry,
 end
 
 open real
@@ -28,7 +28,12 @@ noncomputable def φ₂ : ℝ → ℝ × ℝ × ℝ :=
 λ x, (real.sin x, x^4+37*x^2+1, abs x)
 
 example : cont_diff_on ℝ ⊤ φ₂ (set.Icc 0 1) :=
-sorry
+begin
+  apply cont_diff_on.prod, sorry,
+  apply cont_diff_on.prod, sorry,
+  apply cont_diff_on.congr,
+  sorry,
+end
 
 -- AFAIK nobody did the below example yet (including me)
 
@@ -49,12 +54,12 @@ example (φ : ℝ → ℝ) (ψ : ℝ → ℝ) (a b c d : ℝ)
 sorry
 
 /-
-Heather Macbeth: @Kevin Buzzard This is a toy case of the inverse function theorem, 
-but you might need to glue together several related results. Some starting points: 
+Heather Macbeth: @Kevin Buzzard This is a toy case of the inverse function theorem,
+but you might need to glue together several related results. Some starting points:
 docs#cont_diff_at.to_local_inverse, docs#has_strict_fderiv_at.local_inverse_unique
 
-Heather Macbeth: If you want to construct the inverse, and you want to avoid invoking 
-the inverse function theorem on Banach spaces, you can also route through order theory 
-for a purely one-dimensional construction. Look at the construction of docs#real.arctan 
+Heather Macbeth: If you want to construct the inverse, and you want to avoid invoking
+the inverse function theorem on Banach spaces, you can also route through order theory
+for a purely one-dimensional construction. Look at the construction of docs#real.arctan
 for a model; it uses docs#strict_mono_on.order_iso
 -/
