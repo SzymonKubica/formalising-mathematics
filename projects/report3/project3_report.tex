@@ -163,7 +163,7 @@ Before we prove the theorem let us first reformulate it in terms of upper
 bounds instead of requiring that suprema are finite. The reasoning behind doing
 this is that the statement of the theorem below is equivalent to the one above,
 however it is much more convenient to work with in Lean. That is because
-bounding a specific term is easier than working with the finiteness suprema. In
+bounding a specific term is easier than working with the finiteness of suprema. In
 fact the two alternative ways of formulating the theorem are present in the
 mathlib library, however the original statement that can be seen above is
 considered to be an alternative definition.
@@ -181,16 +181,18 @@ considered to be an alternative definition.
     \exists K' \in \R \sucht \forall \lambda \in \Lambda \sep \|A_\lambda \|_{\mathcal{L}\left( X, Y \right) } \le K'  .\]
 \end{theorem}
 
-later we'll see how in Lean
+In the later part of the report we'll see how in Lean
 we can use the proof of the alternative version to easily deduce the theorem in it's
-initial form. Before we do that however, let us consider the following lemma which
-is a consequence of the Baire Category Theorem and allows us to deduce topological
-properties of a family of continuous functions which are bounded pointwise.
+initial form.
+
+Before we do that however, let us consider the following lemma which
+is a consequence of the Baire Category Theorem and allows us to deduce uniform
+boundedness of a family of continuous functions which are bounded pointwise.
 
 \begin{lemma}
   Let $\left( X, d \right) $ be a complete metric space. Let
   $\left( f_\lambda \right)_{\lambda \in \Lambda} $ be a family of continuous
-  functions $$f_\lambda : X \to \R $$ (note that they don't need to be linear).
+  functions $$f_\lambda : X \to \R $$ (note that $f\_\lambda$ don't need to be linear).
   If the family above is bounded pointwise i.e. :
   \[
     \forall x \in X, \sep \exists \sep K_x \in \R \sucht \forall \lambda \in \Lambda \sep |f_\lambda(x)| \le K_x
@@ -219,27 +221,27 @@ closed and that
 X = \bigcup_{k = 1}^\infty A_k
 .\end{equation}
 
-First let us consider closedness. Note that for all $\lambda \in \Lambda$ the map
+First let us prove that all sets in that family are closed. Note that for all $\lambda \in \Lambda$ the map
  $x \mapsto |f_\lambda(x)| $ is continuous by composition. That is because the
  absolute value function is continuous and we have also assumed that all  $f_\lambda$
- are continuous. Therefore if we rewrite eack of  $A_k$ as follows, we'll get:
+ are continuous. Therefore if we rewrite each of  $A_k$ as follows, we'll get:
   \[
     A_k = \lbrace x \in X \st \forall \lambda \in \Lambda \sep | f_\lambda (x) | \le k \rbrace = \bigcap_{\lambda \in \Lambda} \lbrace x \in X \st |f_\lambda(x)| \le k\rbrace
  .\]
 
  Now if we denote the map $g_\lambda := x \mapsto |f_\lambda(x)| $, then each of the
  sets of the form $\lbrace x \in X \st |f_\lambda(x)| \le k\rbrace$ is the
- preimage of  $g_\lambda$ of  $[0, k]$. Consequently it is the preimage of a
+ pre-image of  $g_\lambda$ of  $[0, k]$. Consequently it is the pre-image of a
  continuous function of a closed set, hence it is closed. Therefore, each of the
  $A_k$ is an intersection of closed sets, and thus it is also closed.
  Hence we have established that all  $A_k$ are closed. Now in order to show that
- their union covers all of  $X$, note that we only need to show the forward insclusion
+ their union covers all of  $X$, we only need to show the forward inclusion
  i.e.
  \begin{equation}
     X \subseteq \bigcup_{k = 1}^\infty A_k
   .\end{equation}
- and the equation $(1)$ follows immediately from antisymmetry of set inclusion, because
- each of $A_k$ is already a subset of  $X$ and therefore the backward inclusion follows
+ and the equality of the two sets above follows immediately from antisymmetry of set inclusion,
+ because each of $A_k$ is already a subset of  $X$ and therefore the backward inclusion follows
  from the fact that a union of subsets is still a subset.
 
  In order to show the forward direction, let $x \in X$ be arbitrary. Now by our assumption
@@ -253,7 +255,7 @@ we deduce:
 \forall \lambda \in \Lambda \sep |f_\lambda(x)| \le K_x \le k
 .\]
 
-And so now we can deduce that $x \in \bigcap_{\lambda \in \Lambda}\lbrace x \in X \st
+And so now it follows that $x \in \bigcap_{\lambda \in \Lambda}\lbrace x \in X \st
 |f_\lambda(x)| \le k \rbrace = A_k$. Which in turn implies that $x \in \bigcup_{k = 1}^\infty A_k$.
 And since  $x$ was arbitrary, we can deduce that (2) holds which combined with
 antisymmertry and the fact that the union is a subset of $X$ yields equation (1).
@@ -261,7 +263,7 @@ antisymmertry and the fact that the union is a subset of $X$ yields equation (1)
 Now since $X$ is nonempty and complete, and given that  $X = \bigcup_{k = 1}^\infty A_k$, where
 each  $A_k$ is closed, by Baire category theorem we deduce that there exists a
 $k_0 \in \N$ such that the interior of  $A_{k_0}$ is non-empty.
-Hence, because of the fact that $\int(A_{k_0})$ is open and non-empty, we can pick
+Hence, because of the fact that $\text{int}(A_{k_0})$ is open and non-empty, we can pick
 $x_0$ inside of it and  $r > 0$ such that
  \[
    B_r(x_0) \subseteq A_{k_0}
@@ -276,7 +278,7 @@ the lemma. \hfill \blacksquare
 Having proved the lemma, we can now move on to proving the main theorem.
 Let $X, Y$ be normed spaces, assume  $X$ is complete. Let
   $\left( A_\lambda \right)_{\lambda \in \Lambda} \subset \mathcal{L}\left( X, Y \right) $
-  be a bounded pointwise family of linear operators. In order to prove that
+  be a family of linear operators which is pointwise bounded. In order to prove that
   $\left( A_\lambda \right)_{\lambda \in \Lambda} $ is in fact uniformly bounded,
   let us first define a family of continuous functions to which we can then apply the
   previous lemma. For $\lambda \in \Lambda$ define a map  $f_\lambda : X \to \R$ as
@@ -307,12 +309,12 @@ Let $X, Y$ be normed spaces, assume  $X$ is complete. Let
    \forall \lambda \in \Lambda, \sep \|A_\lambda\|_{\mathcal{L}\left( X,Y \right)} \le K''
  .\]
 
- In order to do this, fix $\lambda \in \Lambda$ arbitrary and consider the following:
+ In order to do this, let $\lambda \in \Lambda$ arbitrary and consider the following:
 \[
    \forall x \in X \sep \|A_\lambda x\|_Y \le K'' \|x\|_X \implies \|A_\lambda\|_{\mathcal{L}\left( X, Y\right)} \le K''
 .\]
 
-Hence if we need to fix $x \in X$ arbitrary and impose a bound
+Hence if we need to take $x \in X$ arbitrary and impose a bound
 \[
 \|A_\lambda x\|_Y \le K'' \|x\|_X
 .\]
@@ -330,9 +332,9 @@ Now if we substitute the expression above into $\|A_\lambda x\|$ we obtain:
 \[
 \|A_\lambda x\| = \left|\left|A_\lambda\left(\frac{2\|x\|}{r}\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} - x_0 \right)  \right) \right|\right|
 .\]
-By linearity of $A_\lambda$ we can take the multiplicative factor out of the argument
-and split the expression inside of the norm because $A_\lambda\left( \alpha x \right) = \alpha A_\lambda\left( x \right)  $ and
-$A_\lambda\left( x - y \right) = A_\lambda\left( x \right)  - A_\lambda\left( y \right)  $
+By linearity of $A_\lambda$ we can rearrange the expression above using the following
+properties: $A_\lambda\left( \alpha x \right) = \alpha A_\lambda\left( x \right)  $ and
+$A_\lambda\left( x - y \right) = A_\lambda\left( x \right)  - A_\lambda\left( y \right)  $.
 Hence, we obtain
 \[
 \left|\left|A_\lambda\left(\frac{2\|x\|}{r}\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} - x_0 \right)  \right) \right|\right|_Y =
@@ -344,18 +346,18 @@ Now, by absolute homogeneity of $\|\cdot\|_Y$, we get:
 \left| \frac{2\|x\|}{r} \right| \left|\left| \left( A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right) - A_\lambda(x_0)  \right) \right|\right|_Y =
 \]
 
-Observe that both $0 \le r, \|x\|$, therefore we may drop the absolute value above
-and apply the triangle inequality:
+Observe that both $ r, \|x\|$ are non-negative, therefore we may drop the absolute value above
+and then apply the triangle inequality:
 \begin{equation}
  \le \frac{2\|x\|}{r} \left( \left|\left| A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right)
  \right|\right|_Y + \left|\left| A_\lambda(x_0)  \right|\right|_Y \right)
 .\end{equation}
 
 Now note that both $x_0 + \frac{r}{2}\frac{x}{\|x\|} $ and $x_0$ belong to $B_r(x_0)$.
-In case of $x_0$ it is obvious, whereas when it comes to the first point, let us
+In case of $x_0$ it is the case because $x_0$ is the centre of the ball, whereas when it comes to the first point, let us
 consider the following to see that it is indeed contained in the ball  $B$:
 \[
-  x_0 + \frac{r}{2}\frac{x}{\|x\|} \in B_r{x_0} \iff \left|\left|x_0 - \left(x_0 + \frac{r}{2}\frac{x}{\|x\|}   \right) \right|\right| < r
+  x_0 + \frac{r}{2}\frac{x}{\|x\|} \in B_r(x_0) \iff \left|\left|x_0 - \left(x_0 + \frac{r}{2}\frac{x}{\|x\|}   \right) \right|\right| < r
 .\]
 
 Simplifying the left-hand side of the iff above allows us to see:
@@ -381,7 +383,7 @@ That is because we can use the definition of $f_\lambda$ in reverse and then app
  \le \frac{2\|x\|}{r} \left( K' + K'\right) = \frac{4K'}{r}\|x\| = K''\|x\|
  .\]
 
- Since $\lambda$ and  $x$ were arbitrary and our choice of $K''$ didn't depend  either
+ Since $\lambda$ and  $x$ were arbitrary and our choice of $K''$ didn't depend on either
  of them, we can conclude that:
 \[
    \forall \lambda \in \Lambda \sep \forall x \in X \sep \|A_\lambda x\|_Y \le K'' \|x\|_X
@@ -392,6 +394,68 @@ Which in turn implies
 
 And so the family $\left( A_\lambda \right)_{\lambda \in \Lambda} $ is uniformly
 bounded and that concludes the proof. \hfill \blacksquare
+
+The final step of the proof was to deduce the initial way of formulating the theorem
+from the alternative one which uses those bounding constants $K_x, K'$. Informally,
+it isn't difficult to observe that the two ways of phrasing the theorem are equivalent.
+However, in Lean showing this requires a certain degree of care and doesn't follow
+immediately. In the next section I will explain the process of formalising the
+theorem and discuss unexpected observations that I made while translating the proof
+above into Lean.
+
+
+\begin{comment}
+  Below is a collections of intermediate code snippets illustrating inefficiencies
+  in my intermediate implementation.
+
+
+
+  -- This one is a good example of showing how the code has been refactored afterwards
+  -- to make it shorter and make it compile faster.
+  have hA_closed : ∀ n : ℕ, is_closed (A n),
+  { intro n,
+    apply is_closed_Inter,
+    intro i,
+    apply is_closed_le,
+    { exact continuous.norm (h_cont i), },
+    { exact continuous_const, },
+    },
+  -- After refactoring it's been transformed into something like this:
+    have hA_closed : ∀ n : ℕ, is_closed (A n),
+  { intro n,
+    exact is_closed_Inter (λ i, is_closed_le (continuous.norm (h_cont i)) continuous_const), },
+
+
+  -- Also proving the set equality here is a great example.
+  have hA_union : (⋃ n : ℕ, (A n)) = univ,
+  { ext,
+    split,
+    { intro x, triv, },
+    { intros hx,
+      cases h x with k hk,
+      obtain ⟨k', hk'⟩ := exists_nat_ge k,
+      rw mem_Union,
+      use k',
+      rw hA,
+      rw mem_Inter,
+      intro i,
+      specialize hk i,
+      exact le_trans hk hk', },},
+
+
+  -- After the refactoring.
+    have hA_union : (⋃ n : ℕ, (A n)) = univ,
+  { ext, -- Proving equality by set extensionality.
+    refine ⟨λ hx, mem_univ x, _⟩,        -- First deal with the trivial forward inclusion.
+    cases h x with k hk,                 -- Find the bound which works for x,
+    obtain ⟨k', hk'⟩ := exists_nat_ge k, -- Find a natural number greater than the bound k.
+    -- Conclude that x is a member of the union because there exists a set which
+    -- is a part of that union such that x belongs to it.
+    exact λ hx, mem_Union.mpr ⟨k', mem_Inter.mpr (λ i, le_trans (hk i)  hk')⟩, },
+
+
+\end{comment}
+
 
 
 \section*{The Process of Formalising}
