@@ -1,0 +1,407 @@
+\documentclass[11pt]{article}
+%% Package imports
+\usepackage[newfloat]{minted}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{verbatim}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{parskip}
+\usepackage{minted}
+\usepackage{newunicodechar}
+\usepackage{blindtext}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    anchorcolor=cyan,
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+\renewcommand{\baselinestretch}{1.5}
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Listing}
+
+%% Commands for inserting big braces.
+\newcommand\lb{\left\lbrace}
+\newcommand\rb{\right\rbrace}
+
+%% Commands for set such that notation
+\newcommand\st{\text{ } | \text{ }}
+\newcommand\sthat{\text{ such that }}
+
+\definecolor{bg}{RGB}{240, 240, 240}
+
+%% Math symbols
+\newcommand\Q{\mathbb{Q}}
+\newcommand\R{\mathbb{R}}
+\newcommand\N{\mathbb{N}}
+\newcommand\C{\mathbb{C}}
+\newcommand\Lmu{\mathcal{L}^1(\mu)}
+\newcommand\A{\mathcal{A}}
+
+%% Shortcuts for inserting common words in the maths mode.
+\newcommand\sucht{\sep \mathrm{such} \sep \mathrm{that} \sep}
+\newcommand\weh{\text{ we have }}
+\newcommand\as{\text{ as }}
+\newcommand\sep{\text{ }}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+\newunicodechar{ℝ}{\ensuremath{\mathbb{R}}}
+\newunicodechar{ℕ}{\ensuremath{\N}}
+\newunicodechar{ε}{\ensuremath{\varepsilon}}
+\newunicodechar{μ}{\ensuremath{\mu}}
+\newunicodechar{δ}{\ensuremath{\delta}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{∃}{\ensuremath{\exists}}
+\newunicodechar{∉}{\ensuremath{\not\in}}
+\newunicodechar{𝓝}{\ensuremath{\cal{N}}}
+\newunicodechar{∫}{\ensuremath{\int}}
+\newunicodechar{λ}{\ensuremath{\lambda}}
+
+\newunicodechar{₊}{\ensuremath{_+}}
+\newunicodechar{↔}{\ensuremath{\iff}}
+\newunicodechar{ₙ}{\ensuremath{_n}}
+\newunicodechar{⁻}{\ensuremath{^-}}
+\newunicodechar{⦃}{\ensuremath{\lbrace}}
+\newunicodechar{⦄}{\ensuremath{\rbrace}}
+\newunicodechar{≠}{\ensuremath{\ne}}
+\newunicodechar{≥}{\ensuremath{\ge}}
+\newunicodechar{∞}{\ensuremath{\infty}}
+\newunicodechar{ᵐ}{\ensuremath{^m}}
+\newunicodechar{∂}{\ensuremath{\partial}}
+\newunicodechar{ℒ}{\ensuremath{\mathcal{L}}}
+
+
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∧}{\ensuremath{\land}}
+\newunicodechar{≤}{\ensuremath{\le}}
+\newunicodechar{∨}{\ensuremath{\lor}}
+\newunicodechar{⊆}{\ensuremath{\subset}}
+
+\usepackage[shortlabels]{enumitem}
+
+\newtheorem*{theorem}{Theorem}
+\newtheorem*{lemma}{Lemma}
+\renewcommand\qedsymbol{$\blacksquare$}
+
+%% Page style settings
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyhead[L]{\slshape{Formalising Mathematics - Coursework 3}}
+\fancyhead[R]{\slshape{CID: 01871147}}
+\fancyfoot[C]{\thepage}
+\begin{document}
+
+\title{Formalising Mathematics - Coursework 3 \\ Banach-Steinhaus Theorem and Extensions}
+\date{\today}
+\author{CID: 01871147}
+\maketitle
+
+\section*{Introduction}
+
+As the final part of my coursework I decided to formalise the Banach-Steinhaus theorem
+which I've learned about this year when taking the functional analysis course:
+MATH60030: Functional Analysis. Given that the final part of the coursework needed
+to cover a theorem from the 3rd year of undergraduate mathematics, I had to pick
+a theorem from Functional Analysis as it is the only other 3rd year mathematics
+module that I do apart from Formalising Mathematics. However that constraint wasn't
+a big issue for me as I thoroughly enjoyed taking the module during the Autumn Term
+2022/2023.
+
+What is more, I deliberately chose the past two projects so that the experience
+that I gained by working on those was very helpful when working on this project.
+My first project covered the intermediate value theorem and was a great way to
+gain experience proving theorems in mathematical analysis which mainly focus on
+manipulating inequalities and being able to estimate and bound expressions. The
+second project - Vitali's theorem allowed me to learn how to properly use the mathlib
+library and further developed my toolkit for proving claims in analysis.
+
+This report documents the process of formalising Banach-Steinhaus theorem using the Lean programming language.
+It is a functional language which can also be used as an interactive theorem prover. I used Lean together
+with the mathlib library which contains many fundamental theorems and identities that are useful when
+building more complex proofs.
+
+In what follows we'll first state and prove the theorem. Then I will explain the
+methodology that I followed in order to formalise the theorem. I will also describe
+the interesting challenges that needed to be overcome when formalising the proof.
+The last section contains conclusions which I made after working on the three sizeable
+projects in Lean and describe the future things that I will be working on.
+
+\section*{Proof of the Banach-Steinhaus Theorem}
+
+Before I document the process of formalising, let us first state the
+theorem and observe the proof which I followed when translating the theorem
+into Lean.
+\begin{theorem}[Banach-Steinhaus Theorem]
+  Let $X, Y$ be normed vector spaces over $\R$, assume that $X$ is complete. Consider
+  the following family of continuous linear operators:
+  $\left( A_\lambda \right)_{\lambda \in \Lambda} \subset \mathcal{L}\left( X, Y \right) $
+  Assume that this family is bounded pointwise i.e. (with each upper bound being dependent on $x$)
+  \[
+    \forall x \in X \sep \sup_{\lambda \in \Lambda} \|A_\lambda x\|_Y < \infty
+  .\]
+  Then $\left( A_\lambda \right)_{\lambda \in \Lambda}$ is bounded uniformly i.e.
+  \[
+    \sup_{\lambda \in \Lambda} \|A_\lambda \|_{\mathcal{L}\left( X, Y \right) } < \infty
+  .\]
+\end{theorem}
+Before we prove the theorem let us first reformulate it in terms of upper
+bounds instead of requiring that suprema are finite. The reasoning behind doing
+this is that the statement of the theorem below is equivalent to the one above,
+however it is much more convenient to work with in Lean. That is because
+bounding a specific term is easier than working with the finiteness suprema. In
+fact the two alternative ways of formulating the theorem are present in the
+mathlib library, however the original statement that can be seen above is
+considered to be an alternative definition.
+
+\begin{theorem}[Banach-Steinhaus Theorem (Alternative formulation)]
+  Let $X, Y$ be normed vector spaces over $\R$, assume that $X$ is complete. Consider
+  the following family of linear operators:
+  $\left( A_\lambda \right)_{\lambda \in \Lambda} \subset \mathcal{L}\left( X, Y \right) $
+  Assume that this family is bounded pointwise i.e.
+  \[
+    \forall x \in X, \sep \exists \sep K_x \in \R \sucht \forall \lambda \in \Lambda \sep \|A_\lambda x\|_Y \le K_x
+  .\]
+  Then $\left( A_\lambda \right)_{\lambda \in \Lambda}$ is bounded uniformly i.e.
+  \[
+    \exists K' \in \R \sucht \forall \lambda \in \Lambda \sep \|A_\lambda \|_{\mathcal{L}\left( X, Y \right) } \le K'  .\]
+\end{theorem}
+
+later we'll see how in Lean
+we can use the proof of the alternative version to easily deduce the theorem in it's
+initial form. Before we do that however, let us consider the following lemma which
+is a consequence of the Baire Category Theorem and allows us to deduce topological
+properties of a family of continuous functions which are bounded pointwise.
+
+\begin{lemma}
+  Let $\left( X, d \right) $ be a complete metric space. Let
+  $\left( f_\lambda \right)_{\lambda \in \Lambda} $ be a family of continuous
+  functions $$f_\lambda : X \to \R $$ (note that they don't need to be linear).
+  If the family above is bounded pointwise i.e. :
+  \[
+    \forall x \in X, \sep \exists \sep K_x \in \R \sucht \forall \lambda \in \Lambda \sep |f_\lambda(x)| \le K_x
+  .\]
+  Then there exists an open ball $B_r(x_0)$ with  $x_0 \in X$ and  $0 < r \in \R$.
+  Such that $\left( f_\lambda \right)_{\lambda \in \Lambda} $ is uniformly bounded
+  on it, that is:
+  \[
+    \exists K' \in \R \sucht \forall x \in B_r(x_0) \sep \forall \lambda \in \Lambda \sep |f_\lambda(x) | \le K'
+  .\]
+\end{lemma}
+
+We'll first prove the lemma by appeal to the Baire category theorem and then
+use it to prove the main statement of the theorem.
+
+Let $\left( X, d \right) $ be a complete metric space and
+$\left( f_\lambda \right)_{\lambda \in \Lambda} $ be a uniformly bounded family of continuous
+functions. Define a family of closed sets $\left( A_k \right)_{k \in \N} $, where
+\[
+  A_k = \lbrace x \in X \st \forall \lambda \in \Lambda \sep | f_\lambda (x) | \le k \rbrace
+.\]
+
+Now in order to apply Baire category theorem we need to show that  all $A_k$ are
+closed and that
+\begin{equation}
+X = \bigcup_{k = 1}^\infty A_k
+.\end{equation}
+
+First let us consider closedness. Note that for all $\lambda \in \Lambda$ the map
+ $x \mapsto |f_\lambda(x)| $ is continuous by composition. That is because the
+ absolute value function is continuous and we have also assumed that all  $f_\lambda$
+ are continuous. Therefore if we rewrite eack of  $A_k$ as follows, we'll get:
+  \[
+    A_k = \lbrace x \in X \st \forall \lambda \in \Lambda \sep | f_\lambda (x) | \le k \rbrace = \bigcap_{\lambda \in \Lambda} \lbrace x \in X \st |f_\lambda(x)| \le k\rbrace
+ .\]
+
+ Now if we denote the map $g_\lambda := x \mapsto |f_\lambda(x)| $, then each of the
+ sets of the form $\lbrace x \in X \st |f_\lambda(x)| \le k\rbrace$ is the
+ preimage of  $g_\lambda$ of  $[0, k]$. Consequently it is the preimage of a
+ continuous function of a closed set, hence it is closed. Therefore, each of the
+ $A_k$ is an intersection of closed sets, and thus it is also closed.
+ Hence we have established that all  $A_k$ are closed. Now in order to show that
+ their union covers all of  $X$, note that we only need to show the forward insclusion
+ i.e.
+ \begin{equation}
+    X \subseteq \bigcup_{k = 1}^\infty A_k
+  .\end{equation}
+ and the equation $(1)$ follows immediately from antisymmetry of set inclusion, because
+ each of $A_k$ is already a subset of  $X$ and therefore the backward inclusion follows
+ from the fact that a union of subsets is still a subset.
+
+ In order to show the forward direction, let $x \in X$ be arbitrary. Now by our assumption
+ of pointwise boundedness of the collection  $\left( f_\lambda \right)_{\lambda \in \Lambda} $,
+for that particular $x$ we can find a  $K_x$ such that
+$$\forall \lambda \in \Lambda \sep |f_\lambda\left( x \right)| \le K_x. $$
+
+But now we can pick a sufficiently large $k \in \N$ such that  $k \ge K_x$ and then
+we deduce:
+\[
+\forall \lambda \in \Lambda \sep |f_\lambda(x)| \le K_x \le k
+.\]
+
+And so now we can deduce that $x \in \bigcap_{\lambda \in \Lambda}\lbrace x \in X \st
+|f_\lambda(x)| \le k \rbrace = A_k$. Which in turn implies that $x \in \bigcup_{k = 1}^\infty A_k$.
+And since  $x$ was arbitrary, we can deduce that (2) holds which combined with
+antisymmertry and the fact that the union is a subset of $X$ yields equation (1).
+
+Now since $X$ is nonempty and complete, and given that  $X = \bigcup_{k = 1}^\infty A_k$, where
+each  $A_k$ is closed, by Baire category theorem we deduce that there exists a
+$k_0 \in \N$ such that the interior of  $A_{k_0}$ is non-empty.
+Hence, because of the fact that $\int(A_{k_0})$ is open and non-empty, we can pick
+$x_0$ inside of it and  $r > 0$ such that
+ \[
+   B_r(x_0) \subseteq A_{k_0}
+.\]
+Thus, by definition of $A_{k_0}$ we deduce that:
+ \[
+ \forall x \in B_r(x_0) \sep \forall \lambda \in \Lambda \sep |f_\lambda(x)| \le k_0
+.\]
+And so we have found our $K' := k_0$ whose existence we needed to show to prove
+the lemma. \hfill \blacksquare
+
+Having proved the lemma, we can now move on to proving the main theorem.
+Let $X, Y$ be normed spaces, assume  $X$ is complete. Let
+  $\left( A_\lambda \right)_{\lambda \in \Lambda} \subset \mathcal{L}\left( X, Y \right) $
+  be a bounded pointwise family of linear operators. In order to prove that
+  $\left( A_\lambda \right)_{\lambda \in \Lambda} $ is in fact uniformly bounded,
+  let us first define a family of continuous functions to which we can then apply the
+  previous lemma. For $\lambda \in \Lambda$ define a map  $f_\lambda : X \to \R$ as
+   \[
+   \forall x \in X \sep f_\lambda(x) = \|A_\lambda(x)\|_Y
+  .\]
+  Now note that the norm $y \mapsto \|y\|_Y$ is continuous and by our assumption
+  $A_\lambda$ is a continuous linear map. Therefore, by composition we deduce that
+  for all $\lambda \in \Lambda$  $f_\lambda $ is continuous and therefore we can
+  apply the lemma to get a ball  $B = B_r(x_0)$ with  $r > 0$ and  $x_0 \in X$,
+  such that  there exists $K' \in \R$ satisfying:
+  \begin{equation}
+ \forall x \in B_r(x_0) \sep \forall \lambda \in \Lambda \sep |f_\lambda(x)| \le K'
+.\end{equation}
+ Our objective is to show that
+ \[
+    \exists K'' \in \R \sucht \forall \lambda \in \Lambda \sep \|A_\lambda \|_{\mathcal{L}\left( X, Y \right) } \le K''
+ .\]
+
+ Now note that we are able to control the operator norm in a following way:
+ \[
+   \forall \lambda \in \Lambda \sep \forall x \in X \sep \|A_\lambda x\|_Y \le K'' \|x\|_X \implies \|A_\lambda\|_{\mathcal{L}\left( X, Y\right)} \le K''
+ .\]
+
+ Now fix $K'' := \dfrac{4K'}{r}$ where $K'$ is the constant bounding uniformly $|f_\lambda(s)|$
+ that we have obtained from the lemma. We want to show that
+ \[
+   \forall \lambda \in \Lambda, \sep \|A_\lambda\|_{\mathcal{L}\left( X,Y \right)} \le K''
+ .\]
+
+ In order to do this, fix $\lambda \in \Lambda$ arbitrary and consider the following:
+\[
+   \forall x \in X \sep \|A_\lambda x\|_Y \le K'' \|x\|_X \implies \|A_\lambda\|_{\mathcal{L}\left( X, Y\right)} \le K''
+.\]
+
+Hence if we need to fix $x \in X$ arbitrary and impose a bound
+\[
+\|A_\lambda x\|_Y \le K'' \|x\|_X
+.\]
+
+In order to achieve this, consider the following chain of manipulations.
+First note that by adding and subtracting $x_0$ and multiplying by a scaling factor
+and its inverse, we get:
+ \[
+x = \frac{2\|x\|}{r}\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} - x_0 \right)
+.\]
+It is important to note that in order for this to work we need $X$ to be a normed
+vector space over $\R$ (as  $r \in \R$). And that is why in my Lean implementation
+I took $X, Y$ to be vector spaces over  $\R$ as opposed to arbitrary fields  $\mathbb{F}_1, \mathbb{F}_2,$
+Now if we substitute the expression above into $\|A_\lambda x\|$ we obtain:
+\[
+\|A_\lambda x\| = \left|\left|A_\lambda\left(\frac{2\|x\|}{r}\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} - x_0 \right)  \right) \right|\right|
+.\]
+By linearity of $A_\lambda$ we can take the multiplicative factor out of the argument
+and split the expression inside of the norm because $A_\lambda\left( \alpha x \right) = \alpha A_\lambda\left( x \right)  $ and
+$A_\lambda\left( x - y \right) = A_\lambda\left( x \right)  - A_\lambda\left( y \right)  $
+Hence, we obtain
+\[
+\left|\left|A_\lambda\left(\frac{2\|x\|}{r}\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} - x_0 \right)  \right) \right|\right|_Y =
+\left|\left| \frac{2\|x\|}{r} \left( A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right) - A_\lambda(x_0)  \right) \right|\right|_Y
+.\]
+Now, by absolute homogeneity of $\|\cdot\|_Y$, we get:
+\[
+\left|\left| \frac{2\|x\|}{r} \left( A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right) - A_\lambda(x_0)  \right) \right|\right|_Y =
+\left| \frac{2\|x\|}{r} \right| \left|\left| \left( A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right) - A_\lambda(x_0)  \right) \right|\right|_Y =
+\]
+
+Observe that both $0 \le r, \|x\|$, therefore we may drop the absolute value above
+and apply the triangle inequality:
+\begin{equation}
+ \le \frac{2\|x\|}{r} \left( \left|\left| A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right)
+ \right|\right|_Y + \left|\left| A_\lambda(x_0)  \right|\right|_Y \right)
+.\end{equation}
+
+Now note that both $x_0 + \frac{r}{2}\frac{x}{\|x\|} $ and $x_0$ belong to $B_r(x_0)$.
+In case of $x_0$ it is obvious, whereas when it comes to the first point, let us
+consider the following to see that it is indeed contained in the ball  $B$:
+\[
+  x_0 + \frac{r}{2}\frac{x}{\|x\|} \in B_r{x_0} \iff \left|\left|x_0 - \left(x_0 + \frac{r}{2}\frac{x}{\|x\|}   \right) \right|\right| < r
+.\]
+
+Simplifying the left-hand side of the iff above allows us to see:
+\[
+\left|\left|x_0 - \left(x_0 + \frac{r}{2}\frac{x}{\|x\|}   \right) \right|\right| =
+\left|\left| \frac{r}{2}\frac{x}{\|x\|}\right|\right| = \frac{r}{2} \frac{\|x\|}{\|x\|} = \frac{r}{2}  < r
+.\]
+
+Hence, we deduce that both of the points above belong to the open ball $B$, and
+thus we can conclude:
+\[
+  \left|\left| A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right)\right|\right|_Y = \left| f_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right)\right| \le K' \text{ and }
+\left|\left| A_\lambda(x_0)  \right|\right|_Y = \left| f_\lambda(x_0)  \right| \le K'
+.\]
+That is because we can use the definition of $f_\lambda$ in reverse and then apply
+ $(3)$ to impose those bounds.
+
+ We can substitute the above findings back into the inequality $(4)$ to continue
+ estimating the bound:
+ \[
+ \le \frac{2\|x\|}{r} \left( \left|\left| A_\lambda\left( x_0 + \frac{r}{2}\frac{x}{\|x\|} \right)
+ \right|\right|_Y + \left|\left| A_\lambda(x_0)  \right|\right|_Y \right)
+ \le \frac{2\|x\|}{r} \left( K' + K'\right) = \frac{4K'}{r}\|x\| = K''\|x\|
+ .\]
+
+ Since $\lambda$ and  $x$ were arbitrary and our choice of $K''$ didn't depend  either
+ of them, we can conclude that:
+\[
+   \forall \lambda \in \Lambda \sep \forall x \in X \sep \|A_\lambda x\|_Y \le K'' \|x\|_X
+.\]
+Which in turn implies
+\[
+\forall \lambda \in \Lambda \sep \|A_\lambda\|_{\mathcal{L}\left( X, Y \right)}  \le K''.\]
+
+And so the family $\left( A_\lambda \right)_{\lambda \in \Lambda} $ is uniformly
+bounded and that concludes the proof. \hfill \blacksquare
+
+
+\section*{The Process of Formalising}
+\subsection*{Methodology}
+\subsection*{Challenges}
+\subsection*{Language Extensions}
+\section*{Conclusions}
+\section*{Future Work}
+
+
+
+
+\end{document}
