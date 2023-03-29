@@ -99,44 +99,30 @@ begin
   linarith,
 end
 
-/-
-rw smul_smul,
-        rw div_eq_mul_inv,
-        rw div_eq_mul_inv,
-        rw mul_assoc,
-        rw ← mul_assoc r⁻¹ r,
-        rw inv_mul_cancel,
-        { simp,
-        rw mul_assoc,
-        rw ← mul_assoc (‖x‖) (‖x‖⁻¹) (2⁻¹),
-        rw mul_inv_cancel,
-        simp,
-        exact norm_ne_zero_iff.mpr h},
-        { exact ne_of_gt hr,
--/
 
-lemma scale_add_zero_rescale {x : X } (x₀ : X) {r : ℝ} (hx : x ≠ 0) (hr : 0 < r) :
+/- This lemma is allows us to perform a very specific manipulation on x ∈ X.
+   If we scale x by r/(2 * ‖x‖) then add and subtract x₀ and then rescale,
+   we still get x. -/
+lemma scale_add_zero_rescale {x : X } (x₀ : X) {r : ℝ} (hx : x ≠ 0) (hr : r ≠ 0) :
 x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀) :=
 by conv begin
   to_rhs,
-  find (x₀ + _ - x₀) { -- RHS = (2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀)
-    rw [add_comm,      --     = (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + x₀ - x₀)
-        add_sub_assoc, --     = (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + (x₀ - x₀))
-        sub_self,      --     = (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + 0)
-        add_zero], },  --     = (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x))
-  rw [smul_smul,       --     = ((2 * ‖x‖) / r) * (r / (2 * ‖x‖))) • x
-      div_eq_mul_inv,
-      div_eq_mul_inv,
-      mul_assoc],
-
-  conv { congr, congr, skip,
-         rw [← mul_assoc,
-             inv_mul_cancel (ne_of_gt (gt.lt hr)),
-             one_mul] },
-
-  conv { congr,
+  find (x₀ + _ - x₀) { -- RHS =   (2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀) =
+    rw [add_comm,      --         (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + x₀ - x₀) =
+        add_sub_assoc, --       (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + (x₀ - x₀)) =
+        sub_self,      --               (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + 0) =
+        add_zero], },  --                   (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x)) =
+  rw [smul_smul,       --                   (((2 * ‖x‖) / r) * (r / (2 * ‖x‖))) • x  =
+      div_eq_mul_inv,  --                (((2 * ‖x‖) * r⁻¹) * (r * (2 * ‖x‖)⁻¹)) • x =
+      div_eq_mul_inv,  --                (((2 * ‖x‖) * r⁻¹) * (r * (2 * ‖x‖)⁻¹)) • x =
+      mul_assoc],      --                ((2 * ‖x‖) * (r⁻¹ * (r * (2 * ‖x‖)⁻¹))) • x =
+  conv { congr, congr, skip,    --                                                   =
+         rw [← mul_assoc,       --       ((2 * ‖x‖) * ((r⁻¹ * r) * (2 * ‖x‖)⁻¹)) • x =
+             inv_mul_cancel hr, --               ((2 * ‖x‖) * (1 * (2 * ‖x‖)⁻¹)) • x =
+             one_mul] },        --                     ((2 * ‖x‖) * (2 * ‖x‖)⁻¹) • x =
+  conv { congr,                 --                                             1 • x =
          rw mul_inv_cancel (mul_ne_zero two_ne_zero (norm_ne_zero_iff.mpr hx)), },
-  rw one_smul,
+  rw one_smul,                  --                                                 = x
 end
 
 
@@ -170,32 +156,41 @@ begin
   -- Once that precondition is satisfied we can apply the proposition.
   apply continuous_linear_map.op_norm_le_bound (f i) hBoundNonneg,
   { intro x,
+    -- We need to consider cases when x=0 and x≠0 separately because if x is zero
+    -- then our manipulation doesn't work as we can't divide by ‖x‖ which is 0.
     by_cases x ≠ 0,
     {
       have hx: x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀),
-      { simp,
-        rw smul_smul,
-        rw div_eq_mul_inv,
-        rw div_eq_mul_inv,
-        rw mul_assoc,
-        rw ← mul_assoc r⁻¹ r,
-        rw inv_mul_cancel,
-        { simp,
-        rw mul_assoc,
-        rw ← mul_assoc (‖x‖) (‖x‖⁻¹) (2⁻¹),
-        rw mul_inv_cancel,
-        simp,
-        exact norm_ne_zero_iff.mpr h},
-        { exact ne_of_gt hr, }, },
+       from scale_add_zero_rescale x₀ h (ne_of_gt (gt.lt hr)),
+      have hpos : 0 ≤ (2 * ‖x‖) / r,
+        from div_nonneg (mul_nonneg (le_of_lt two_pos) (norm_nonneg x)) (le_of_lt hr),
       nth_rewrite 0 hx,
+
+      have h1: ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ≤ K',
+      { specialize hBound (x₀ + (r / (2 * ‖x‖)) • x),
+        have hinBall: (x₀ + (r / (2 * ‖x‖)) • x) ∈ metric.ball x₀ r,
+        { exact point_in_ball hr h},
+        specialize hBound hinBall,
+        change (F i) (x₀ + (r / (2 * ‖x‖)) • x) ≤ K',
+        change ‖‖(f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ‖ ≤ K' at hBound,
+        rw norm_norm at hBound,
+        change (F i) (x₀ + (r / (2 * ‖x‖)) • x) ≤ K' at hBound,
+        exact hBound, },
+      have h2: ‖ (f i) x₀ ‖ ≤ K',
+      { specialize hBound x₀ (metric.mem_ball_self hr),
+        change ‖ ‖ (f i) x₀ ‖‖ ≤ K' at hBound,
+        rw norm_norm at hBound,
+        exact hBound, },
+      have h3: ‖ (f i) (x₀ + (r / (‖x‖ * 2)) • x) - (f i) x₀ ‖ ≤ ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ + ‖ (f i) x₀ ‖,
+      { rw mul_comm (‖x‖) 2, exact norm_sub_le ((f i) (x₀ + (r / (2 * ‖x‖)) • x)) ((f i) x₀), },
+      have h4: K' + K'  ≤  2 * K',
+      { rw ← mul_two, rw mul_comm,},
+
+
       rw continuous_linear_map.map_smulₛₗ (f i) (2 * ‖x‖ / r),
       rw norm_smul,
       rw ring_hom.id_apply,
       rw real.norm_eq_abs,
-      have hpos : 0 ≤  (2 * ‖x‖) / r,
-      { apply div_nonneg,
-        { exact mul_nonneg (le_of_lt two_pos) (norm_nonneg x), },
-        { exact le_of_lt hr, }, },
       rw abs_of_nonneg hpos,
       rw continuous_linear_map.map_sub,
       rw div_eq_inv_mul,
@@ -213,36 +208,12 @@ begin
         rw mul_comm 2 (‖x‖),
         rw mul_assoc (‖x‖) 2 K',
         rw mul_le_mul_left,
-        { { have h1: ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ≤ K',
-          { specialize hBound (x₀ + (r / (2 * ‖x‖)) • x),
-            have hinBall: (x₀ + (r / (2 * ‖x‖)) • x) ∈ metric.ball x₀ r,
-            { exact point_in_ball hr h},
-            specialize hBound hinBall,
-            change (F i) (x₀ + (r / (2 * ‖x‖)) • x) ≤ K',
-            change ‖‖(f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ‖ ≤ K' at hBound,
-            rw norm_norm at hBound,
-            change (F i) (x₀ + (r / (2 * ‖x‖)) • x) ≤ K' at hBound,
-            exact hBound, },
-          have h2: ‖ (f i) x₀ ‖ ≤ K',
-          { specialize hBound x₀ (metric.mem_ball_self hr),
-            change ‖ ‖ (f i) x₀ ‖‖ ≤ K' at hBound,
-            rw norm_norm at hBound,
-            exact hBound, },
-          have h3: ‖ (f i) (x₀ + (r / (‖x‖ * 2)) • x) - (f i) x₀ ‖ ≤ ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ + ‖ (f i) x₀ ‖,
-          { rw mul_comm (‖x‖) 2, exact norm_sub_le ((f i) (x₀ + (r / (2 * ‖x‖)) • x)) ((f i) x₀), },
-          have h4: K' + K'  ≤  2 * K',
-          { rw ← mul_two,
-            rw mul_comm,},
-          exact le_trans h3 (le_trans (add_le_add h1 h2) h4),},},
+        { exact le_trans h3 (le_trans (add_le_add h1 h2) h4),},
         { exact norm_pos_iff.mpr h, }, },
       { exact two_pos }, },
     { push_neg at h,
       have hf0 : (f i) x = 0,
-      {
-      rw h,
-      exact continuous_linear_map.map_zero (f i), },
-      rw hf0,
-      rw h,
-      simp, }, },
+      { rw h, exact continuous_linear_map.map_zero (f i), },
+      rw [hf0, h, norm_zero, norm_zero, mul_zero] }, },
 end
 
