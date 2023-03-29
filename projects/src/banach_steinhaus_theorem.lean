@@ -125,6 +125,46 @@ by conv begin
   rw one_smul,                  --                                                 = x
 end
 
+/-     rw continuous_linear_map.map_smulₛₗ (f i) (2 * ‖x‖ / r),
+      rw norm_smul,
+      rw ring_hom.id_apply,
+      rw real.norm_eq_abs,
+      rw abs_of_nonneg hpos,
+      rw continuous_linear_map.map_sub,
+      rw div_eq_inv_mul,
+      rw mul_assoc,
+      rw div_eq_inv_mul (2 * 2 * K') r,
+      rw mul_assoc (r⁻¹) (2 * 2 * K'),
+      rw mul_le_mul_left (inv_pos_of_pos hr),
+      rw mul_assoc,
+      rw mul_assoc 2 2 K',
+      rw mul_assoc 2 (2 * K'),
+      rw mul_le_mul_left,
+      { rw mul_comm 2 K',
+        rw mul_assoc,
+        rw mul_comm K' (2 * ‖x‖),
+        rw mul_comm 2 (‖x‖),
+        rw mul_assoc (‖x‖) 2 K',
+        rw mul_le_mul_left,
+        { exact le_trans h3 (le_trans (add_le_add h1 h2) h4),},
+        { exact norm_pos_iff.mpr h, }, },
+      { exact two_pos }, },
+
+-/
+
+lemma linear_manipulation (f : X→SL[ring_hom.id ℝ] Y) (x₀ x : X) {β : ℝ} (hβ : β ≠ 0):
+‖ f (β • (x₀ + (β⁻¹ • x) - x₀)) ‖ ≤ |β| * (‖ f (x₀ + β⁻¹ • x) ‖ + ‖ f x₀ ‖) :=
+begin
+  rw continuous_linear_map.map_smulₛₗ f  β,
+    rw norm_smul,
+    rw ring_hom.id_apply,
+    rw real.norm_eq_abs,
+    rw continuous_linear_map.map_sub,
+    rw mul_le_mul_left (abs_pos.mpr hβ),
+    refine norm_sub_le (f(x₀ + (β⁻¹ • x))) (f x₀),
+end
+
+
 
 theorem banach_steinhaus_theorem {l : Type*} [complete_space X] {f : l → (X →SL[ring_hom.id ℝ] Y)}
   (h: ∀ x, ∃ K, ∀ (i : l), ‖f i x‖ ≤ K): ∃ K', ∀ i, ‖f i‖ ≤ K' :=
