@@ -3,6 +3,7 @@ import analysis.normed_space.operator_norm
 import topology.metric_space.baire
 import tactic
 
+import tactic.basic
 
 open normed_space
 open set
@@ -125,33 +126,6 @@ by conv begin
   rw one_smul,                  --                                                 = x
 end
 
-/-     rw continuous_linear_map.map_smulₛₗ (f i) (2 * ‖x‖ / r),
-      rw norm_smul,
-      rw ring_hom.id_apply,
-      rw real.norm_eq_abs,
-      rw abs_of_nonneg hpos,
-      rw continuous_linear_map.map_sub,
-      rw div_eq_inv_mul,
-      rw mul_assoc,
-      rw div_eq_inv_mul (2 * 2 * K') r,
-      rw mul_assoc (r⁻¹) (2 * 2 * K'),
-      rw mul_le_mul_left (inv_pos_of_pos hr),
-      rw mul_assoc,
-      rw mul_assoc 2 2 K',
-      rw mul_assoc 2 (2 * K'),
-      rw mul_le_mul_left,
-      { rw mul_comm 2 K',
-        rw mul_assoc,
-        rw mul_comm K' (2 * ‖x‖),
-        rw mul_comm 2 (‖x‖),
-        rw mul_assoc (‖x‖) 2 K',
-        rw mul_le_mul_left,
-        { exact le_trans h3 (le_trans (add_le_add h1 h2) h4),},
-        { exact norm_pos_iff.mpr h, }, },
-      { exact two_pos }, },
-
--/
-
 lemma linear_manipulation (f : X→SL[ring_hom.id ℝ] Y) (x₀ x : X) {β : ℝ} (hβ : β ≠ 0):
 ‖ f (β • (x₀ + (β⁻¹ • x) - x₀)) ‖ ≤ |β| * (‖ f (x₀ + β⁻¹ • x) ‖ + ‖ f x₀ ‖) :=
 begin
@@ -202,8 +176,6 @@ begin
     {
       have hx: x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀),
        from scale_add_zero_rescale x₀ h (ne_of_gt (gt.lt hr)),
-      have hpos : 0 ≤ (2 * ‖x‖) / r,
-        from div_nonneg (mul_nonneg (le_of_lt two_pos) (norm_nonneg x)) (le_of_lt hr),
 
       -- The idea of the proof is to show that
       -- ‖fᵢ(x)‖ ≤  (2‖x‖/r)(‖fᵢ(x₀ + (r / (2‖x‖)) • x)‖ + ‖f(x₀)‖) and then we
@@ -222,36 +194,60 @@ begin
           (le_of_eq (eq.symm (norm_norm ((f i) x₀))))
           (h_bound x₀ (metric.mem_ball_self hr)),
 
-      have h3: ‖ (f i) (x₀ + (r / (‖x‖ * 2)) • x) - (f i) x₀ ‖ ≤ ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ + ‖ (f i) x₀ ‖,
-      { rw mul_comm (‖x‖) 2, exact norm_sub_le ((f i) (x₀ + (r / (2 * ‖x‖)) • x)) ((f i) x₀), },
-      have h4: K' + K'  ≤  2 * K',
-      { rw ← mul_two, rw mul_comm, },
+      have h_ne_zero : (2 * ‖x‖) / r ≠ 0,
+        from div_ne_zero
+          (mul_ne_zero (two_ne_zero) (norm_ne_zero_iff.mpr h))
+          (ne.symm (ne_of_lt hr)),
 
-      nth_rewrite 0 hx,
-      rw continuous_linear_map.map_smulₛₗ (f i) (2 * ‖x‖ / r),
-      rw norm_smul,
-      rw ring_hom.id_apply,
-      rw real.norm_eq_abs,
-      rw abs_of_nonneg hpos,
-      rw continuous_linear_map.map_sub,
-      rw div_eq_inv_mul,
+      have h5: ‖ (f i) x ‖ ≤ |((2 * ‖x‖)/r)| * (‖ (f i) (x₀ + ((2 * ‖x‖)/r)⁻¹ • x) ‖ + ‖ (f i) x₀ ‖),
+        { nth_rewrite 0 hx,
+          conv { to_lhs, find (r / _) { rw ← inv_div, }},
+          exact linear_manipulation (f i) x₀ x (h_ne_zero), },
+
+      apply le_trans h5,
+      have h_nonneg : 0 ≤ (2 * ‖x‖) / r,
+        from div_nonneg (mul_nonneg (le_of_lt two_pos) (norm_nonneg x)) (le_of_lt hr),
+      rw abs_eq_self.mpr h_nonneg,
+
+      conv {
+          to_rhs,
+          rw mul_assoc,
+          rw div_eq_mul_inv,
+          rw mul_comm,
+          rw ← mul_assoc,
+          find (_ * r⁻¹) { rw mul_comm, },
+          rw ← mul_assoc,
+          rw ← mul_assoc,
+          find (r⁻¹ * _) { rw mul_comm, },
+          find (‖x‖ * r⁻¹ * _) { rw mul_comm, },
+          rw ← div_eq_mul_inv,
+        },
+
+      conv {
+          to_lhs,
+          congr,
+          rw mul_div_assoc,
+        },
+
+
+
       rw mul_assoc,
-      rw div_eq_inv_mul (2 * 2 * K') r,
-      rw mul_assoc (r⁻¹) (2 * 2 * K'),
-      rw mul_le_mul_left (inv_pos_of_pos hr),
       rw mul_assoc,
-      rw mul_assoc 2 2 K',
-      rw mul_assoc 2 (2 * K'),
+
+      -- For some reason I wasn't able to feed two_pos directly into the lemma
+      -- mul_le_mul_left to be able to cancel 2 * _ ≤ 2 * _. I think it failed
+      -- to fill in the instance variables and writing : 'rw mul_le_mul_left two_pos'
+      -- resulted in 5 new goals appearing which required to prove the instance
+      -- properties for ℝ which whould have been filled in automatically.
       rw mul_le_mul_left,
-      { rw mul_comm 2 K',
-        rw mul_assoc,
-        rw mul_comm K' (2 * ‖x‖),
-        rw mul_comm 2 (‖x‖),
-        rw mul_assoc (‖x‖) 2 K',
-        rw mul_le_mul_left,
-        { exact le_trans h3 (le_trans (add_le_add h1 h2) h4),},
-        { exact norm_pos_iff.mpr h, }, },
-      { exact two_pos }, },
+      { rw mul_le_mul_left,
+        {
+          rw ← inv_div,
+          rw inv_inv,
+          exact le_trans (add_le_add h1 h2) (le_of_eq (eq.symm (two_mul K'))), },
+        { exact div_pos (norm_pos_iff.mpr h) (hr), }, },
+      { exact two_pos, }, },
+
     { push_neg at h,
       have hf0 : (f i) x = 0,
       { rw h, exact continuous_linear_map.map_zero (f i), },
