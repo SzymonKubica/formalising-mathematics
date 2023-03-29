@@ -156,12 +156,12 @@ lemma linear_manipulation (f : X→SL[ring_hom.id ℝ] Y) (x₀ x : X) {β : ℝ
 ‖ f (β • (x₀ + (β⁻¹ • x) - x₀)) ‖ ≤ |β| * (‖ f (x₀ + β⁻¹ • x) ‖ + ‖ f x₀ ‖) :=
 begin
   rw continuous_linear_map.map_smulₛₗ f  β,
-    rw norm_smul,
-    rw ring_hom.id_apply,
-    rw real.norm_eq_abs,
-    rw continuous_linear_map.map_sub,
-    rw mul_le_mul_left (abs_pos.mpr hβ),
-    refine norm_sub_le (f(x₀ + (β⁻¹ • x))) (f x₀),
+  rw norm_smul,
+  rw ring_hom.id_apply,
+  rw real.norm_eq_abs,
+  rw continuous_linear_map.map_sub,
+  rw mul_le_mul_left (abs_pos.mpr hβ),
+  exact norm_sub_le (f(x₀ + (β⁻¹ • x))) (f x₀),
 end
 
 
@@ -182,19 +182,19 @@ begin
     exact ⟨K, λ i, le_trans (le_of_eq (norm_norm ((f i) x))) (hK i)⟩, },
 
   /- We get a ball B(x₀, r) from the lemma. -/
-  obtain ⟨x₀, ⟨r, hr, ⟨K', hK', hBound⟩⟩⟩ := uniform_bounded_of_cont_of_bounded_pointwise h_cont hF,
+  obtain ⟨x₀, ⟨r, hr, ⟨K', hK', h_bound⟩⟩⟩ := uniform_bounded_of_cont_of_bounded_pointwise h_cont hF,
   -- The bounding constant that we'll use is: K'' := 4K'/r.
   use 2 * 2 * K' / r,
   intro i,
-  specialize hBound i,
+  specialize h_bound i,
   -- Here we use the proposition that if we control the norm ‖(f i) x‖ for all
   -- x then we control the operator norm of (f i). Before we can apply it however,
   -- we need to ensure that our bound is non-negative.
-  have hBoundNonneg : 0 ≤ 2 * 2 * K' / r,
+  have h_bound_nonneg : 0 ≤ 2 * 2 * K' / r,
   from div_nonneg (mul_nonneg (le_of_lt (mul_pos two_pos two_pos)) (ge.le hK')) (le_of_lt hr),
 
   -- Once that precondition is satisfied we can apply the proposition.
-  apply continuous_linear_map.op_norm_le_bound (f i) hBoundNonneg,
+  apply continuous_linear_map.op_norm_le_bound (f i) h_bound_nonneg,
   { intro x,
     -- We need to consider cases when x=0 and x≠0 separately because if x is zero
     -- then our manipulation doesn't work as we can't divide by ‖x‖ which is 0.
@@ -204,29 +204,30 @@ begin
        from scale_add_zero_rescale x₀ h (ne_of_gt (gt.lt hr)),
       have hpos : 0 ≤ (2 * ‖x‖) / r,
         from div_nonneg (mul_nonneg (le_of_lt two_pos) (norm_nonneg x)) (le_of_lt hr),
-      nth_rewrite 0 hx,
 
+      -- The idea of the proof is to show that
+      -- ‖fᵢ(x)‖ ≤  (2‖x‖/r)(‖fᵢ(x₀ + (r / (2‖x‖)) • x)‖ + ‖f(x₀)‖) and then we
+      -- bound both of the norms above by K' to deduce that
+      -- ‖fᵢ(x)‖ ≤ (2‖x‖/r)(K' + K') = K''‖x‖
       have h1: ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ≤ K',
-      { specialize hBound (x₀ + (r / (2 * ‖x‖)) • x),
-        have hinBall: (x₀ + (r / (2 * ‖x‖)) • x) ∈ metric.ball x₀ r,
-        { exact point_in_ball hr h},
-        specialize hBound hinBall,
-        change (F i) (x₀ + (r / (2 * ‖x‖)) • x) ≤ K',
-        change ‖‖(f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ‖ ≤ K' at hBound,
-        rw norm_norm at hBound,
-        change (F i) (x₀ + (r / (2 * ‖x‖)) • x) ≤ K' at hBound,
-        exact hBound, },
+        -- ‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖ = ‖‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖‖
+        -- = ‖(F i) (x₀ + (r / (2 * ‖x‖)) • x)‖ ≤ K' <- as the point is in the ball.
+        from le_trans
+          (le_of_eq (eq.symm (norm_norm ((f i) (x₀ + (r / (2 * ‖ x ‖)) • x)))))
+          (h_bound (x₀ + (r / (2 * ‖x‖)) • x) (point_in_ball hr h)),
+
       have h2: ‖ (f i) x₀ ‖ ≤ K',
-      { specialize hBound x₀ (metric.mem_ball_self hr),
-        change ‖ ‖ (f i) x₀ ‖‖ ≤ K' at hBound,
-        rw norm_norm at hBound,
-        exact hBound, },
+      -- Again : ‖ (f i) x₀ ‖ = ‖‖ (f i) x₀ ‖‖ = ‖ (F i) x₀ ‖ ≤ K' as x₀ ∈ B.
+        from le_trans
+          (le_of_eq (eq.symm (norm_norm ((f i) x₀))))
+          (h_bound x₀ (metric.mem_ball_self hr)),
+
       have h3: ‖ (f i) (x₀ + (r / (‖x‖ * 2)) • x) - (f i) x₀ ‖ ≤ ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ + ‖ (f i) x₀ ‖,
       { rw mul_comm (‖x‖) 2, exact norm_sub_le ((f i) (x₀ + (r / (2 * ‖x‖)) • x)) ((f i) x₀), },
       have h4: K' + K'  ≤  2 * K',
-      { rw ← mul_two, rw mul_comm,},
+      { rw ← mul_two, rw mul_comm, },
 
-
+      nth_rewrite 0 hx,
       rw continuous_linear_map.map_smulₛₗ (f i) (2 * ‖x‖ / r),
       rw norm_smul,
       rw ring_hom.id_apply,
