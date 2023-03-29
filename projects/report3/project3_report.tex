@@ -454,6 +454,22 @@ above into Lean.
     exact λ hx, mem_Union.mpr ⟨k', mem_Inter.mpr (λ i, le_trans (hk i)  hk')⟩, },
 
 
+  -- Refactoring the main theorem:
+
+  -- before:
+  have h_cont: ∀ (i : l), continuous (F i),
+  { intro i,
+    rw hF,
+    simp,
+    apply continuous.norm,
+    exact continuous_linear_map.continuous (f i),
+  },
+  -- after:
+    have h_cont: ∀ (i : l), continuous (F i),
+    from λ i, continuous.norm (continuous_linear_map.continuous (f i)),
+
+
+
 \end{comment}
 
 
