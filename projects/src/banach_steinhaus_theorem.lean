@@ -129,15 +129,14 @@ end
 lemma linear_manipulation (f : X→SL[ring_hom.id ℝ] Y) (x₀ x : X) {β : ℝ} (hβ : β ≠ 0):
 ‖ f (β • (x₀ + (β⁻¹ • x) - x₀)) ‖ ≤ |β| * (‖ f (x₀ + β⁻¹ • x) ‖ + ‖ f x₀ ‖) :=
 begin
-  rw continuous_linear_map.map_smulₛₗ f  β,
-  rw norm_smul,
-  rw ring_hom.id_apply,
-  rw real.norm_eq_abs,
-  rw continuous_linear_map.map_sub,
-  rw mul_le_mul_left (abs_pos.mpr hβ),
+  rw [continuous_linear_map.map_smulₛₗ f  β,
+      norm_smul,
+      ring_hom.id_apply,
+      real.norm_eq_abs,
+      continuous_linear_map.map_sub,
+      mul_le_mul_left (abs_pos.mpr hβ)],
   exact norm_sub_le (f(x₀ + (β⁻¹ • x))) (f x₀),
 end
-
 
 
 theorem banach_steinhaus_theorem {l : Type*} [complete_space X] {f : l → (X →SL[ring_hom.id ℝ] Y)}
@@ -169,88 +168,91 @@ begin
 
   -- Once that precondition is satisfied we can apply the proposition.
   apply continuous_linear_map.op_norm_le_bound (f i) h_bound_nonneg,
-  { intro x,
-    -- We need to consider cases when x=0 and x≠0 separately because if x is zero
-    -- then our manipulation doesn't work as we can't divide by ‖x‖ which is 0.
-    by_cases x ≠ 0,
-    {
-      have hx: x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀),
-       from scale_add_zero_rescale x₀ h (ne_of_gt (gt.lt hr)),
+  intro x,
+  -- We need to consider cases when x=0 and x≠0 separately because if x is zero
+  -- then our manipulation doesn't work as we can't divide by ‖x‖ which is 0.
+  by_cases x = 0,
+  { -- The case when x = 0 is trivial because by linearity we get 0 ≤ 0 in the end.
+    rw [h, continuous_linear_map.map_zero (f i), norm_zero, norm_zero, mul_zero], },
+  { -- Here we assume x ≠ 0.
+    have hx: x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀),
+      from scale_add_zero_rescale x₀ h (ne_of_gt (gt.lt hr)),
 
-      -- The idea of the proof is to show that
-      -- ‖fᵢ(x)‖ ≤  (2‖x‖/r)(‖fᵢ(x₀ + (r / (2‖x‖)) • x)‖ + ‖f(x₀)‖) and then we
-      -- bound both of the norms above by K' to deduce that
-      -- ‖fᵢ(x)‖ ≤ (2‖x‖/r)(K' + K') = K''‖x‖
-      have h1: ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ≤ K',
-        -- ‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖ = ‖‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖‖
-        -- = ‖(F i) (x₀ + (r / (2 * ‖x‖)) • x)‖ ≤ K' <- as the point is in the ball.
-        from le_trans
-          (le_of_eq (eq.symm (norm_norm ((f i) (x₀ + (r / (2 * ‖ x ‖)) • x)))))
-          (h_bound (x₀ + (r / (2 * ‖x‖)) • x) (point_in_ball hr h)),
+    /- The idea of the proof is to show that
+       ‖fᵢ(x)‖ ≤  (2‖x‖/r)(‖fᵢ(x₀ + (r / (2‖x‖)) • x)‖ + ‖f(x₀)‖) and then we
+       bound both of the norms above by K' to deduce that
+       ‖fᵢ(x)‖ ≤ (2‖x‖/r)(K' + K') = K''‖x‖ -/
 
-      have h2: ‖ (f i) x₀ ‖ ≤ K',
-      -- Again : ‖ (f i) x₀ ‖ = ‖‖ (f i) x₀ ‖‖ = ‖ (F i) x₀ ‖ ≤ K' as x₀ ∈ B.
-        from le_trans
-          (le_of_eq (eq.symm (norm_norm ((f i) x₀))))
-          (h_bound x₀ (metric.mem_ball_self hr)),
+    -- ‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖ = ‖‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖‖
+    -- = ‖(F i) (x₀ + (r / (2 * ‖x‖)) • x)‖ ≤ K' <- as the point is in the ball.
+    have h1: ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ≤ K',
+      from le_trans
+        (le_of_eq (eq.symm (norm_norm ((f i) (x₀ + (r / (2 * ‖ x ‖)) • x)))))
+        (h_bound (x₀ + (r / (2 * ‖x‖)) • x) (point_in_ball hr h)),
 
-      have h_ne_zero : (2 * ‖x‖) / r ≠ 0,
-        from div_ne_zero
-          (mul_ne_zero (two_ne_zero) (norm_ne_zero_iff.mpr h))
-          (ne.symm (ne_of_lt hr)),
+    -- Again : ‖ (f i) x₀ ‖ = ‖‖ (f i) x₀ ‖‖ = ‖ (F i) x₀ ‖ ≤ K' as x₀ ∈ B.
+    have h2: ‖ (f i) x₀ ‖ ≤ K',
+      from le_trans
+        (le_of_eq (eq.symm (norm_norm ((f i) x₀))))
+        (h_bound x₀ (metric.mem_ball_self hr)),
 
-      have h5: ‖ (f i) x ‖ ≤ |((2 * ‖x‖)/r)| * (‖ (f i) (x₀ + ((2 * ‖x‖)/r)⁻¹ • x) ‖ + ‖ (f i) x₀ ‖),
-        { nth_rewrite 0 hx,
-          conv { to_lhs, find (r / _) { rw ← inv_div, }},
-          exact linear_manipulation (f i) x₀ x (h_ne_zero), },
+    -- The linear manipulation lemma requires that the constant that we use
+    -- for multiplying is not equal to zero, thus we need to first establish
+    -- that (2 * ‖x‖) / r ≠ 0.
+    have h_ne_zero : (2 * ‖x‖) / r ≠ 0,
+      from div_ne_zero
+        (mul_ne_zero (two_ne_zero) (norm_ne_zero_iff.mpr h))
+        (ne.symm (ne_of_lt hr)),
 
-      apply le_trans h5,
-      have h_nonneg : 0 ≤ (2 * ‖x‖) / r,
-        from div_nonneg (mul_nonneg (le_of_lt two_pos) (norm_nonneg x)) (le_of_lt hr),
-      rw abs_eq_self.mpr h_nonneg,
+    -- We also need to know that the constant is non-negative to be able to
+    -- drop the absolute value around it.
+    have h_nonneg : 0 ≤ (2 * ‖x‖) / r,
+      from div_nonneg (mul_nonneg (le_of_lt two_pos) (norm_nonneg x)) (le_of_lt hr),
 
-      conv {
-          to_rhs,
-          rw mul_assoc,
-          rw div_eq_mul_inv,
-          rw mul_comm,
-          rw ← mul_assoc,
-          find (_ * r⁻¹) { rw mul_comm, },
-          rw ← mul_assoc,
-          rw ← mul_assoc,
-          find (r⁻¹ * _) { rw mul_comm, },
-          find (‖x‖ * r⁻¹ * _) { rw mul_comm, },
-          rw ← div_eq_mul_inv,
-        },
+    -- This hypothesis uses the linear_manipulation lemma and non-negativity of
+    -- the (2 * ‖x‖) / r to get the bound on ‖ (f i) x ‖.
+    have h5: ‖ (f i) x ‖ ≤ ((2 * ‖x‖)/r) * (‖ (f i) (x₀ + ((2 * ‖x‖)/r)⁻¹ • x) ‖ + ‖ (f i) x₀ ‖),
+    { nth_rewrite 0 hx,
+      nth_rewrite 1 ← abs_eq_self.mpr h_nonneg,
+      conv { to_lhs, find (r / _) { rw ← inv_div, }},
+      exact linear_manipulation (f i) x₀ x (h_ne_zero), },
 
-      conv {
-          to_lhs,
-          congr,
-          rw mul_div_assoc,
-        },
+    -- Use h5 to turn the goal into:
+    -- ((2 * ‖x‖)/r) * (‖ (f i) (x₀ + ((2 * ‖x‖)/r)⁻¹ • x) ‖ + ‖ (f i) x₀ ‖) ≤
+    -- 2 * 2 * K' / r * ‖ x ‖.
+    apply le_trans h5,
 
+    -- Now we need to convert to rearrange multiplications of terms so that
+    -- they are on the left side of each side of the inequality. That
+    -- way we can later use mul_le_mul_left to strip them off.
+    conv
+    { conv
+      { to_rhs,                          -- Convert RHS:  2 * 2 * K' / r * ‖x‖ =
+        rw [mul_assoc, div_eq_mul_inv],        --     2 * (2 * K') * r⁻¹ * ‖x‖ =
+        rw [mul_comm, ← mul_assoc, mul_comm],  -- r⁻¹ * (‖x‖ * (2 * (2 * K'))) =
+        rw [← mul_assoc, ← mul_assoc],         --     r⁻¹ * ‖x‖ * 2 * (2 * K') =
+        find (r⁻¹ * _) { rw mul_comm, },       --     ‖x‖ * r⁻¹ * 2 * (2 * K') =
+        find (‖x‖ * r⁻¹ * _) { rw mul_comm, }, --   2 * (‖x‖ * r⁻¹) * (2 * K') =
+        rw ← div_eq_mul_inv, },                --       2 * (‖x‖ / r) * (2 * K')
+      conv
+      { to_lhs, congr,
+        rw mul_div_assoc, }, -- Obtains: 2 * (‖x‖ / r) * (‖(f i) ...) on the LHS.
+      -- uses associativity to get to the final shape 2 * (_) ≤ 2 * (_) and replaces
+      -- the multiplication by inverse with division as other hypotheses require
+      -- that form.
+      rw [mul_assoc, mul_assoc, inv_div], },
 
-
-      rw mul_assoc,
-      rw mul_assoc,
-
-      -- For some reason I wasn't able to feed two_pos directly into the lemma
-      -- mul_le_mul_left to be able to cancel 2 * _ ≤ 2 * _. I think it failed
-      -- to fill in the instance variables and writing : 'rw mul_le_mul_left two_pos'
-      -- resulted in 5 new goals appearing which required to prove the instance
-      -- properties for ℝ which whould have been filled in automatically.
-      rw mul_le_mul_left,
-      { rw mul_le_mul_left,
-        {
-          rw ← inv_div,
-          rw inv_inv,
-          exact le_trans (add_le_add h1 h2) (le_of_eq (eq.symm (two_mul K'))), },
-        { exact div_pos (norm_pos_iff.mpr h) (hr), }, },
-      { exact two_pos, }, },
-
-    { push_neg at h,
-      have hf0 : (f i) x = 0,
-      { rw h, exact continuous_linear_map.map_zero (f i), },
-      rw [hf0, h, norm_zero, norm_zero, mul_zero] }, },
+    -- For some reason I wasn't able to feed two_pos directly into the lemma
+    -- mul_le_mul_left to be able to cancel 2 * _ ≤ 2 * _. I think it failed
+    -- to fill in the instance variables and writing : 'rw mul_le_mul_left two_pos'
+    -- resulted in 5 new goals appearing which required to prove the instance
+    -- properties for ℝ which whould have been filled in automatically.
+    -- I decided to use work_on_goal 2 to switch the order of goals and supply
+    -- the positivity hypotheses straight away. This way the instance variables
+    -- are filled in properly.
+    rw mul_le_mul_left, work_on_goal 2 { exact two_pos },
+    rw mul_le_mul_left, work_on_goal 2 { exact div_pos (norm_pos_iff.mpr h) (hr), },
+    exact le_trans (add_le_add h1 h2) (le_of_eq (eq.symm (two_mul K'))),
+   },
 end
 
