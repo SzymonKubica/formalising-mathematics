@@ -264,58 +264,18 @@ end
 open ennreal
 open_locale ennreal
 
-#check le_supr
-
 theorem banach_steinhaus_supremum {ι : Type*} [complete_space X] {f : ι → (X →SL[ring_hom.id ℝ] Y)}
 (h : ∀ x, (⨆ i, ↑‖f i x‖₊) < ∞) : (⨆ i, ↑‖f i‖₊) < ∞ :=
 begin
   have h_bound : ∀ (x : X), ∃ (Kₓ : ℝ), ∀ (i : ι), ‖(f i) x‖ ≤ Kₓ,
   { intro x,
-    specialize h x,
-    rw ennreal.lt_iff_exists_coe at h,
-    rcases h with ⟨Kₓ, hKₓ_bound, hKₓ_lt_top⟩,
-    refine ⟨Kₓ, (λ i, _)⟩,
-    have h_supr: ∀ i : ι, ‖(f i) x‖ ≤  (⨆ i, ‖f i x‖₊),
-    { sorry, },
-    apply le_trans (h_supr i),
-    apply le_of_eq,
-    norm_cast,
-    rw ← ennreal.coe_eq_coe,
-    rw ← hKₓ_bound,
-    rw with_top.coe_supr,
-    rw bdd_above_def,
-    use Kₓ,
-    intro c,
-    rw mem_range,
-    intro h_index,
-    cases h_index with j hj,
-    rw ← hj,
-    apply le_trans (h_supr j),
-    rw ← hKₓ_bound,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  },
-
-  -- We apply the previous version of the theorem to get the bounding constant.
+     -- Since the sup < ∞ there exists Kₓ st sup < Kₓ < ∞.
+    rcases (ennreal.lt_iff_exists_coe.mp (h x)) with ⟨Kₓ, hKₓ_bound, hKₓ_lt_top⟩,
+    refine ⟨Kₓ, (λ i, _)⟩, -- We use Kₓ as our constant and let i be arbitrary.
+    have h1 : (‖f i x‖₊ : ℝ≥0∞) ≤ ⨆ j,  ‖f j x‖₊, from le_supr _ i,
+    rw hKₓ_bound at h1,
+    exact_mod_cast h1, },
+      -- We apply the previous version of the theorem to get the bounding constant.
   obtain ⟨K', hK'⟩ := banach_steinhaus_theorem h_bound,
 
   -- Here the idea of the proof is to show that sup{‖(f i) x‖ | i ∈ ι} ≤ K' < ∞
