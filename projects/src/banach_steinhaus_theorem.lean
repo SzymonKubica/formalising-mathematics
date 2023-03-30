@@ -3,8 +3,6 @@ import analysis.normed_space.operator_norm
 import topology.metric_space.baire
 import tactic
 
-import tactic.basic
-
 open normed_space
 open set
 
@@ -22,13 +20,13 @@ variables {X Y : Type*}
    from it as a corollary. Given a family of continuous functions from a complete
    space X to ℝ which are bounded pointwise, we can find a ball Bᵣ(x₀) such that
    the family is uniformly bounded on that ball. -/
-theorem uniform_bounded_of_cont_of_bounded_pointwise {l : Type*} [complete_space X]
-{f : l → (X → ℝ)} (h_cont : ∀ (i : l), continuous (f i)) (h: ∀ x, ∃ K, ∀ (i : l), ‖f i x‖ ≤ K) :
-∃ (x₀ : X) (r : ℝ), 0 < r ∧  ∃ K' ≥ 0, ∀ (i : l) x ∈ metric.ball x₀ r, ‖f i x‖ ≤ K' :=
+theorem uniform_bounded_of_cont_of_bounded_pointwise {ι : Type*} [complete_space X]
+{f : ι → (X → ℝ)} (h_cont : ∀ (i : ι), continuous (f i)) (h : ∀ x, ∃ K, ∀ (i : ι), ‖f i x‖ ≤ K) :
+∃ (x₀ : X) (r : ℝ), 0 < r ∧  ∃ K' ≥ 0, ∀ (i : ι) x ∈ metric.ball x₀ r, ‖f i x‖ ≤ K' :=
 begin
   /- We define a sequence of sets (Aₖ) such that on the k-th set for all i ∈ l
      the norm of fᵢ is bounded by k on that set. -/
-  set A : ℕ → set X := λ n, (⋂ i : l, { x : X | ‖(f i) x‖ ≤ n }) with hA,
+  set A : ℕ → set X := λ n, (⋂ i : ι, { x : X | ‖(f i) x‖ ≤ n }) with hA,
   /- In order to apply the Baire category theorem, we need two things:
      →  ∀ k ∈ ℕ, Aₖ is closed
      →  the infinite union of Aₖ covers the whole space X -/
@@ -50,7 +48,7 @@ begin
   rcases nonempty_interior_of_Union_of_closed hA_closed hA_union with ⟨k₀, x₀, hx₀⟩,
   /- Now that we have found a k such that the interior of Aₖ is nonempty, we can
      pick a point inside of it and get the ball around it. -/
-  have hBall: ∃ δ > 0, metric.ball x₀ δ ⊆ interior (A k₀),
+  have hBall : ∃ δ > 0, metric.ball x₀ δ ⊆ interior (A k₀),
     from (metric.is_open_iff.mp is_open_interior) x₀ hx₀,
   rcases hBall with ⟨r, hr, hball⟩, -- Extract the radius r and hypothesis 0 < r from hBall
 
@@ -69,7 +67,7 @@ end
 -- x₀ in the direction x, then the point still lies inside of the ball. It looks
 -- trivial, however dealing with those kinds of arithmetic manipulations is a bit
 -- tricky in Lean.
-lemma point_in_ball {r : ℝ} {x₀ x : X} (hr: (0 : ℝ) < r) (hx: x ≠ 0) :
+lemma point_in_ball {r : ℝ} {x₀ x : X} (hr : (0 : ℝ) < r) (hx : x ≠ 0) :
 (x₀ + (r / ((2 : ℝ) * ‖x‖)) • x) ∈ metric.ball x₀ r
 :=
 begin
@@ -126,7 +124,7 @@ by conv begin
   rw one_smul,                  --                                                 = x
 end
 
-lemma linear_manipulation (f : X→SL[ring_hom.id ℝ] Y) (x₀ x : X) {β : ℝ} (hβ : β ≠ 0):
+lemma linear_manipulation (f : X→SL[ring_hom.id ℝ] Y) (x₀ x : X) {β : ℝ} (hβ : β ≠ 0) :
 ‖ f (β • (x₀ + (β⁻¹ • x) - x₀)) ‖ ≤ |β| * (‖ f (x₀ + β⁻¹ • x) ‖ + ‖ f x₀ ‖) :=
 begin
   rw [continuous_linear_map.map_smulₛₗ f  β,
@@ -139,20 +137,20 @@ begin
 end
 
 
-theorem banach_steinhaus_theorem {l : Type*} [complete_space X] {f : l → (X →SL[ring_hom.id ℝ] Y)}
-  (h: ∀ x, ∃ K, ∀ (i : l), ‖f i x‖ ≤ K): ∃ K', ∀ i, ‖f i‖ ≤ K' :=
+theorem banach_steinhaus_theorem {ι : Type*} [complete_space X] {f : ι → (X →SL[ring_hom.id ℝ] Y)}
+  (h : ∀ x, ∃ K, ∀ (i : ι), ‖f i x‖ ≤ K) : ∃ K', ∀ i, ‖f i‖ ≤ K' :=
 begin
   /- Define a family of functions to which we'll apply the lemma. -/
-  set F : l → X → ℝ := λ i, (λ x, ‖f i x‖) with hF,
-  have h_cont: ∀ (i : l), continuous (F i),
+  set F : ι → X → ℝ := λ i, (λ x, ‖f i x‖) with hF,
+  have h_cont : ∀ (i : ι), continuous (F i),
     -- For each i the composition of the norm and the continuous (f i) is continuous.
     from λ i, continuous.norm (continuous_linear_map.continuous (f i)),
 
-  have hF: ∀ x, ∃ K, ∀ (i : l), ‖F i x‖ ≤ K,
+  have hF : ∀ x, ∃ K, ∀ (i : ι), ‖F i x‖ ≤ K,
   { intro x, -- let x be arbitrary
     rcases (h x) with ⟨K, hK⟩, -- get K such that ∀ i ‖(f i) x‖ ≤ K
     -- now use that K and the fact that ‖F i x‖ = ‖ ‖(f i) x‖ ‖ =  ‖(f i) x‖ ≤ K
-    exact ⟨K, λ i, le_trans (le_of_eq (norm_norm ((f i) x))) (hK i)⟩, },
+    exact ⟨K, λ i, le_of_eq_of_le (norm_norm ((f i) x)) (hK i)⟩, },
 
   /- We get a ball B(x₀, r) from the lemma. -/
   obtain ⟨x₀, ⟨r, hr, ⟨K', hK', h_bound⟩⟩⟩ := uniform_bounded_of_cont_of_bounded_pointwise h_cont hF,
@@ -164,7 +162,9 @@ begin
   -- x then we control the operator norm of (f i). Before we can apply it however,
   -- we need to ensure that our bound is non-negative.
   have h_bound_nonneg : 0 ≤ 2 * 2 * K' / r,
-  from div_nonneg (mul_nonneg (le_of_lt (mul_pos two_pos two_pos)) (ge.le hK')) (le_of_lt hr),
+    from div_nonneg
+      (mul_nonneg (le_of_lt (mul_pos two_pos two_pos)) (ge.le hK'))
+      (le_of_lt hr),
 
   -- Once that precondition is satisfied we can apply the proposition.
   apply continuous_linear_map.op_norm_le_bound (f i) h_bound_nonneg,
@@ -175,7 +175,7 @@ begin
   { -- The case when x = 0 is trivial because by linearity we get 0 ≤ 0 in the end.
     rw [h, continuous_linear_map.map_zero (f i), norm_zero, norm_zero, mul_zero], },
   { -- Here we assume x ≠ 0.
-    have hx: x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀),
+    have hx : x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀),
       from scale_add_zero_rescale x₀ h (ne_of_gt (gt.lt hr)),
 
     /- The idea of the proof is to show that
@@ -185,15 +185,15 @@ begin
 
     -- ‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖ = ‖‖(f i) (x₀ + (r / (2 * ‖x‖)) • x)‖‖
     -- = ‖(F i) (x₀ + (r / (2 * ‖x‖)) • x)‖ ≤ K' <- as the point is in the ball.
-    have h1: ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ≤ K',
-      from le_trans
-        (le_of_eq (eq.symm (norm_norm ((f i) (x₀ + (r / (2 * ‖ x ‖)) • x)))))
+    have h1 : ‖ (f i) (x₀ + (r / (2 * ‖x‖)) • x) ‖ ≤ K',
+      from le_of_eq_of_le
+        (eq.symm (norm_norm ((f i) (x₀ + (r / (2 * ‖ x ‖)) • x))))
         (h_bound (x₀ + (r / (2 * ‖x‖)) • x) (point_in_ball hr h)),
 
     -- Again : ‖ (f i) x₀ ‖ = ‖‖ (f i) x₀ ‖‖ = ‖ (F i) x₀ ‖ ≤ K' as x₀ ∈ B.
-    have h2: ‖ (f i) x₀ ‖ ≤ K',
-      from le_trans
-        (le_of_eq (eq.symm (norm_norm ((f i) x₀))))
+    have h2 : ‖ (f i) x₀ ‖ ≤ K',
+      from le_of_eq_of_le
+        (eq.symm (norm_norm ((f i) x₀)))
         (h_bound x₀ (metric.mem_ball_self hr)),
 
     -- The linear manipulation lemma requires that the constant that we use
@@ -211,7 +211,7 @@ begin
 
     -- This hypothesis uses the linear_manipulation lemma and non-negativity of
     -- the (2 * ‖x‖) / r to get the bound on ‖ (f i) x ‖.
-    have h5: ‖ (f i) x ‖ ≤ ((2 * ‖x‖)/r) * (‖ (f i) (x₀ + ((2 * ‖x‖)/r)⁻¹ • x) ‖ + ‖ (f i) x₀ ‖),
+    have h5 : ‖ (f i) x ‖ ≤ ((2 * ‖x‖)/r) * (‖ (f i) (x₀ + ((2 * ‖x‖)/r)⁻¹ • x) ‖ + ‖ (f i) x₀ ‖),
     { nth_rewrite 0 hx,
       nth_rewrite 1 ← abs_eq_self.mpr h_nonneg,
       conv { to_lhs, find (r / _) { rw ← inv_div, }},
@@ -237,7 +237,8 @@ begin
       conv
       { to_lhs, congr,
         rw mul_div_assoc, }, -- Obtains: 2 * (‖x‖ / r) * (‖(f i) ...) on the LHS.
-      -- uses associativity to get to the final shape 2 * (_) ≤ 2 * (_) and replaces
+
+      -- By associativity we get to the final shape 2 * (_) ≤ 2 * (_) and replace
       -- the multiplication by inverse with division as other hypotheses require
       -- that form.
       rw [mul_assoc, mul_assoc, inv_div], },
@@ -252,7 +253,78 @@ begin
     -- are filled in properly.
     rw mul_le_mul_left, work_on_goal 2 { exact two_pos },
     rw mul_le_mul_left, work_on_goal 2 { exact div_pos (norm_pos_iff.mpr h) (hr), },
-    exact le_trans (add_le_add h1 h2) (le_of_eq (eq.symm (two_mul K'))),
-   },
+    exact le_of_le_of_eq (add_le_add h1 h2) (eq.symm (two_mul K')), },
 end
 
+-- Now having proven the Banach-Steinhaus theorem in terms of bounding constants,
+-- we can state it using suprema and prove it using the previous version.
+
+-- Since we are now dealing with suprema of norms, we need extended non-negative
+-- real numbers to be able to describe them.
+open ennreal
+open_locale ennreal
+
+#check le_supr
+
+theorem banach_steinhaus_supremum {ι : Type*} [complete_space X] {f : ι → (X →SL[ring_hom.id ℝ] Y)}
+(h : ∀ x, (⨆ i, ↑‖f i x‖₊) < ∞) : (⨆ i, ↑‖f i‖₊) < ∞ :=
+begin
+  have h_bound : ∀ (x : X), ∃ (Kₓ : ℝ), ∀ (i : ι), ‖(f i) x‖ ≤ Kₓ,
+  { intro x,
+    specialize h x,
+    rw ennreal.lt_iff_exists_coe at h,
+    rcases h with ⟨Kₓ, hKₓ_bound, hKₓ_lt_top⟩,
+    refine ⟨Kₓ, (λ i, _)⟩,
+    have h_supr: ∀ i : ι, ‖(f i) x‖ ≤  (⨆ i, ‖f i x‖₊),
+    { sorry, },
+    apply le_trans (h_supr i),
+    apply le_of_eq,
+    norm_cast,
+    rw ← ennreal.coe_eq_coe,
+    rw ← hKₓ_bound,
+    rw with_top.coe_supr,
+    rw bdd_above_def,
+    use Kₓ,
+    intro c,
+    rw mem_range,
+    intro h_index,
+    cases h_index with j hj,
+    rw ← hj,
+    apply le_trans (h_supr j),
+    rw ← hKₓ_bound,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  },
+
+  -- We apply the previous version of the theorem to get the bounding constant.
+  obtain ⟨K', hK'⟩ := banach_steinhaus_theorem h_bound,
+
+  -- Here the idea of the proof is to show that sup{‖(f i) x‖ | i ∈ ι} ≤ K' < ∞
+  -- it is achieved by showing that for all i ∈ ι, ‖(f i) x‖ is bounded by K'
+  -- The statement below is complicated because I needed to handle coercions between
+  -- K' which is real and the contexts which expect it to be nnreal or ennreal.
+  exact lt_of_le_of_lt
+    (supr_le (λ i, le_of_eq_of_le'
+        (eq.symm (ennreal.of_real_eq_coe_nnreal (le_trans (norm_nonneg (f i)) (hK' i))))
+        (coe_le_coe.mpr (hK' i))))
+    (ennreal.coe_lt_top),
+end
