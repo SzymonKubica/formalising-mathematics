@@ -258,7 +258,7 @@ we deduce:
 And so now it follows that $x \in \bigcap_{\lambda \in \Lambda}\lbrace x \in X \st
 |f_\lambda(x)| \le k \rbrace = A_k$. Which in turn implies that $x \in \bigcup_{k = 1}^\infty A_k$.
 And since  $x$ was arbitrary, we can deduce that (2) holds which combined with
-antisymmertry and the fact that the union is a subset of $X$ yields equation (1).
+antisymmetry and the fact that the union is a subset of $X$ yields equation (1).
 
 Now since $X$ is nonempty and complete, and given that  $X = \bigcup_{k = 1}^\infty A_k$, where
 each  $A_k$ is closed, by Baire category theorem we deduce that there exists a
@@ -469,12 +469,82 @@ above into Lean.
     from λ i, continuous.norm (continuous_linear_map.continuous (f i)),
 
 
+    -- The final refactoring.
+    { exact supr_le (λ i, le_of_eq_of_le'  (eq.symm (ennreal.of_real_eq_coe_nnreal (le_trans (norm_nonneg (f i)) (hK' i)))) (coe_le_coe.mpr (hK' i))), },
+
+    have supr_le_K' : (⨆ i, ↑‖f i‖₊) ≤ ennreal.of_real(K'),
+  { refine supr_le _,
+    intro i,
+    specialize hK' i,
+    rw ennreal.of_real_eq_coe_nnreal,
+    { rw coe_le_coe,
+      exact hK', },
+    { exact le_trans (norm_nonneg (f i)) hK', }, },
+
 
 \end{comment}
-
-
-
 \section*{The Process of Formalising}
+
+Having already completed two sizeable projects in Lean, I had quite a strong
+background knowledge and hands-on experience using the programming language in
+conjunction with the mathlib library. When I started working on the third
+project, I already had a fixed approach which I was following when formalising
+any given proof. What I would normally do was first write down the proof by
+hand on paper, then move on to typesetting it into latex for the report. During
+that process I was always trying to formulate all transitions in the proof as
+explicitly as possible so that it is easier to translate everything into Lean
+later on. After that I would make an attempt at formalising the argument by
+splitting it into smaller lemmas where applicable. When I encountered a more
+difficult part of the proof which didn't translate into Lean very well, I would
+try to reformulate the written argument. After that I would normally refactor
+the code to remove redundancies and possibly introduce additional notation to
+make the code more similar to an actual written argument.
+
+However, when working on the final project I decided to follow a different approach.
+This was because after I received the feedback for my second project, it included
+a very thorough code review of my submission which indicated the main problems
+with my code and suggested ways to fix them and refactor the code so that it is
+more professional and could possibly be included in an actual library. I found
+this advice very helpful and at this point I wanted to thank Prof. Kevin Buzzard
+for devoting so much time to analysing my code and suggesting ways to improve it.
+I must admit that this was by far the most useful piece of advice thich I have
+received throughout the whole duration of the module. The reason being that it
+was directly referring to my code, so it allowed me to observe inefficient patterns
+in my cod  and helped me change my habits to closer resemble professional workflow.
+Below you can see a list of the most common problems that one could find in my
+submission for the second part of the coursework:
+\begin{enumerate}
+  \item Introducing redundant one-liner lemmas which could be inlined in the main
+    body of the proof.
+  \item Using inefficient \texttt{simp} tactic in the middle of the proof instead of only closing the goals with it.
+  \item Adding redundant \texttt{dsimp} or \texttt{rw} lines to only change the visual output in the goal state.
+  \item Introducing unnecessary intermediate hypotheses for simple claims which
+    are in the library (e.g. \texttt{one\_ne\_top}) instead of using function composition
+    in the \texttt{exact} tactic to close the goal.
+  \item Not supplying immediate arguments into \texttt{apply} or \texttt{rw} tactics
+    which causes multiple goals to appear and requires indenting the code.
+\end{enumerate}
+In the following section I will show how I applied these suggestions when writing
+the code for this project.
+
+The approach that I followed was similar to what I've done for the first two
+projects, however this time I spent a lot more time refactoring the code after my
+first attempt at formalising the proof. When writing the proof for the first time,
+I have changed my attitude towards adding auxiliary lemmas. In the past what I
+would do is sometimes when the proof was getting a bit to cluttered and I wasn't
+able to easily read it as if it was hand-written, I would introduce a new lemma
+with a descriptive name to "hide complexity". This time however, I prioritised
+optimising the code for performance and so I only introduced an additional lemma
+if it was some generalised claim or a seemingly obvious algebraic manipulation which
+was tricky to prove inline using Lean. Below you can see two examples of lemmas that
+I have introduced in my code.
+After I finished writing the "first draft"
+of the proof in Lean,
+
+
+
+
+
 \subsection*{Methodology}
 \subsection*{Challenges}
 \subsection*{Language Extensions}
