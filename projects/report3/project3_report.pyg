@@ -1,0 +1,2 @@
+have hA_closed : ∀ n : ℕ, is_closed (A n), from
+λ n, is_closed_Inter (λ i, is_closed_le (continuous.norm (h_cont i)) continuous_const),

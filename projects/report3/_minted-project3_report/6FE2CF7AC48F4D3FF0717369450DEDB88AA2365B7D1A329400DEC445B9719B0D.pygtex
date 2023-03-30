@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{have} \PYG{n}{hA\PYGZus{}closed} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{,} \PYG{n}{is\PYGZus{}closed} \PYG{o}{(}\PYG{n}{A} \PYG{n}{n}\PYG{o}{),}
+  \PYG{o}{\PYGZob{}} \PYG{n}{intro} \PYG{n}{n}\PYG{o}{,}
+    \PYG{n}{apply} \PYG{n}{is\PYGZus{}closed\PYGZus{}Inter}\PYG{o}{,}
+    \PYG{n}{intro} \PYG{n}{i}\PYG{o}{,}
+    \PYG{n}{apply} \PYG{n}{is\PYGZus{}closed\PYGZus{}le}\PYG{o}{,}
+    \PYG{o}{\PYGZob{}} \PYG{n}{exact} \PYG{n}{continuous.norm} \PYG{o}{(}\PYG{n}{h\PYGZus{}cont} \PYG{n}{i}\PYG{o}{),} \PYG{o}{\PYGZcb{},}
+    \PYG{o}{\PYGZob{}} \PYG{n}{exact} \PYG{n}{continuous\PYGZus{}const}\PYG{o}{,} \PYG{o}{\PYGZcb{},} \PYG{o}{\PYGZcb{},}
+\end{Verbatim}

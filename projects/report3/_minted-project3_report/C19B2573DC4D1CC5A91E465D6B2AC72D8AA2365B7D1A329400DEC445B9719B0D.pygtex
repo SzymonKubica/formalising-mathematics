@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{theorem} \PYG{n}{uniform\PYGZus{}bounded\PYGZus{}of\PYGZus{}cont\PYGZus{}of\PYGZus{}bounded\PYGZus{}pointwise} \PYG{o}{\PYGZob{}}\PYG{n}{ι} \PYG{o}{:} \PYG{k+kt}{Type}\PYG{n+nb+bp}{*}\PYG{o}{\PYGZcb{}} \PYG{o}{[}\PYG{n}{complete\PYGZus{}space} \PYG{n}{X}\PYG{o}{]}
+\PYG{o}{\PYGZob{}}\PYG{n}{f} \PYG{o}{:} \PYG{n}{ι} \PYG{n+nb+bp}{→} \PYG{o}{(}\PYG{n}{X} \PYG{n+nb+bp}{→} \PYG{n}{ℝ}\PYG{o}{)\PYGZcb{}} \PYG{o}{(}\PYG{n}{h\PYGZus{}cont} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{o}{(}\PYG{n}{i} \PYG{o}{:} \PYG{n}{ι}\PYG{o}{),} \PYG{n}{continuous} \PYG{o}{(}\PYG{n}{f} \PYG{n}{i}\PYG{o}{))} \PYG{o}{(}\PYG{n}{h} \PYG{o}{:} \PYG{n+nb+bp}{∀} \PYG{n}{x}\PYG{o}{,} \PYG{n+nb+bp}{∃} \PYG{n}{K}\PYG{o}{,} \PYG{n+nb+bp}{∀} \PYG{o}{(}\PYG{n}{i} \PYG{o}{:} \PYG{n}{ι}\PYG{o}{),} \PYG{n+nb+bp}{‖}\PYG{n}{f} \PYG{n}{i} \PYG{n}{x}\PYG{n+nb+bp}{‖} \PYG{n+nb+bp}{≤} \PYG{n}{K}\PYG{o}{)} \PYG{o}{:}
+\PYG{n+nb+bp}{∃} \PYG{o}{(}\PYG{n}{x₀} \PYG{o}{:} \PYG{n}{X}\PYG{o}{)} \PYG{o}{(}\PYG{n}{r} \PYG{o}{:} \PYG{n}{ℝ}\PYG{o}{),} \PYG{l+m+mi}{0} \PYG{n+nb+bp}{\PYGZlt{}} \PYG{n}{r} \PYG{n+nb+bp}{∧}  \PYG{n+nb+bp}{∃} \PYG{n}{K\PYGZsq{}} \PYG{n+nb+bp}{≥} \PYG{l+m+mi}{0}\PYG{o}{,} \PYG{n+nb+bp}{∀} \PYG{o}{(}\PYG{n}{i} \PYG{o}{:} \PYG{n}{ι}\PYG{o}{)} \PYG{n}{x} \PYG{n+nb+bp}{∈} \PYG{n}{metric.ball} \PYG{n}{x₀} \PYG{n}{r}\PYG{o}{,} \PYG{n+nb+bp}{‖}\PYG{n}{f} \PYG{n}{i} \PYG{n}{x}\PYG{n+nb+bp}{‖} \PYG{n+nb+bp}{≤} \PYG{n}{K\PYGZsq{}} \PYG{o}{:=}
+\PYG{k+kd}{begin}
+\PYG{n+nb+bp}{...}
+\PYG{k+kd}{end}
+\end{Verbatim}

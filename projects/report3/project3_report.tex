@@ -84,6 +84,8 @@
 \newunicodechar{ᵐ}{\ensuremath{^m}}
 \newunicodechar{∂}{\ensuremath{\partial}}
 \newunicodechar{ℒ}{\ensuremath{\mathcal{L}}}
+\newunicodechar{ι}{\ensuremath{\iota}}
+\newunicodechar{₀}{\ensuremath{_0}}
 
 
 \newunicodechar{∈}{\ensuremath{\in}}
@@ -273,7 +275,7 @@ Thus, by definition of $A_{k_0}$ we deduce that:
  \forall x \in B_r(x_0) \sep \forall \lambda \in \Lambda \sep |f_\lambda(x)| \le k_0
 .\]
 And so we have found our $K' := k_0$ whose existence we needed to show to prove
-the lemma. \hfill \blacksquare
+the lemma. \hfill $\blacksquare$
 
 Having proved the lemma, we can now move on to proving the main theorem.
 Let $X, Y$ be normed spaces, assume  $X$ is complete. Let
@@ -393,7 +395,7 @@ Which in turn implies
 \forall \lambda \in \Lambda \sep \|A_\lambda\|_{\mathcal{L}\left( X, Y \right)}  \le K''.\]
 
 And so the family $\left( A_\lambda \right)_{\lambda \in \Lambda} $ is uniformly
-bounded and that concludes the proof. \hfill \blacksquare
+bounded and that concludes the proof. \hfill $\blacksquare$
 
 The final step of the proof was to deduce the initial way of formulating the theorem
 from the alternative one which uses those bounding constants $K_x, K'$. Informally,
@@ -424,6 +426,10 @@ above into Lean.
     have hA_closed : ∀ n : ℕ, is_closed (A n),
   { intro n,
     exact is_closed_Inter (λ i, is_closed_le (continuous.norm (h_cont i)) continuous_const), },
+
+    have hA_closed : ∀ n : ℕ, is_closed (A n), from
+    λ n, is_closed_Inter (λ i, is_closed_le (continuous.norm (h_cont i)) continuous_const),
+
 
 
   -- Also proving the set equality here is a great example.
@@ -527,20 +533,137 @@ submission for the second part of the coursework:
 In the following section I will show how I applied these suggestions when writing
 the code for this project.
 
-The approach that I followed was similar to what I've done for the first two
-projects, however this time I spent a lot more time refactoring the code after my
-first attempt at formalising the proof. When writing the proof for the first time,
-I have changed my attitude towards adding auxiliary lemmas. In the past what I
-would do is sometimes when the proof was getting a bit to cluttered and I wasn't
+When writing the proof for the first time,
+I have changed my approach towards adding auxiliary lemmas. In the past what I
+would do is sometimes when the proof was getting a bit too cluttered and I wasn't
 able to easily read it as if it was hand-written, I would introduce a new lemma
 with a descriptive name to "hide complexity". This time however, I prioritised
 optimising the code for performance and so I only introduced an additional lemma
 if it was some generalised claim or a seemingly obvious algebraic manipulation which
-was tricky to prove inline using Lean. Below you can see two examples of lemmas that
-I have introduced in my code.
-After I finished writing the "first draft"
-of the proof in Lean,
+was tricky to prove inline using Lean. An example of that can be seen below.
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+theorem uniform_bounded_of_cont_of_bounded_pointwise {ι : Type*} [complete_space X]
+{f : ι → (X → ℝ)} (h_cont : ∀ (i : ι), continuous (f i)) (h : ∀ x, ∃ K, ∀ (i : ι), ‖f i x‖ ≤ K) :
+∃ (x₀ : X) (r : ℝ), 0 < r ∧  ∃ K' ≥ 0, ∀ (i : ι) x ∈ metric.ball x₀ r, ‖f i x‖ ≤ K' :=
+begin ... end
+\end{minted}
+\captionof{listing}{Lemma which is a generally applicable theorem.}
+\end{code}
 
+The theorem above can be contrasted with the simple lemma below
+that cannot be solved using \texttt{simp}.
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+lemma scale_add_zero_rescale {x : X} (x₀ : X) {r : ℝ} (hx : x ≠ 0) (hr : r ≠ 0) :
+x = ((2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀) :=
+by conv begin
+  to_rhs,
+  find (x₀ + _ - x₀) { -- RHS =   (2 * ‖x‖) / r) • (x₀ + ((r / (2 * ‖x‖)) • x) - x₀) =
+    rw [add_comm,      --         (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + x₀ - x₀) =
+        add_sub_assoc, --       (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + (x₀ - x₀)) =
+        sub_self,      --               (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x) + 0) =
+        add_zero], },  --                   (2 * ‖x‖) / r) • (((r / (2 * ‖x‖)) • x)) =
+  rw [smul_smul,       --                   (((2 * ‖x‖) / r) * (r / (2 * ‖x‖))) • x  =
+      div_eq_mul_inv,  --                (((2 * ‖x‖) * r⁻¹) * (r * (2 * ‖x‖)⁻¹)) • x =
+      div_eq_mul_inv,  --                (((2 * ‖x‖) * r⁻¹) * (r * (2 * ‖x‖)⁻¹)) • x =
+      mul_assoc],      --                ((2 * ‖x‖) * (r⁻¹ * (r * (2 * ‖x‖)⁻¹))) • x =
+  conv { congr, congr, skip,    --                                                   =
+         rw [← mul_assoc,       --       ((2 * ‖x‖) * ((r⁻¹ * r) * (2 * ‖x‖)⁻¹)) • x =
+             inv_mul_cancel hr, --               ((2 * ‖x‖) * (1 * (2 * ‖x‖)⁻¹)) • x =
+             one_mul] },        --                     ((2 * ‖x‖) * (2 * ‖x‖)⁻¹) • x =
+  conv { congr,                 --                                             1 • x =
+         rw mul_inv_cancel (mul_ne_zero two_ne_zero (norm_ne_zero_iff.mpr hx)), },
+  rw one_smul,                  --                                                 = x
+end
+\end{minted}
+\captionof{listing}{ Lemma allowing to perform a specific manipulation. }
+\end{code}
+
+The Listing 2 above also illustrates a very insightful learning experience. When
+working on this final project I've decided to start incorporating some more of
+the advanced Lean language features into my proofs. In that listing, I have
+exclusively used the \texttt{conv} mode which is a very powerful tool where we need
+to perform very fine-grained rewrites on a very complex expression.
+
+By considering the addition of each new lemma more thoroughly, I was able to address
+the first issue on the list of suggestions. The suggestions $2.$ and  $3.$ involved
+not using computationally-expensive \texttt{simp} tactic in the middle of a proof
+and removing redundant \texttt{dsimp} and \texttt{rw} lines which only affected the
+way the goal is displayed (effectively the ones relying on definitional equality).
+This improvement was achieved by using the \texttt{squeeze\_simp} tactic which
+shows the theorems that it uses to perform simplification and then replacing the
+invocation of that tactic with a targeted rewrite. Furthermore, I was trying to
+exploit the definitional equality wherever possible to avoid using the redundant
+rewrites. The reason behind those optimisations is that when the code is compiled
+(i.e. the proof is effectively getting checked) it runs much faster if the
+proof is comprised of fewer statements and if there aren't many usages of the
+\texttt{simp} tactic, whose biggest drawback is that it tries to search through
+all of the over $10000$ lemmas present in mathlib to perform simplification.
+
+In order to further remove redundancies and optimise the code I used the following
+iterative approach. At the start I wrote the "first draft" of the proof in Lean,
+using as many steps as I needed to easily understand the proof from the code.
+A snippet of that first draft can be found below.
+
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+have hA_closed : ∀ n : ℕ, is_closed (A n),
+  { intro n,
+    apply is_closed_Inter,
+    intro i,
+    apply is_closed_le,
+    { exact continuous.norm (h_cont i), },
+    { exact continuous_const, }, },
+\end{minted}
+\end{code}
+
+This snippet proves all sets in a particular collections are closed. In its nature,
+the argument is fairly mechanical, it involves taking an arbitrary set, applying
+lemmas and hypotheses and concluding the proof. After refactoring it, I managed
+to make it much shorter by using lambda functions:
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+have hA_closed : ∀ n : ℕ, is_closed (A n), from
+λ n, is_closed_Inter (λ i, is_closed_le (continuous.norm (h_cont i)) continuous_const),
+\end{minted}
+\captionof{listing}{Code after refactoring.}
+\end{code}
+
+My approach to refactoring the code was as follows. After I managed to compile the proof
+and see that there were no errors, I went through the code line-by-line and was
+trying to make it as short as possible using function compositions and lambda
+functions instead of the \texttt{intro} tactic.
+
+It is important to understand the trade-off when performing refactorings similar to
+the one described above. On one hand, the code becomes more performant because it
+uses less steps. However on the other hand, the code readability is impacted which
+might make it less accessible to people who want to learn Lean. When it comes to the
+improved performance, I haven't experienced substantial benefits in terms of the
+compilation times of my code after refactoring it. However, I suspect that once
+the codebase grows larger (for example the mathlib one) every single line of
+code matters when we need to compile it.
+
+In my opinion, the readability aspect of the code requires thorough consideration.
+In my previous projects my goal was to write code which is visually as close as possible
+to the informal hand-written argument. That's why I often introduced new notation which
+seemed more convenient to me. Even though I used shortcuts such as \texttt{intros} or \texttt{rcases} to make
+the code shorter, those tactics are used to let multiple variables be arbitrary
+or extract witnesses from existentially quantified statements which is almost always
+done in one step in an informal argument. Thus the readability wasn't negatively affected.
+However I didn't push the function composition to its limits as I felt like it
+makes the code too obscure.
+
+I remember when I first started looking at the professional code in the mathilb
+library, I often struggled to understand it because of its extensive use of advanced
+tactics modes and function composition. However, over the course of this project
+I noticed that if one focuses on incorporating those optimisations, they require
+less and less cognitive effort. It happened to a point where I'm now able to
+refactor even some of the more complicated statements into one-line proofs.
+I must admit that it is very satisfying to be able to get a particular function
+composition just right and see that all goals have been accomplished. The only
+drawback that I'm worried about is that from the perspective of code maintainability
+and code reviews, sometimes the refactored code might look incomprehensible.
 
 
 
