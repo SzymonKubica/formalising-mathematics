@@ -1,7 +1,0 @@
-reserve prefix `B_{`:65
-reserve infix `}`:65
-notation `B_{` r `}` x := metric.ball x r
--- Example usage
-lemma point_in_ball {r : ℝ} {x₀ x : X} (hr : (0 : ℝ) < r) (hx : x ≠ 0) :
-(x₀ + (r / ((2 : ℝ) * ‖x‖)) • x) ∈ B_{r}(x₀)
-:= begin ... end
