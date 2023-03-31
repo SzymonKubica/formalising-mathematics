@@ -1,0 +1,10 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+ \PYG{k}{have} \PYG{n}{supr\PYGZus{}le\PYGZus{}K\PYGZsq{}} \PYG{o}{:} \PYG{o}{(}\PYG{n+nb+bp}{⨆} \PYG{n}{i}\PYG{o}{,} \PYG{n+nb+bp}{↑‖}\PYG{n}{f} \PYG{n}{i}\PYG{n+nb+bp}{‖₊}\PYG{o}{)} \PYG{n+nb+bp}{≤} \PYG{n}{ennreal.of\PYGZus{}real}\PYG{o}{(}\PYG{n}{K\PYGZsq{}}\PYG{o}{),}
+  \PYG{o}{\PYGZob{}} \PYG{n}{refine} \PYG{n}{supr\PYGZus{}le} \PYG{n}{\PYGZus{}}\PYG{o}{,}
+    \PYG{n}{intro} \PYG{n}{i}\PYG{o}{,}
+    \PYG{n}{specialize} \PYG{n}{hK\PYGZsq{}} \PYG{n}{i}\PYG{o}{,}
+    \PYG{n}{rw} \PYG{n}{ennreal.of\PYGZus{}real\PYGZus{}eq\PYGZus{}coe\PYGZus{}nnreal}\PYG{o}{,}
+    \PYG{o}{\PYGZob{}} \PYG{n}{rw} \PYG{n}{coe\PYGZus{}le\PYGZus{}coe}\PYG{o}{,}
+      \PYG{n}{exact} \PYG{n}{hK\PYGZsq{}}\PYG{o}{,} \PYG{o}{\PYGZcb{},}
+    \PYG{o}{\PYGZob{}} \PYG{n}{exact} \PYG{n}{le\PYGZus{}trans} \PYG{o}{(}\PYG{n}{norm\PYGZus{}nonneg} \PYG{o}{(}\PYG{n}{f} \PYG{n}{i}\PYG{o}{))} \PYG{n}{hK\PYGZsq{}}\PYG{o}{,} \PYG{o}{\PYGZcb{},} \PYG{o}{\PYGZcb{},}
+\end{Verbatim}

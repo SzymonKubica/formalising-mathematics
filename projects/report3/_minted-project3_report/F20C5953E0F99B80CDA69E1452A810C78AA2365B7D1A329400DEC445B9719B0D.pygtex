@@ -1,0 +1,23 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+  \PYG{k}{have} \PYG{n}{hA\PYGZus{}union} \PYG{o}{:} \PYG{o}{(}\PYG{n+nb+bp}{⋃} \PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{,} \PYG{o}{(}\PYG{n}{A} \PYG{n}{n}\PYG{o}{))} \PYG{n+nb+bp}{=} \PYG{n}{univ}\PYG{o}{,} \PYG{c+c1}{\PYGZhy{}\PYGZhy{} Before the refactoring.}
+  \PYG{o}{\PYGZob{}} \PYG{n}{ext}\PYG{o}{,}
+    \PYG{n}{split}\PYG{o}{,}
+    \PYG{o}{\PYGZob{}} \PYG{n}{intro} \PYG{n}{x}\PYG{o}{,} \PYG{n}{triv}\PYG{o}{,} \PYG{o}{\PYGZcb{},}
+    \PYG{o}{\PYGZob{}} \PYG{n}{intros} \PYG{n}{hx}\PYG{o}{,}
+      \PYG{n}{cases} \PYG{n}{h} \PYG{n}{x} \PYG{k}{with} \PYG{n}{k} \PYG{n}{hk}\PYG{o}{,}
+      \PYG{n}{obtain} \PYG{o}{⟨}\PYG{n}{k\PYGZsq{}}\PYG{o}{,} \PYG{n}{hk\PYGZsq{}}\PYG{o}{⟩} \PYG{o}{:=} \PYG{n}{exists\PYGZus{}nat\PYGZus{}ge} \PYG{n}{k}\PYG{o}{,}
+      \PYG{n}{rw} \PYG{n}{mem\PYGZus{}Union}\PYG{o}{,}
+      \PYG{n}{use} \PYG{n}{k\PYGZsq{}}\PYG{o}{,}
+      \PYG{n}{rw} \PYG{n}{hA}\PYG{o}{,}
+      \PYG{n}{rw} \PYG{n}{mem\PYGZus{}Inter}\PYG{o}{,}
+      \PYG{n}{intro} \PYG{n}{i}\PYG{o}{,}
+      \PYG{n}{specialize} \PYG{n}{hk} \PYG{n}{i}\PYG{o}{,}
+      \PYG{n}{exact} \PYG{n}{le\PYGZus{}trans} \PYG{n}{hk} \PYG{n}{hk\PYGZsq{}}\PYG{o}{,} \PYG{o}{\PYGZcb{},\PYGZcb{},}
+    \PYG{k}{have} \PYG{n}{hA\PYGZus{}union} \PYG{o}{:} \PYG{o}{(}\PYG{n+nb+bp}{⋃} \PYG{n}{n} \PYG{o}{:} \PYG{n}{ℕ}\PYG{o}{,} \PYG{o}{(}\PYG{n}{A} \PYG{n}{n}\PYG{o}{))} \PYG{n+nb+bp}{=} \PYG{n}{univ}\PYG{o}{,} \PYG{c+c1}{\PYGZhy{}\PYGZhy{} After the refactoring.}
+  \PYG{o}{\PYGZob{}} \PYG{n}{ext}\PYG{o}{,}                                 \PYG{c+c1}{\PYGZhy{}\PYGZhy{} Proving equality by set extensionality.}
+    \PYG{n}{refine} \PYG{o}{⟨}\PYG{n+nb+bp}{λ} \PYG{n}{hx}\PYG{o}{,} \PYG{n}{mem\PYGZus{}univ} \PYG{n}{x}\PYG{o}{,} \PYG{n}{\PYGZus{}}\PYG{o}{⟩,}        \PYG{c+c1}{\PYGZhy{}\PYGZhy{} First deal with the trivial forward inclusion.}
+    \PYG{n}{cases} \PYG{n}{h} \PYG{n}{x} \PYG{k}{with} \PYG{n}{k} \PYG{n}{hk}\PYG{o}{,}                 \PYG{c+c1}{\PYGZhy{}\PYGZhy{} Find the bound which works for x,}
+    \PYG{n}{obtain} \PYG{o}{⟨}\PYG{n}{k\PYGZsq{}}\PYG{o}{,} \PYG{n}{hk\PYGZsq{}}\PYG{o}{⟩} \PYG{o}{:=} \PYG{n}{exists\PYGZus{}nat\PYGZus{}ge} \PYG{n}{k}\PYG{o}{,} \PYG{c+c1}{\PYGZhy{}\PYGZhy{} Find a natural number greater than the bound k.}
+    \PYG{c+c1}{\PYGZhy{}\PYGZhy{} Conclude that x is a member of the union because it belongs to Ak\PYGZsq{}}
+    \PYG{n}{exact} \PYG{n+nb+bp}{λ} \PYG{n}{hx}\PYG{o}{,} \PYG{n}{mem\PYGZus{}Union.mpr} \PYG{o}{⟨}\PYG{n}{k\PYGZsq{}}\PYG{o}{,} \PYG{n}{mem\PYGZus{}Inter.mpr} \PYG{o}{(}\PYG{n+nb+bp}{λ} \PYG{n}{i}\PYG{o}{,} \PYG{n}{le\PYGZus{}trans} \PYG{o}{(}\PYG{n}{hk} \PYG{n}{i}\PYG{o}{)}  \PYG{n}{hk\PYGZsq{}}\PYG{o}{)⟩,} \PYG{o}{\PYGZcb{},}
+\end{Verbatim}

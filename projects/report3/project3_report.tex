@@ -80,12 +80,18 @@
 \newunicodechar{⦄}{\ensuremath{\rbrace}}
 \newunicodechar{≠}{\ensuremath{\ne}}
 \newunicodechar{≥}{\ensuremath{\ge}}
+\newunicodechar{⋃}{\ensuremath{\bigcup}}
 \newunicodechar{∞}{\ensuremath{\infty}}
 \newunicodechar{ᵐ}{\ensuremath{^m}}
 \newunicodechar{∂}{\ensuremath{\partial}}
+\newunicodechar{β}{\ensuremath{\beta}}
 \newunicodechar{ℒ}{\ensuremath{\mathcal{L}}}
 \newunicodechar{ι}{\ensuremath{\iota}}
 \newunicodechar{₀}{\ensuremath{_0}}
+\newunicodechar{⨆}{\ensuremath{\sqcup}}
+\newunicodechar{ₛ}{\ensuremath{_s}}
+\newunicodechar{ₗ}{\ensuremath{_l}}
+
 
 
 \newunicodechar{∈}{\ensuremath{\in}}
@@ -108,7 +114,7 @@
 \fancyfoot[C]{\thepage}
 \begin{document}
 
-\title{Formalising Mathematics - Coursework 3 \\ Banach-Steinhaus Theorem and Extensions}
+\title{Formalising Mathematics - Coursework 3 \\ Banach-Steinhaus Theorem}
 \date{\today}
 \author{CID: 01871147}
 \maketitle
@@ -141,7 +147,7 @@ In what follows we'll first state and prove the theorem. Then I will explain the
 methodology that I followed in order to formalise the theorem. I will also describe
 the interesting challenges that needed to be overcome when formalising the proof.
 The last section contains conclusions which I made after working on the three sizeable
-projects in Lean and describe the future things that I will be working on.
+projects in Lean and describe the future extensions that I will be working on.
 
 \section*{Proof of the Banach-Steinhaus Theorem}
 
@@ -163,9 +169,11 @@ into Lean.
 \end{theorem}
 Before we prove the theorem let us first reformulate it in terms of upper
 bounds instead of requiring that suprema are finite. The reasoning behind doing
-this is that the statement of the theorem below is equivalent to the one above,
-however it is much more convenient to work with in Lean. That is because
-bounding a specific term is easier than working with the finiteness of suprema. In
+this is that it is much more convenient to work with in Lean. That is because
+bounding a specific term is easier than working with the finiteness of suprema.
+In Lean, dealing with a supremum of a norm requires working with extended non-negative
+real numbers and this requires handling type coercions appropriately.
+In
 fact the two alternative ways of formulating the theorem are present in the
 mathlib library, however the original statement that can be seen above is
 considered to be an alternative definition.
@@ -194,7 +202,7 @@ boundedness of a family of continuous functions which are bounded pointwise.
 \begin{lemma}
   Let $\left( X, d \right) $ be a complete metric space. Let
   $\left( f_\lambda \right)_{\lambda \in \Lambda} $ be a family of continuous
-  functions $$f_\lambda : X \to \R $$ (note that $f\_\lambda$ don't need to be linear).
+  functions $$f_\lambda : X \to \R $$ (note that $f_\lambda$ don't need to be linear).
   If the family above is bounded pointwise i.e. :
   \[
     \forall x \in X, \sep \exists \sep K_x \in \R \sucht \forall \lambda \in \Lambda \sep |f_\lambda(x)| \le K_x
@@ -356,7 +364,7 @@ and then apply the triangle inequality:
 .\end{equation}
 
 Now note that both $x_0 + \frac{r}{2}\frac{x}{\|x\|} $ and $x_0$ belong to $B_r(x_0)$.
-In case of $x_0$ it is the case because $x_0$ is the centre of the ball, whereas when it comes to the first point, let us
+In case of $x_0$ that's true because $x_0$ is the centre of the ball, whereas when it comes to the first point, let us
 consider the following to see that it is indeed contained in the ball  $B$:
 \[
   x_0 + \frac{r}{2}\frac{x}{\|x\|} \in B_r(x_0) \iff \left|\left|x_0 - \left(x_0 + \frac{r}{2}\frac{x}{\|x\|}   \right) \right|\right| < r
@@ -401,94 +409,12 @@ The final step of the proof was to deduce the initial way of formulating the the
 from the alternative one which uses those bounding constants $K_x, K'$. Informally,
 it isn't difficult to observe that the two ways of phrasing the theorem are equivalent.
 However, in Lean showing this requires a certain degree of care and doesn't follow
-immediately. In the next section I will explain the process of formalising the
+immediately. That is because we need to correctly handle coercions between three different
+types : \texttt{real} \texttt{nnreal} and \texttt{ennreal}. In the next section I will explain the process of formalising the
 theorem and discuss unexpected observations that I made while translating the proof
 above into Lean.
 
 
-\begin{comment}
-  Below is a collections of intermediate code snippets illustrating inefficiencies
-  in my intermediate implementation.
-
-
-
-  -- This one is a good example of showing how the code has been refactored afterwards
-  -- to make it shorter and make it compile faster.
-  have hA_closed : ∀ n : ℕ, is_closed (A n),
-  { intro n,
-    apply is_closed_Inter,
-    intro i,
-    apply is_closed_le,
-    { exact continuous.norm (h_cont i), },
-    { exact continuous_const, },
-    },
-  -- After refactoring it's been transformed into something like this:
-    have hA_closed : ∀ n : ℕ, is_closed (A n),
-  { intro n,
-    exact is_closed_Inter (λ i, is_closed_le (continuous.norm (h_cont i)) continuous_const), },
-
-    have hA_closed : ∀ n : ℕ, is_closed (A n), from
-    λ n, is_closed_Inter (λ i, is_closed_le (continuous.norm (h_cont i)) continuous_const),
-
-
-
-  -- Also proving the set equality here is a great example.
-  have hA_union : (⋃ n : ℕ, (A n)) = univ,
-  { ext,
-    split,
-    { intro x, triv, },
-    { intros hx,
-      cases h x with k hk,
-      obtain ⟨k', hk'⟩ := exists_nat_ge k,
-      rw mem_Union,
-      use k',
-      rw hA,
-      rw mem_Inter,
-      intro i,
-      specialize hk i,
-      exact le_trans hk hk', },},
-
-
-  -- After the refactoring.
-    have hA_union : (⋃ n : ℕ, (A n)) = univ,
-  { ext, -- Proving equality by set extensionality.
-    refine ⟨λ hx, mem_univ x, _⟩,        -- First deal with the trivial forward inclusion.
-    cases h x with k hk,                 -- Find the bound which works for x,
-    obtain ⟨k', hk'⟩ := exists_nat_ge k, -- Find a natural number greater than the bound k.
-    -- Conclude that x is a member of the union because there exists a set which
-    -- is a part of that union such that x belongs to it.
-    exact λ hx, mem_Union.mpr ⟨k', mem_Inter.mpr (λ i, le_trans (hk i)  hk')⟩, },
-
-
-  -- Refactoring the main theorem:
-
-  -- before:
-  have h_cont: ∀ (i : l), continuous (F i),
-  { intro i,
-    rw hF,
-    simp,
-    apply continuous.norm,
-    exact continuous_linear_map.continuous (f i),
-  },
-  -- after:
-    have h_cont: ∀ (i : l), continuous (F i),
-    from λ i, continuous.norm (continuous_linear_map.continuous (f i)),
-
-
-    -- The final refactoring.
-    { exact supr_le (λ i, le_of_eq_of_le'  (eq.symm (ennreal.of_real_eq_coe_nnreal (le_trans (norm_nonneg (f i)) (hK' i)))) (coe_le_coe.mpr (hK' i))), },
-
-    have supr_le_K' : (⨆ i, ↑‖f i‖₊) ≤ ennreal.of_real(K'),
-  { refine supr_le _,
-    intro i,
-    specialize hK' i,
-    rw ennreal.of_real_eq_coe_nnreal,
-    { rw coe_le_coe,
-      exact hK', },
-    { exact le_trans (norm_nonneg (f i)) hK', }, },
-
-
-\end{comment}
 \section*{The Process of Formalising}
 
 Having already completed two sizeable projects in Lean, I had quite a strong
@@ -514,9 +440,9 @@ more professional and could possibly be included in an actual library. I found
 this advice very helpful and at this point I wanted to thank Prof. Kevin Buzzard
 for devoting so much time to analysing my code and suggesting ways to improve it.
 I must admit that this was by far the most useful piece of advice thich I have
-received throughout the whole duration of the module. The reason being that it
+received throughout the whole duration of the module. The reason is that it
 was directly referring to my code, so it allowed me to observe inefficient patterns
-in my cod  and helped me change my habits to closer resemble professional workflow.
+in my code and helped me change my habits to closer resemble professional workflow.
 Below you can see a list of the most common problems that one could find in my
 submission for the second part of the coursework:
 \begin{enumerate}
@@ -534,17 +460,17 @@ In the following section I will show how I applied these suggestions when writin
 the code for this project.
 
 When writing the proof for the first time,
-I have changed my approach towards adding auxiliary lemmas. In the past what I
-would do is sometimes when the proof was getting a bit too cluttered and I wasn't
+I have changed my approach towards adding auxiliary lemmas. In the past when the
+proof was getting a bit too cluttered and I wasn't
 able to easily read it as if it was hand-written, I would introduce a new lemma
 with a descriptive name to "hide complexity". This time however, I prioritised
 optimising the code for performance and so I only introduced an additional lemma
-if it was some generalised claim or a seemingly obvious algebraic manipulation which
+if it was a general claim or a seemingly obvious algebraic manipulation which
 was tricky to prove inline using Lean. An example of that can be seen below.
 \begin{code}
 \begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
 theorem uniform_bounded_of_cont_of_bounded_pointwise {ι : Type*} [complete_space X]
-{f : ι → (X → ℝ)} (h_cont : ∀ (i : ι), continuous (f i)) (h : ∀ x, ∃ K, ∀ (i : ι), ‖f i x‖ ≤ K) :
+{f : ι → (X → ℝ)} (h_cont : ∀(i : ι), continuous (f i)) (h : ∀ x, ∃K, ∀(i : ι), ‖f i x‖ ≤ K) :
 ∃ (x₀ : X) (r : ℝ), 0 < r ∧  ∃ K' ≥ 0, ∀ (i : ι) x ∈ metric.ball x₀ r, ‖f i x‖ ≤ K' :=
 begin ... end
 \end{minted}
@@ -586,25 +512,27 @@ the advanced Lean language features into my proofs. In that listing, I have
 exclusively used the \texttt{conv} mode which is a very powerful tool where we need
 to perform very fine-grained rewrites on a very complex expression.
 
-By considering the addition of each new lemma more thoroughly, I was able to address
-the first issue on the list of suggestions. The suggestions $2.$ and  $3.$ involved
-not using computationally-expensive \texttt{simp} tactic in the middle of a proof
-and removing redundant \texttt{dsimp} and \texttt{rw} lines which only affected the
-way the goal is displayed (effectively the ones relying on definitional equality).
-This improvement was achieved by using the \texttt{squeeze\_simp} tactic which
-shows the theorems that it uses to perform simplification and then replacing the
-invocation of that tactic with a targeted rewrite. Furthermore, I was trying to
-exploit the definitional equality wherever possible to avoid using the redundant
-rewrites. The reason behind those optimisations is that when the code is compiled
-(i.e. the proof is effectively getting checked) it runs much faster if the
-proof is comprised of fewer statements and if there aren't many usages of the
-\texttt{simp} tactic, whose biggest drawback is that it tries to search through
-all of the over $10000$ lemmas present in mathlib to perform simplification.
+By considering the addition of each new lemma more thoroughly, I was able to
+address the first issue on the list of suggestions. The suggestions $2.$ and
+$3.$ involved not using computationally-expensive \texttt{simp} tactic in the
+middle of a proof and removing redundant \texttt{dsimp} and \texttt{rw} lines
+which only affected the way the goal is displayed (effectively the ones relying
+on definitional equality). This improvement was achieved by using the
+\texttt{squeeze\_simp} tactic which shows the theorems that it uses to perform
+simplification. After I identified the correct lemma that needed to be used, I
+replaced the invocation of that \texttt{squeeze\_simp} tactic with a targeted
+rewrite. Furthermore, I was trying to exploit the definitional equality
+wherever possible to avoid using the redundant rewrites. The reason behind
+those optimisations is that when the code is compiled (i.e. the proof is
+effectively getting checked) it runs much faster if the proof is comprised of
+fewer statements and if there aren't many usages of the \texttt{simp} tactic,
+whose biggest drawback is that it tries to search through all of the over
+$10000$ lemmas present in mathlib to perform simplification.
 
-In order to further remove redundancies and optimise the code I used the following
-iterative approach. At the start I wrote the "first draft" of the proof in Lean,
-using as many steps as I needed to easily understand the proof from the code.
-A snippet of that first draft can be found below.
+In order to further remove redundancies and optimise the code I used the
+following iterative approach. At the start I wrote the "first draft" of the
+proof in Lean, using as many steps as I needed to easily understand the proof
+just by looking at the code. A snippet of that first draft can be found below.
 
 \begin{code}
 \begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
@@ -630,7 +558,7 @@ have hA_closed : ∀ n : ℕ, is_closed (A n), from
 \captionof{listing}{Code after refactoring.}
 \end{code}
 
-My approach to refactoring the code was as follows. After I managed to compile the proof
+My approach to refactoring the code was the following. After I managed to compile the proof
 and see that there were no errors, I went through the code line-by-line and was
 trying to make it as short as possible using function compositions and lambda
 functions instead of the \texttt{intro} tactic.
@@ -642,7 +570,44 @@ might make it less accessible to people who want to learn Lean. When it comes to
 improved performance, I haven't experienced substantial benefits in terms of the
 compilation times of my code after refactoring it. However, I suspect that once
 the codebase grows larger (for example the mathlib one) every single line of
-code matters when we need to compile it.
+code matters when we need to compile it. Below you can see another example of that
+refactoring process, it shows the usage of a complex \texttt{exact} tactic at
+the end of the proof which closes the goal by performing many logical transitions
+in one step.
+
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=true, bgcolor=bg]{lean}
+  have hA_union : (⋃ n : ℕ, (A n)) = univ, -- Before the refactoring.
+  { ext,
+    split,
+    { intro x, triv, },
+    { intros hx,
+      cases h x with k hk,
+      obtain ⟨k', hk'⟩ := exists_nat_ge k,
+      rw mem_Union,
+      use k',
+      rw hA,
+      rw mem_Inter,
+      intro i,
+      specialize hk i,
+      exact le_trans hk hk', },},
+    have hA_union : (⋃ n : ℕ, (A n)) = univ, -- After the refactoring.
+  { ext,                                 -- Proving equality by set extensionality.
+    refine ⟨λ hx, mem_univ x, _⟩,        -- First deal with the trivial forward inclusion.
+    cases h x with k hk,                 -- Find the bound which works for x,
+    obtain ⟨k', hk'⟩ := exists_nat_ge k, -- Find a natural number greater than the bound k.
+    -- Conclude that x is a member of the union because it belongs to Ak'
+    exact λ hx, mem_Union.mpr ⟨k', mem_Inter.mpr (λ i, le_trans (hk i)  hk')⟩, },
+\end{minted}
+\captionof{listing}{Refactoring which combines many steps into one usage of \texttt{exact}.}
+\end{code}
+
+As you can see above, the refactored code is much shorter, however it's arguably
+less readable as some steps arent that explicit. In the line 21 in the listing above
+one can see an application of the \texttt{exact} tactic which uses lambda functions
+and function composition to close the goal by executing multiple steps at once.
+Because of its impact on readability, after my refactorings
+I always inserted descriptive comments to document what is happening in the proof.
 
 In my opinion, the readability aspect of the code requires thorough consideration.
 In my previous projects my goal was to write code which is visually as close as possible
@@ -651,30 +616,258 @@ seemed more convenient to me. Even though I used shortcuts such as \texttt{intro
 the code shorter, those tactics are used to let multiple variables be arbitrary
 or extract witnesses from existentially quantified statements which is almost always
 done in one step in an informal argument. Thus the readability wasn't negatively affected.
-However I didn't push the function composition to its limits as I felt like it
+However I didn't use the function composition too often as I felt like it
 makes the code too obscure.
 
-I remember when I first started looking at the professional code in the mathilb
+When I first started looking at the professional code in the mathilb
 library, I often struggled to understand it because of its extensive use of advanced
 tactics modes and function composition. However, over the course of this project
 I noticed that if one focuses on incorporating those optimisations, they require
-less and less cognitive effort. It happened to a point where I'm now able to
+less and less cognitive effort. It got to a point where I'm now able to
 refactor even some of the more complicated statements into one-line proofs.
 I must admit that it is very satisfying to be able to get a particular function
 composition just right and see that all goals have been accomplished. The only
 drawback that I'm worried about is that from the perspective of code maintainability
 and code reviews, sometimes the refactored code might look incomprehensible.
 
+One possible danger that I identified is that once the code is refactored and
+condensed to the shortest form possible, in order to understand it, one has to
+know the API of all of the functions which are used in the complicated refactored
+expression. It is much harder to get a general understanding of what is happening
+in the proof. A following example can illustrate that:
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+ have supr_le_K' : (⨆ i, ↑‖f i‖₊) ≤ ennreal.of_real(K'),
+  { refine supr_le _,
+    intro i,
+    specialize hK' i,
+    rw ennreal.of_real_eq_coe_nnreal,
+    { rw coe_le_coe,
+      exact hK', },
+    { exact le_trans (norm_nonneg (f i)) hK', }, },
+\end{minted}
+\captionof{listing}{Proof that a supremum of a set of operator norms is bounded by $K'$.}
+\end{code}
+The code above explicitly uses the lemma \texttt{supr\_le} which tells us that
+a supremum over an indexed set is less than or equal to a bounding constant if each element
+of that set is less than or equal to the constant. After that we take an arbitrary
+index, use some hypothesis \texttt{hK'} on it and then deal with type coercions
+between real numbers and extended non-negative real numbers. After refactoring that
+argument, I managed to express it in a following way:
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+ have supr_le_K' : (⨆ i, ↑‖f i‖₊) ≤ ennreal.of_real(K'),
+    from supr_le (λ i, le_of_eq_of_le'
+        (eq.symm (ennreal.of_real_eq_coe_nnreal (le_trans (norm_nonneg (f i)) (hK' i))))
+        (coe_le_coe.mpr (hK' i))),
+\end{minted}
+\captionof{listing}{Proof from Listing 5 after refactoring.}
+\end{code}
 
+Note that even though the argument above spans over three lines of code, it was
+done only to improve readability and it is in fact a single-line proof. Having
+contrasted the two listings above, I think that in terms of refactoring the code the
+programmer should strive towards a middle-ground between writing verbose and explicit code
+and using clever optimisations. My aim throughout this project was to write
+code of a similar level of complexity to the one in the mathlib library. Because of
+this I was trying to make it as short as possible at a cost of sacrificing readability
+for the inexperienced users.
 
-
-\subsection*{Methodology}
 \subsection*{Challenges}
-\subsection*{Language Extensions}
-\section*{Conclusions}
-\section*{Future Work}
+One of the biggest challenges that I faced when working on this final project was
+connected with the nature of the proof that I was formalising. The main idea of the
+proof is to be able to bound $\|f_i (x)\|$ by rewriting x in a clever way (see Listing 2)
+and then using the linearity of $f_i$ and absolute homogeneity of the norm
+to split the expression into separate terms and bound each one of them individually.
 
+The difficulty with that approach is that performing numerous simple manipulations of
+expressions in Lean can be tedious at times. That is because whenever we want to apply
+some simplification lemma, the state of the goal needs to precisely match the hypothesis
+of that lemma (see \texttt{mul\_le\_mul\_left} explained later). On top of that, sometimes
+we deal with expressions containing operations which are incompatible with each other in
+Lean, however in an informal argument we don't really notice a difference between them.
+An example of that would be regular multiplication between two real numbers and scalar
+multiplication. In Lean those are two completely distinct concepts and we need to
+use mathilb lemmas to perform manipulations on them. An example of that can be seen
+in the listing below where I needed to prove an inequality using properties of the norm and
+linearity of a function $f$.
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+lemma linear_manipulation (f : X→SL[ring_hom.id ℝ] Y) (x₀ x : X) {β : ℝ} (hβ : β ≠ 0) :
+‖ f (β • (x₀ + (β⁻¹ • x) - x₀)) ‖ ≤ |β| * (‖ f (x₀ + β⁻¹ • x) ‖ + ‖ f x₀ ‖) :=
+begin
+  rw [continuous_linear_map.map_smulₛₗ f  β,
+      norm_smul,
+      ring_hom.id_apply,
+      real.norm_eq_abs,
+      continuous_linear_map.map_sub,
+      mul_le_mul_left (abs_pos.mpr hβ)],
+  exact norm_sub_le (f(x₀ + (β⁻¹ • x))) (f x₀),
+end
+\end{minted}
+\captionof{listing}{Using mathlib's Markov inequality.}
+\end{code}
 
+As you can see the proof almost exclusively consists of \texttt{rw} statements
+followed by one application of the triangle inequality for norms. Despite the
+simplicity of the claim that we are trying to prove, it requires a certain amount
+of care to transform the goal state into precisely the expression that we require.
 
+Another difficulty that I had was also connected with those kinds of manipulations,
+in the main proof near the end of the argument I needed to perform cancellation
+of positive constants from both sides of an inequality (e.g. $2 * x \le 2 * y \iff x \le y$).
+However the issue I had was that in order to perform that simplification, I needed to
+get the cancelled term to be precisely the first term on the left of each side of
+the inequality. Moreover, everything else needed to be enclosed in parentheses so that
+the lemma \texttt{mul\_le\_mul\_left} could be applied (i.e. the required form was
+$2 * (\_) \le 2 * (\_)$ ). It turned out to be surprisingly difficult to perform that
+kind of rearrangement. In order to do it, I needed to learn how to use the
+\texttt{conv} mode.
+
+The \texttt{conv} mode is a very powerful tool to rewrite multiply nested
+expressions. In that mode, the programmer has access to all rewrite lemmas as well
+as a new set of tactics which allow for skipping parts of simplified expressions.
+After the parts that aren't modified are skipped, one can target the sub-expressions
+which need to be modified by using e.g. commutativity or associativity of multiplication.
+
+Using this mode I was perform fine-grained manipulations on the goal state to
+transform it into a shape which could be accepted into the lemma. It allowed for
+working on both sides of the inequality separately and thanks to the \texttt{find}
+tactic I was able to rewrite only the sub-expressions of a certain desired form.
+
+The code snippet illustrating this manipulation can be seen below:
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+    conv
+    { conv
+      { to_rhs,                          -- Convert RHS:  2 * 2 * K' / r * ‖x‖ =
+        rw [mul_assoc, div_eq_mul_inv],        --     2 * (2 * K') * r⁻¹ * ‖x‖ =
+        rw [mul_comm, ← mul_assoc, mul_comm],  -- r⁻¹ * (‖x‖ * (2 * (2 * K'))) =
+        rw [← mul_assoc, ← mul_assoc],         --     r⁻¹ * ‖x‖ * 2 * (2 * K') =
+        find (r⁻¹ * _) { rw mul_comm, },       --     ‖x‖ * r⁻¹ * 2 * (2 * K') =
+        find (‖x‖ * r⁻¹ * _) { rw mul_comm, }, --   2 * (‖x‖ * r⁻¹) * (2 * K') =
+        rw ← div_eq_mul_inv, },                --       2 * (‖x‖ / r) * (2 * K')
+      conv
+      { to_lhs, congr,
+        rw mul_div_assoc, }, -- Obtains: 2 * (‖x‖ / r) * (‖(f i) ...) on the LHS.
+      rw [mul_assoc, mul_assoc, inv_div], },
+\end{minted}
+  \captionof{listing}{Rearranging terms using the \texttt{conv} mode.}
+\end{code}
+
+It is important to note that this form was achieved after properly refactoring the
+code and making it as short as possible while maintaining readability by adding comments.
+The initial version didn't use the \texttt{conv} mode and was over 2 times longer.
+This was because it involved numerous targeted rewrites such as the one below:
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+rw div_eq_inv_mul (2 * 2 * K') r,
+\end{minted}
+\captionof{listing}{Targeted rewrite with specified arguments.}
+\end{code}
+The problem with that approach was that it made the code much longer and it wasn't
+obvious that the step was meant to only alter the shape of the target expression.
+After incorporating the \texttt{conv} mode the code is much cleaner because there
+is a very distinct separation between the actual logical transitions of the proof
+and those simple conversions of the shape of the expressions as the one discussed above.
+
+\section*{Language Extensions}
+With respect to the advanced language features, this project is much simpler than
+the previous ones. Because of the extensive use of function compositions and
+optimising the code as much as possible, there weren't many places where I could
+introduce new language notation. This was caused by the refactoring process which
+transformed the code into a state where it mainly referred to the library functions
+and composed them together to get to the desired goal in just one step.
+
+As an example we can consider the proof of the second version of the Banach-Steinhaus theorem.
+The second version states the claim in terms of suprema and I decided to prove
+it as a corollary of the first version because dealing with the concepts
+such as the supremum requires us to work inside of \texttt{ennreal} numbers and
+thus it inevitably leads to complicated type coercions. The closing statement of
+that theorem illustrates how there is no space left for the new notation after the
+code has been properly refactored.
+\begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+  exact lt_of_le_of_lt
+    (supr_le (λ i, le_of_eq_of_le'
+        (eq.symm (ennreal.of_real_eq_coe_nnreal (le_trans (norm_nonneg (f i)) (hK' i))))
+        (coe_le_coe.mpr (hK' i))))
+    (ennreal.coe_lt_top),
+\end{minted}
+\captionof{listing}{Closing statement of the corollary to Banach-Steinhaus theorem.}
+\end{code}
+
+As you can see above, the code is complex enough and I would argue that new notation
+would only make it harder to understand. The main motivation that I had when introducing
+the new notation in my past projects was to make the code shorter and more readable.
+This time, since writing optimised professional-looking code was a priority, some the
+readability from the perspective of inexperienced users has already been sacrificed. If I were
+to add new notation, all it could do is confuse the experienced language users
+and make the code more obscure. It also wasn't possible for the new notation to make
+the code shorter because it was already as short as possible.
+
+The only language extension that I introduced was one for open balls in metric spaces.
+Personally I prefer to use $B_r(x)$ to denote an open ball centered at  $x$ of radius
+$r$. In mathlib however, we need to write \texttt{metric.ball x r} which is readable,
+but I always struggled to remember which argument is the radius and which one
+is the centre. Because of this, I decided to introduce the following alternative
+notation:
+ \begin{code}
+\begin{minted}[numbersep=5pt, fontsize=\small, linenos=false, bgcolor=bg]{lean}
+reserve prefix `B_{`:65
+reserve infix `}`:65
+notation `B_{` r `}` x := metric.ball x r
+-- Example usage
+lemma point_in_ball {r : ℝ} {x₀ x : X} (hr : (0 : ℝ) < r) (hx : x ≠ 0) :
+(x₀ + (r / ((2 : ℝ) * ‖x‖)) • x) ∈ B_{r}(x₀)
+:= begin ... end
+\end{minted}
+\captionof{listing}{Alternative notation for balls in metric spaces.}
+\end{code}
+As it can be seen above, because of the new notation we can now read the declaration
+of the lemma more as if it was written using actual mathematical notation.
+\section*{Conclusions and Future Extensions}
+
+The final project was a great opportunity to get more hands-on experience
+writing professional Lean code. The feedback that I received after my second project
+was a very useful starting point to guide the work on this project. Initially I
+planned to implement the Banach-Steinhaus theorem and some of it's generalisations
+which aren't yet implemented in the mathilb library.
+
+After implementing the first
+version of the code, I reached out to the members of the mathlib community to see
+how does the state of the library look like when it comes to implementing those
+generalisations. I got a lot useful insights and suggestions as to which parts
+of the library I could use to implement the extensions. However, I also learned
+that one of the professional contributors to the library is already in progress
+of implementing that particular generalisation which I was planning to work on.
+As a result I've decided to pivot and focus on optimising the regular version
+of the Banach-Steinhaus theorem together with its corollary stated in terms
+of finite suprema.
+
+Ultimately I think it was a good decision as it turned out
+that producing professional-level code is more time consuming than I anticipated.
+This was because refactoring often involves searching through the library to find
+precisely the right version of each lemma so that they can be composed into a
+single chain of function applications without introducing redundant rewrites in
+between steps. For instance, in the past when I needed to prove something using
+the transitivity of $\le$, I would always use the mathilb lemma \texttt{le\_trans}.
+In this project however I've learned that there are many more versions of that
+lemma which are applicable to different scenarios (e.g. $a = b \le c \implies a \le c$
+can be shown using the \texttt{le\_of\_eq\_of\_le} lemma). Those small optimisations
+are time consuming, but eventually they lead to the code in which the amount of
+redundancies has been minimised.
+
+To conclude, this project gave me a very useful insight into developing professional
+Lean code. I was able to gain appreciation of the trade-off between the code
+readability and performance. I was also able to reflect on the impact of introducing
+new notation on the general readability of the code. The theorem that I've proven helped me revise some
+of the concepts from functional analysis leading up to my final exam in May.
+Interacting with the mathilb community was also a great
+opportunity to learn how to contribute to open-source libraries. In the future,
+I'm planning to continue using Lean as a way to revise functional analysis and
+find a theorem which I've learned about this year and isn't yet implemented
+in mathilb. That way I could practise writing professional-level lean code and
+contribute to the library.
 
 \end{document}
