@@ -1,7 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-  \PYG{n}{exact} \PYG{n}{lt\PYGZus{}of\PYGZus{}le\PYGZus{}of\PYGZus{}lt}
-    \PYG{o}{(}\PYG{n}{supr\PYGZus{}le} \PYG{o}{(}\PYG{n+nb+bp}{λ} \PYG{n}{i}\PYG{o}{,} \PYG{n}{le\PYGZus{}of\PYGZus{}eq\PYGZus{}of\PYGZus{}le\PYGZsq{}}
-        \PYG{o}{(}\PYG{n}{eq.symm} \PYG{o}{(}\PYG{n}{ennreal.of\PYGZus{}real\PYGZus{}eq\PYGZus{}coe\PYGZus{}nnreal} \PYG{o}{(}\PYG{n}{le\PYGZus{}trans} \PYG{o}{(}\PYG{n}{norm\PYGZus{}nonneg} \PYG{o}{(}\PYG{n}{f} \PYG{n}{i}\PYG{o}{))} \PYG{o}{(}\PYG{n}{hK\PYGZsq{}} \PYG{n}{i}\PYG{o}{))))}
-        \PYG{o}{(}\PYG{n}{coe\PYGZus{}le\PYGZus{}coe.mpr} \PYG{o}{(}\PYG{n}{hK\PYGZsq{}} \PYG{n}{i}\PYG{o}{))))}
-    \PYG{o}{(}\PYG{n}{ennreal.coe\PYGZus{}lt\PYGZus{}top}\PYG{o}{),}
-\end{Verbatim}

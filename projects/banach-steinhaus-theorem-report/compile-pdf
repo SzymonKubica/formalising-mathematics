@@ -1,0 +1,8 @@
+#!/bin/bash
+# shell-escape flag is required for the minted package for code snippets.
+if [ -z "$1" ]
+then
+  echo "Usage: compile-pdf <tex-file>"
+else
+  pdflatex -shell-escape $1
+fi
