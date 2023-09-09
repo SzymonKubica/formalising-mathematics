@@ -8,3 +8,4 @@
 *.out
 *.pyg
 *.synctex.gz
+_minted*
