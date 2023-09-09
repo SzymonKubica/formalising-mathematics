@@ -1,1 +1,4 @@
+*.olean
+/_target
+/leanpkg.path
 course-files/
