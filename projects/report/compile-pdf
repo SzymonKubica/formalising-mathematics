@@ -1,0 +1,3 @@
+#!/bin/bash
+# shell-escape flag is required for the minted package for code snippets.
+pdflatex -shell-escape $1
