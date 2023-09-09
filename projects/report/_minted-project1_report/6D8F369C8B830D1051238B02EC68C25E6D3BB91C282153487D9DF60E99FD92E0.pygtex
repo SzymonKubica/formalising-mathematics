@@ -1,7 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`} \PYG{n}{between} \PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
-\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`} \PYG{n}{strictly\PYGZus{}between} \PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{65}
-\PYG{k+kd}{reserve} \PYG{k+kd}{infix} \PYG{n+nb+bp}{`} \PYG{n}{and} \PYG{n+nb+bp}{`}\PYG{o}{:}\PYG{l+m+mi}{66}
-\PYG{k+kd}{notation} \PYG{n}{a} \PYG{n+nb+bp}{`} \PYG{n}{between} \PYG{n+nb+bp}{`} \PYG{n}{b} \PYG{n+nb+bp}{`} \PYG{n}{and} \PYG{n+nb+bp}{`} \PYG{n}{c} \PYG{o}{:=} \PYG{n}{is\PYGZus{}between} \PYG{n}{a} \PYG{n}{b} \PYG{n}{c}
-\PYG{k+kd}{notation} \PYG{n}{a} \PYG{n+nb+bp}{`} \PYG{n}{strictly\PYGZus{}between} \PYG{n+nb+bp}{`} \PYG{n}{b} \PYG{n+nb+bp}{`} \PYG{n}{and} \PYG{n+nb+bp}{`} \PYG{n}{c} \PYG{o}{:=} \PYG{n}{is\PYGZus{}strictly\PYGZus{}between} \PYG{n}{a} \PYG{n}{b} \PYG{n}{c}
-\end{Verbatim}
