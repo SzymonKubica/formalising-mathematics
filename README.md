@@ -41,7 +41,53 @@ the compilation on the source files to check that the proofs are correct.
 
 ### Setting up Lean
 
+You can install Lean by following the docs [here](https://leanprover-community.github.io/get_started.html)
+
+If you are running Arch linux you can also follow the instructions [here](https://wiki.archlinux.org/title/Lean_Theorem_Prover#:~:text=exe%20cache%20get-,Lean%203%20via%20the%20AUR,-Install%20lean%2Dcommunity)
+
+This will let you download Lean 3 from AUR and also show how to initialise the project.
+
 ### Getting Access to the Mathlib Library
 
+You need to download Mathlib library so that the code that relies on it works.
+Assuming you have followed the steps above, you can get access to that dependency
+by running:
+
+```
+leanproject pull
+```
+
+This will go to github and download the latest version of mathlib to your project.
+
 ### IDE setup
+
+There is a VS Code extension for Lean, however I don't have that much experience
+using it. You can find my setup for neovim below:
+
+The example below shows configuration using Packer as the neovim package manager.
+
+Add the following to your packer startup configuration:
+
+```
+  use 'Julian/lean.nvim'
+```
+
+After that you need to import and configure the LSP plugin in your file responsible for lsp
+configuration:
+
+```
+local lean = require 'lean'
+lean.setup{
+  abbreviations = { builtin = true },
+  lsp = { on_attach = on_attach },
+  lsp3 = { on_attach = on_attach },
+  mappings = true,
+}
+```
+
+Now that your IDE is set up you can open any of the files in src and you should
+see the language server compiling the code and checking if everything works.
+
+
+
 
